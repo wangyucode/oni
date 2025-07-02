@@ -8,6 +8,7 @@ import plus from '../../components/icons/plus.png'
 import dupe from '../../components/icons/dupe.png'
 import './index.scss'
 import Select from 'src/components/Select';
+import { resourceColumns } from 'src/components/data';
 
 function Index() {
 
@@ -26,25 +27,6 @@ function Index() {
   function onClose() {
     setSelect('');
   }
-
-  const resourceColumns = [
-    {
-      title: '资源',
-      key: 'name',
-    },
-    {
-      title: '消耗(kg/s)',
-      key: 'input',
-    },
-    {
-      title: '产出(kg/s)',
-      key: 'output',
-    },
-    {
-      title: '总计(kg/s)',
-      key: 'level',
-    }
-  ]
 
   return (
     <View className='nutui-react-demo'>
@@ -74,7 +56,7 @@ function Index() {
       </Collapse>
       <Collapse defaultActiveName={['resource', 'food', "power"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="资源" name='resource'>
-          <Table columns={resourceColumns}></Table>
+          <Table columns={resourceColumns} />
         </Collapse.Item>
         <Collapse.Item title="食物" name="food">
           食物

@@ -7,7 +7,7 @@ import rightArrow from "./right-arrow.png";
 import dupe from "./dupe.png";
 import bionic from "./bionic.png";
 
-const icons = {
+export const icons = {
     refine,
     refineDisabled,
     idea,
