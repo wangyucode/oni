@@ -21,25 +21,6 @@ export type Item = {
   parent?: Item;
 };
 
-export const resourceColumns = [
-  {
-    title: "资源",
-    key: "name",
-  },
-  {
-    title: "消耗(kg/s)",
-    key: "input",
-  },
-  {
-    title: "产出(kg/s)",
-    key: "output",
-  },
-  {
-    title: "总计(kg/s)",
-    key: "level",
-  },
-];
-
 export type Data = {
   items: Array<Item>;
 };

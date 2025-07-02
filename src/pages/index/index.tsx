@@ -1,14 +1,13 @@
 
 import { useState } from 'react';
 import { View } from '@tarojs/components'
-import { Avatar, Badge, Collapse, Tabbar, Table } from '@nutui/nutui-react-taro'
+import { Avatar, Badge, Collapse, Grid, Tabbar, Table } from '@nutui/nutui-react-taro'
 
 import Icon from 'src/components/icons'
 import plus from '../../components/icons/plus.png'
 import dupe from '../../components/icons/dupe.png'
-import './index.scss'
 import Select from 'src/components/Select';
-import { resourceColumns } from 'src/components/data';
+import './index.scss'
 
 function Index() {
 
@@ -56,7 +55,7 @@ function Index() {
       </Collapse>
       <Collapse defaultActiveName={['resource', 'food', "power"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="资源" name='resource'>
-          <Table columns={resourceColumns} />
+          <Grid></Grid>
         </Collapse.Item>
         <Collapse.Item title="食物" name="food">
           食物

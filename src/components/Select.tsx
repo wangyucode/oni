@@ -22,10 +22,10 @@ interface SelectDetailProps {
 function SelectItems({ item, handleSelect }: SelectItemsProps) {
 
     return (
-        <Grid columns={5} onClick={handleSelect}>
+        <Grid columns={item.items.length >= 5 ? 5 : item.items.length} onClick={handleSelect}>
             {item.items.map((item, index) => (
                 <Grid.Item key={index} text={item.name}>
-                    <Icon width={24} height={24} name={item.icon} />
+                    <Icon width={48} height={48} name={item.icon} />
                 </Grid.Item>
             ))}
         </Grid>
@@ -57,19 +57,21 @@ function SelectDetail({ item }: SelectDetailProps) {
                     </Radio.Group>
                 </Cell>))}
             <Cell>
-                <Grid style={{ width: '100%' }}>
+                <Grid style={{ width: '100%' }} columns={resources.length >= 5 ? 5 : resources.length}>
                     {resources.map((resource, i) => {
                         const icon = elementIcons.find(e => e.name === resource.name)?.icon;
                         return (
-                            <Grid.Item key={`resource-${i}`}>
-                                <Image width={32} height={32} src={`https://oxygennotincluded.wiki.gg/zh/images/${icon}/${resource.name}.png`} />
+                            <Grid.Item key={`resource-${i}`} >
+                                <Image width={48} height={48} src={`https://oxygennotincluded.wiki.gg/zh/images/${icon}/${resource.name}.png`} />
                                 <Text>{resource.name}</Text>
-                                <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>{`${resource.value < 0 ? '' : '+'}${resource.value} kg/s`}</Text>
+                                <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>
+                                    {`${resource.value < 0 ? '' : '+'}${resource.value.toFixed(3)} kg/s`}
+                                </Text>
                             </Grid.Item>)
                     })}
                 </Grid>
             </Cell>
-            <Cell align="center"><Button className="add" onClick={handleAdd} type="primary">添加</Button></Cell>
+            <Cell align="center"><Button className="add" onClick={handleAdd} type="primary">确定</Button></Cell>
         </Cell.Group>
     );
 }
