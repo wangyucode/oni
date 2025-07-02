@@ -2,6 +2,7 @@ import { Button, Divider, Grid, Popup } from "@nutui/nutui-react-taro";
 import { data, Detail, Item } from "./data";
 import Icon from "./icons";
 import { useRef, useState } from "react";
+import { View } from "@tarojs/components";
 
 interface SelectProps {
     select: string;
@@ -58,9 +59,11 @@ export default function Select({ select, onClose, edit }: SelectProps) {
             left={canGoBack ? <Button onClick={goBack}>返回</Button> : null}
             onClose={onClose}
             closeable>
-            {currentItem.detail ?
-                <SelectDetail item={currentItem} /> :
-                <SelectItems item={currentItem} handleSelect={handleSelect} />}
+            <View className="select-content">
+                {currentItem.detail ?
+                    <SelectDetail item={currentItem} /> :
+                    <SelectItems item={currentItem} handleSelect={handleSelect} />}
+            </View>
         </Popup>
     );
 }

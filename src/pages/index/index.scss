@@ -57,13 +57,11 @@
   }
 
   .nut-popup {
-    .nut-divider {
-      margin: 0;
+    .select-content {
+      padding: 8px;
     }
 
-
     .nut-grid {
-      margin: 8px;
 
       .nut-grid-item {
         &:active {
