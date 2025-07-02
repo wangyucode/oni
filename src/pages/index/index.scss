@@ -7,25 +7,27 @@
   padding: 16px;
   box-sizing: border-box;
 
-  .nut-collapse-item-header{
+  .nut-collapse-item-header {
     background-color: #7F3D5E;
     border-bottom: 1px solid #000;
     padding: 8px 16px;
 
-    .nut-collapse-item-title{
+    .nut-collapse-item-title {
       color: #fff;
       font-weight: bold;
     }
   }
 
-  .nut-tabbar{
+  .nut-tabbar {
     background-color: #3E4357;
     border-top: 1px solid #000;
-    .nut-tabbar-item-icon-box{
+
+    .nut-tabbar-item-icon-box {
       color: #fff;
     }
-    .nut-tabbar-item-active{
-      .nut-tabbar-item-icon-box{
+
+    .nut-tabbar-item-active {
+      .nut-tabbar-item-icon-box {
         color: #BF7FA8;
       }
     }
@@ -34,7 +36,16 @@
   .nut-collapse {
     border: #000 solid 1px;
     width: 100%;
+
+    .nut-avatar {
+      &:active {
+        background-color: #BF7FA8 !important;
+      }
+
+      .avatar-img {
+        width: 80%;
+        height: 80%;
+      }
+    }
   }
 }
-
-

@@ -4,53 +4,20 @@ import refineDisabled from "./refine-1.png";
 import idea from "./idea.png";
 import ideaDisabled from "./idea-1.png";
 import rightArrow from "./right-arrow.png";
+import dupe from "./dupe.png";
+import bionic from "./bionic.png";
 
-export function IconRefine(props: Partial<ImageProps>) {
-    props = {
-        ...props,
-        width: 24,
-        height: 24,
-        src: refine,
-    };
-    return <Image {...props} />;
+const icons = {
+    refine,
+    refineDisabled,
+    idea,
+    ideaDisabled,
+    rightArrow,
+    dupe,
+    bionic
 }
 
-export function IconRefineDisabled(props: Partial<ImageProps>) {
-    props = {
-        ...props,
-        width: 24,
-        height: 24,
-        src: refineDisabled,
-    };
-    return <Image {...props} />;
-}
-
-export function IconIdea(props: Partial<ImageProps>) {
-    props = {
-        ...props,
-        width: 24,
-        height: 24,
-        src: idea,
-    };
-    return <Image {...props} />;
-}
-
-export function IconIdeaDisabled(props: Partial<ImageProps>) {
-    props = {
-        ...props,
-        width: 24,
-        height: 24,
-        src: ideaDisabled,
-    };
-    return <Image {...props} />;
-}
-
-export function IconRightArrow(props: Partial<ImageProps>) {
-    props = {
-        ...props,
-        width: 12,
-        height: 16,
-        src: rightArrow,
-    };
-    return <Image {...props} />;
+export default function Icon(props: Partial<ImageProps> & { name: keyof typeof icons }) {
+    const src = icons[props.name]
+    return <Image {...props} src={src} />;
 }

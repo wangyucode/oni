@@ -1,14 +1,31 @@
 
 import { useState } from 'react';
 import { View } from '@tarojs/components'
-import { Collapse, Tabbar, Table } from '@nutui/nutui-react-taro'
+import { Avatar, Badge, Collapse, Tabbar, Table } from '@nutui/nutui-react-taro'
 
+import Icon from 'src/components/icons'
+import plus from '../../components/icons/plus.png'
+import dupe from '../../components/icons/dupe.png'
 import './index.scss'
-import { IconRefine, IconRefineDisabled, IconIdea, IconIdeaDisabled, IconRightArrow } from 'src/components/icons'
+import Select from 'src/components/Select';
 
 function Index() {
 
-  const [activeTab, setActiveTab] = useState(0);
+  const [select, setSelect] = useState<string>('')
+
+  function handleSwitchTab(index: number) {
+    // TODO: 切换Tabbar
+    console.log(index)
+
+  }
+
+  function handleAddDupe() {
+    setSelect('复制人/仿生人');
+  }
+
+  function onClose() {
+    setSelect('');
+  }
 
   const resourceColumns = [
     {
@@ -31,8 +48,18 @@ function Index() {
 
   return (
     <View className='nutui-react-demo'>
-      <Collapse defaultActiveName={['dupe', 'building', "creature", "plant"]} expandIcon={<IconRightArrow />} rotate={90}>
+      <Collapse defaultActiveName={['dupe', 'building', "creature", "plant"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="复制人/仿生人" name='dupe'>
+          <Avatar.Group gap='-4'>
+            <Badge value="8">
+              <Avatar
+                src={dupe}
+              />
+            </Badge>
+
+          </Avatar.Group>
+
+          <Avatar src={plus} onClick={handleAddDupe} style={{ marginLeft: 10, backgroundColor: '#7F3D5E' }} />
 
         </Collapse.Item>
         <Collapse.Item title="建筑" name="building">
@@ -45,7 +72,7 @@ function Index() {
           植物
         </Collapse.Item>
       </Collapse>
-      <Collapse defaultActiveName={['resource', 'food', "power"]} expandIcon={<IconRightArrow />} rotate={90}>
+      <Collapse defaultActiveName={['resource', 'food', "power"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="资源" name='resource'>
           <Table columns={resourceColumns}></Table>
         </Collapse.Item>
@@ -56,9 +83,12 @@ function Index() {
           电力
         </Collapse.Item>
       </Collapse>
-      <Tabbar fixed value={activeTab} onSwitch={setActiveTab}>
-        <Tabbar.Item title="产物计算" icon={(activeTab === 0 ? <IconRefine /> : <IconRefineDisabled />)} />
-        <Tabbar.Item title="关于" icon={(activeTab === 1 ? <IconIdea /> : <IconIdeaDisabled />)} />
+
+      <Select select={select} onClose={onClose} />
+
+      <Tabbar fixed onSwitch={handleSwitchTab}>
+        <Tabbar.Item title="产物计算" icon={<Icon name='refine' width={24} height={24} />} />
+        <Tabbar.Item title="关于" icon={<Icon name='ideaDisabled' width={24} height={24} />} />
       </Tabbar>
     </View>
   )
