@@ -1,10 +1,13 @@
-type Detail = {};
+import { IconName } from "./icons";
 
-type Item = {
+export type Detail = {};
+
+export type Item = {
   name: string;
-  icon: string;
+  icon: IconName;
   items: Array<Item>;
   detail?: Detail;
+  parent?: Item;
 };
 
 export type Data = {
@@ -17,11 +20,9 @@ export const data: Data = {
       name: "复制人/仿生人",
       icon: "",
       items: [
-        { name: "复制人", icon: "dupe", items: [] },
-        { name: "仿生人", icon: "bionic", items: [] },
+        { name: "复制人", icon: "dupe", items: [], detail: {} },
+        { name: "仿生人", icon: "bionic", items: [], detail: {} },
       ],
     },
-    { name: "Item 2", icon: "icon2", items: [] },
-    { name: "Item 3", icon: "icon3", items: [] },
   ],
 };

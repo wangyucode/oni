@@ -14,10 +14,13 @@ const icons = {
     ideaDisabled,
     rightArrow,
     dupe,
-    bionic
+    bionic,
 }
 
-export default function Icon(props: Partial<ImageProps> & { name: keyof typeof icons }) {
+export type IconName = keyof typeof icons | "";
+
+export default function Icon(props: Partial<ImageProps> & { name: IconName }) {
+    if (!props.name) return null;
     const src = icons[props.name]
     return <Image {...props} src={src} />;
 }

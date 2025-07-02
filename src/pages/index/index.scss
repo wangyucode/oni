@@ -48,4 +48,35 @@
       }
     }
   }
+
+  .nut-button {
+    &:active {
+      background-color: #BF7FA8;
+      color: #fff;
+    }
+  }
+
+  .nut-popup {
+    .nut-divider {
+      margin: 0;
+    }
+
+
+    .nut-grid {
+      margin: 8px;
+
+      .nut-grid-item {
+        &:active {
+          .nut-grid-item-content-center {
+            background-color: #BF7FA8;
+
+            .nut-grid-item-text {
+              color: #fff;
+            }
+          }
+
+        }
+      }
+    }
+  }
 }
