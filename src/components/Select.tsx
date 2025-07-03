@@ -43,14 +43,14 @@ function SelectDetail({ item }: SelectDetailProps) {
 
     return (
         <Cell.Group className="select-detail">
-            <Cell>
-                <Avatar src={icons[item.icon]} />
+            <Cell align="center">
+                <Image src={icons[item.icon]} width={48} />
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
                 <InputNumber defaultValue={1} min={0} />
             </Cell>
             {item.detail?.modes.map((mode, i) => (
-                <Cell key={`mode-${i}`} className="mode">
+                <Cell key={`mode-${i}`} className="mode" align="center">
                     <Text className="mode-name">{mode.name}:</Text>
                     <Radio.Group defaultValue={mode.options[0].name} direction="horizontal">
                         {mode.options.map((option, j) => (<Radio key={`option-${j}`} value={option.name} shape="button">{option.name}</Radio>))}

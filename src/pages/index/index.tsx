@@ -35,12 +35,13 @@ function Index() {
             <Badge value="8">
               <Avatar
                 src={dupe}
+                shape='square'
               />
             </Badge>
 
           </Avatar.Group>
 
-          <Avatar src={plus} onClick={handleAddDupe} style={{ marginLeft: 10, backgroundColor: '#7F3D5E' }} />
+          <Avatar className='avatar-add' shape='square' src={plus} onClick={handleAddDupe} style={{ marginLeft: 10, backgroundColor: '#7F3D5E' }} />
 
         </Collapse.Item>
         <Collapse.Item title="建筑" name="building">

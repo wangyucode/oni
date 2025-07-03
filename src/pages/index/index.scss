@@ -47,6 +47,13 @@
         height: 80%;
       }
     }
+
+    .avatar-add {
+      .avatar-img {
+        width: 60%;
+        height: 60%;
+      }
+    }
   }
 
   .nut-button {
@@ -62,28 +69,32 @@
     }
 
     .select-content {
-      padding: 8px;
 
       .nut-cell {
 
-        // align-items: center !important;
+        padding: 8px 16px;
+
         .item-name {
-          align-self: center;
           margin-left: 8px;
         }
       }
 
       .select-detail {
+
         .mode-name {
-          align-self: center;
           margin-right: 8px;
         }
+
 
         .nut-radiogroup {
           .nut-radio {
             margin-bottom: 0;
             margin-right: 8px;
           }
+        }
+
+        .nut-grid {
+          margin: 0;
         }
 
         .nut-grid-item-content {
@@ -93,8 +104,6 @@
           flex-direction: column;
           row-gap: 4px;
         }
-
-
 
         .nut-radio-button {
           background-color: rgb(233, 213, 225);
@@ -126,6 +135,7 @@
     }
 
     .nut-grid {
+      margin: 8px;
 
       .nut-grid-item {
         &:active {
