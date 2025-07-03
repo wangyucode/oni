@@ -1,7 +1,7 @@
 import { Avatar, Button, Cell, Divider, Grid, InputNumber, Popup, Radio, Image } from "@nutui/nutui-react-taro";
 import { data, elementIcons, Item, Resource } from "./data";
 import Icon, { icons } from "./icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text } from "@tarojs/components";
 
 interface SelectProps {
@@ -35,11 +35,30 @@ function SelectItems({ item, handleSelect }: SelectItemsProps) {
 function SelectDetail({ item }: SelectDetailProps) {
 
     const [resources, setResources] = useState<Array<Resource>>(item.detail?.resources || []);
+    const [count, setCount] = useState<number>(item.detail?.count || 1);
+    const [modes, setModes] = useState<{ [key: string]: number }>({});
+
+    useEffect(() => {
+        const newResources = item.detail?.resources.map(resource => ({ ...resource })) || [];
+        item.detail?.modes.forEach(mode => {
+            const modeValue = modes[mode.name] || 0;
+            const modeOption = mode.options[modeValue];
+            modeOption.resources.forEach(resource => {
+                const resourceItem = newResources.find(r => r.name === resource.name);
+                if (resourceItem) {
+                    resourceItem.value = resourceItem.value + resource.value;
+                } else {
+                    newResources.push({ ...resource });
+                }
+            });
+        });
+        newResources.forEach(resource => resource.value = resource.value * count);
+        setResources(newResources);
+    }, [count, modes])
 
     function handleAdd() {
         // TODO: 处理添加逻辑 
     }
-
 
     return (
         <Cell.Group className="select-detail">
@@ -47,13 +66,13 @@ function SelectDetail({ item }: SelectDetailProps) {
                 <Image src={icons[item.icon]} width={48} />
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
-                <InputNumber defaultValue={1} min={0} />
+                <InputNumber defaultValue={count} min={0} onChange={setCount as any} />
             </Cell>
             {item.detail?.modes.map((mode, i) => (
                 <Cell key={`mode-${i}`} className="mode" align="center">
                     <Text className="mode-name">{mode.name}:</Text>
-                    <Radio.Group defaultValue={mode.options[0].name} direction="horizontal">
-                        {mode.options.map((option, j) => (<Radio key={`option-${j}`} value={option.name} shape="button">{option.name}</Radio>))}
+                    <Radio.Group defaultValue={modes[mode.name] || 0} direction="horizontal" onChange={v => { setModes({ ...modes, [mode.name]: v as number }) }}>
+                        {mode.options.map((option, j) => (<Radio key={`option-${j}`} value={j} shape="button">{option.name}</Radio>))}
                     </Radio.Group>
                 </Cell>))}
             <Cell>
