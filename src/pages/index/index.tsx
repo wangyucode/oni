@@ -1,17 +1,21 @@
 
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { View } from '@tarojs/components'
 import { Avatar, Badge, Collapse, Grid, Tabbar, Table } from '@nutui/nutui-react-taro'
 
-import Icon from 'src/components/icons'
-import plus from '../../components/icons/plus.png'
-import dupe from '../../components/icons/dupe.png'
+import Icon, { icons } from 'src/components/icons'
+import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
+import { SelectionsContext } from 'src/components/SelectionsContext';
+import { Selection } from 'src/components/data';
+
 import './index.scss'
 
 function Index() {
 
-  const [select, setSelect] = useState<string>('')
+  const [select, setSelect] = useState<string>('');
+  const [dupeSelections, setDupeSelections] = useState<Array<Selection>>([]);
+  const selections = useContext(SelectionsContext);
 
   function handleSwitchTab(index: number) {
     // TODO: 切换Tabbar
@@ -27,18 +31,22 @@ function Index() {
     setSelect('');
   }
 
+  useEffect(() => {
+    setDupeSelections(selections.filter(selection => selection.item.name === '复制人' || selection.item.name === '仿生人'));
+  }, selections)
+
   return (
     <View className='nutui-react-demo'>
       <Collapse defaultActiveName={['dupe', 'building', "creature", "plant"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="复制人/仿生人" name='dupe'>
           <Avatar.Group gap='-4'>
-            <Badge value="8">
-              <Avatar
-                src={dupe}
-                shape='square'
-              />
-            </Badge>
-
+            {dupeSelections.map(({ count, item }) =>
+              <Badge value={count}>
+                <Avatar
+                  src={icons[item.icon]}
+                  shape='square'
+                />
+              </Badge>)}
           </Avatar.Group>
 
           <Avatar className='avatar-add' shape='square' src={plus} onClick={handleAddDupe} style={{ marginLeft: 10, backgroundColor: '#7F3D5E' }} />

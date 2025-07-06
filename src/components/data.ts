@@ -1,5 +1,14 @@
 import { IconName } from "./icons";
 
+export type Selection = {
+  item: Item;
+  count: number;
+  modes: Array<{
+    name: string;
+    option: { name: string; resources: Array<Resource> };
+  }>;
+};
+
 export type Resource = {
   name: string;
   value: number;
@@ -52,6 +61,13 @@ export const data: Data = {
                 name: "厕所",
                 options: [
                   {
+                    name: "抽水马桶",
+                    resources: [
+                      { name: "水", value: -5 / 600 },
+                      { name: "污染水", value: 11.7 / 600 },
+                    ],
+                  },
+                  {
                     name: "户外厕所",
                     resources: [
                       {
@@ -62,13 +78,6 @@ export const data: Data = {
                         name: "污染土",
                         value: 19.7 / 600,
                       },
-                    ],
-                  },
-                  {
-                    name: "抽水马桶",
-                    resources: [
-                      { name: "水", value: -5 / 600 },
-                      { name: "污染水", value: 11.7 / 600 },
                     ],
                   },
                 ],
@@ -110,6 +119,18 @@ export const data: Data = {
     },
   ],
 };
+
+const dupe = data.items[0].items[0];
+
+export const initialSelections: Array<Selection> = [
+  {
+    item: dupe,
+    count: 3,
+    modes: dupe.detail!.modes.map((mode) => {
+      return { name: mode.name, option: mode.options[0] };
+    }),
+  },
+];
 
 export const elements = [
   {
