@@ -37,16 +37,25 @@
     border: #000 solid 1px;
     width: 100%;
 
-    .nut-avatar {
-      &:active {
-        background-color: #BF7FA8 !important;
+    .nut-badge {
+      &:last-child {
+        margin-right: 8px;
       }
 
-      .avatar-img {
-        width: 80%;
-        height: 80%;
+      .nut-avatar {
+        &:active {
+          background-color: #BF7FA8 !important;
+        }
+
+        .avatar-img {
+          width: 80%;
+          height: 80%;
+        }
       }
+
     }
+
+
 
     .avatar-add {
       .avatar-img {
