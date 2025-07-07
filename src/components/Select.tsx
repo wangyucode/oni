@@ -70,7 +70,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     function handleModeChange(name: string, value: number) {
         const newSelection = { ...selection, modes: { ...selection.modes, [name]: value } };
         setSelection(newSelection);
-        dispatch({ type: 'update', payload: newSelection });
+        dispatch({ type: newSelection.count > 0 ? 'update' : 'remove', payload: newSelection });
     }
 
     return (

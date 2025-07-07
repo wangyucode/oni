@@ -30,6 +30,19 @@ export const itemIcons = {
     空气净化器: "https://oxygennotincluded.wiki.gg/zh/images/b/b7/%E7%A9%BA%E6%B0%94%E5%87%80%E5%8C%96%E5%99%A8.png",
     碳素脱离器: "https://oxygennotincluded.wiki.gg/zh/images/a/aa/%E7%A2%B3%E7%B4%A0%E8%84%B1%E7%A6%BB%E5%99%A8.png",
 
+    精炼: refine,
+    脱盐器: "https://oxygennotincluded.wiki.gg/zh/images/4/45/%E8%84%B1%E7%9B%90%E5%99%A8.png",
+
+    医疗: "https://oxygennotincluded.wiki.gg/zh/images/2/20/%E5%8C%BB%E7%96%97%E8%8F%9C%E5%8D%95.png",
+    配药桌: "https://oxygennotincluded.wiki.gg/zh/images/0/0e/%E9%85%8D%E8%8D%AF%E6%A1%8C.png",
+
+    好吃哈奇: "https://oxygennotincluded.wiki.gg/zh/images/f/f6/%E5%A5%BD%E5%90%83%E5%93%88%E5%A5%87.png",
+    草质哈奇: "https://oxygennotincluded.wiki.gg/zh/images/3/32/%E8%8D%89%E8%B4%A8%E5%93%88%E5%A5%87.png",
+    石壳哈奇: "https://oxygennotincluded.wiki.gg/zh/images/f/f6/%E7%9F%B3%E5%A3%B3%E5%93%88%E5%A5%87.png",
+    霸王鹦: "https://oxygennotincluded.wiki.gg/zh/images/d/d5/%E9%9C%B8%E7%8E%8B%E9%B9%A6.png",
+    肉: "https://oxygennotincluded.wiki.gg/zh/images/8/88/%E8%82%89.png",
+    硬肉: "https://oxygennotincluded.wiki.gg/zh/images/f/f2/%E7%A1%AC%E8%82%89.png",
+
     磷矿: "https://oxygennotincluded.wiki.gg/zh/images/0/0c/%E7%A3%B7%E7%9F%BF.png",
     肥料: "https://oxygennotincluded.wiki.gg/zh/images/f/fe/%E8%82%A5%E6%96%99.png",
     碎岩: "https://oxygennotincluded.wiki.gg/zh/images/2/2a/%E7%A2%8E%E5%B2%A9.png",
