@@ -1,8 +1,9 @@
-import { createContext, Dispatch, useReducer } from "react";
+import { createContext, Dispatch, SetStateAction, useReducer, useState } from "react";
 import { initialSelections, Selection } from "./data";
 
 export const SelectionsContext = createContext<Array<Selection>>([]);
 export const SelectionsDispatchContext = createContext<Dispatch<SelectionsAction>>(() => { });
+export const CategoryStateContext = createContext<[string, Dispatch<SetStateAction<string>>]>(['', () => { }]);
 
 type SelectionsAction = {
     type: 'add' | 'update' | 'remove';
@@ -11,11 +12,14 @@ type SelectionsAction = {
 
 export function SelectionsProvider({ children }) {
     const [selections, dispatch] = useReducer(selectionsReducer, initialSelections);
+    const categoryState = useState<string>('');
 
     return (
         <SelectionsContext.Provider value={selections}>
             <SelectionsDispatchContext.Provider value={dispatch}>
-                {children}
+                <CategoryStateContext.Provider value={categoryState}>
+                    {children}
+                </CategoryStateContext.Provider>
             </SelectionsDispatchContext.Provider>
         </SelectionsContext.Provider>
     )

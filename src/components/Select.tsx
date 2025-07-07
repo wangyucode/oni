@@ -1,8 +1,10 @@
-import { Avatar, Button, Cell, Divider, Grid, InputNumber, Popup, Radio, Image } from "@nutui/nutui-react-taro";
-import { data, Item, Resource } from "./data";
-import Icon, { itemIcons } from "./icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Button, Cell, Divider, Grid, InputNumber, Popup, Radio, Image } from "@nutui/nutui-react-taro";
 import { View, Text } from "@tarojs/components";
+
+import { data, Item, Resources, Selection } from "./data";
+import Icon, { itemIcons } from "./icons";
+import { CategoryStateContext, SelectionsContext, SelectionsDispatchContext } from "./SelectionsContext";
 
 interface SelectProps {
     select: string;
@@ -33,31 +35,37 @@ function SelectItems({ item, handleSelect }: SelectItemsProps) {
 }
 
 function SelectDetail({ item }: SelectDetailProps) {
-
-    const [resources, setResources] = useState<Array<Resource>>(item.detail?.resources || []);
-    const [count, setCount] = useState<number>(item.detail?.count || 1);
-    const [modes, setModes] = useState<{ [key: string]: number }>({});
+    const selections = useContext(SelectionsContext);
+    const dispatch = useContext(SelectionsDispatchContext);
+    const [category] = useContext(CategoryStateContext);
+    const [resources, setResources] = useState<Resources>({});
+    const [selection, setSelection] = useState<Selection>(selections.find(selection => selection.item.name === item.name) || { item, count: 0, modes: new Map<string, number>(), category });
+    const [modes, setModes] = useState<Record<string, number>>({});
 
     useEffect(() => {
-        const newResources = item.detail?.resources.map(resource => ({ ...resource })) || [];
+        if (!selection) return;
+        const newResources: Resources = {};
+        // 基础
+        Object.entries(item.detail?.resources || {}).forEach(([name, value]) => {
+            const resourceValue = selection.count * value;
+            newResources[name] = (newResources[name] || 0) + resourceValue;
+        });
+        // 模式
         item.detail?.modes.forEach(mode => {
-            const modeValue = modes[mode.name] || 0;
+            const modeValue = selection?.modes[mode.name] || 0;
             const modeOption = mode.options[modeValue];
-            modeOption.resources.forEach(resource => {
-                const resourceItem = newResources.find(r => r.name === resource.name);
-                if (resourceItem) {
-                    resourceItem.value = resourceItem.value + resource.value;
-                } else {
-                    newResources.push({ ...resource });
-                }
+            Object.entries(modeOption.resources || {}).forEach(([name, value]) => {
+                const resourceValue = selection.count * value;
+                newResources[name] = (newResources[name] || 0) + resourceValue;
             });
         });
-        newResources.forEach(resource => resource.value = resource.value * count);
         setResources(newResources);
-    }, [count, modes])
+    }, [selections]);
 
-    function handleAdd() {
-        // TODO: 处理添加逻辑 
+    function handleCountChange(value: number) {
+        const newSelection = { ...selection, count: value };
+        setSelection(newSelection);
+        dispatch({ type: 'update', payload: newSelection });
     }
 
     return (
@@ -66,7 +74,7 @@ function SelectDetail({ item }: SelectDetailProps) {
                 <Image src={itemIcons[item.name]} width={48} />
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
-                <InputNumber defaultValue={count} min={0} onChange={setCount as any} />
+                <InputNumber defaultValue={selection.count || 0} min={0} onChange={handleCountChange} />
             </Cell>
             {item.detail?.modes.map((mode, i) => (
                 <Cell key={`mode-${i}`} className="mode" align="center">
@@ -76,19 +84,18 @@ function SelectDetail({ item }: SelectDetailProps) {
                     </Radio.Group>
                 </Cell>))}
             <Cell>
-                <Grid style={{ width: '100%' }} columns={resources.length >= 5 ? 5 : resources.length}>
-                    {resources.map(resource => (
-                        <Grid.Item key={`${resource.name}`} >
-                            <Image width={48} height={48} src={itemIcons[resource.name]} />
-                            <Text>{resource.name}</Text>
-                            <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>
-                                {`${resource.value < 0 ? '' : '+'}${resource.value.toFixed(3)} kg/s`}
+                <Grid style={{ width: '100%' }} columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
+                    {Object.entries(resources).map(([name, value]) => (
+                        <Grid.Item key={name}>
+                            <Image width={48} height={48} src={itemIcons[name]} />
+                            <Text>{name}</Text>
+                            <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
+                                {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}
                             </Text>
                         </Grid.Item>)
                     )}
                 </Grid>
             </Cell>
-            <Cell align="center"><Button className="add" onClick={handleAdd} type="primary">确定</Button></Cell>
         </Cell.Group>
     );
 }

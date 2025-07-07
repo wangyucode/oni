@@ -37,6 +37,10 @@
     border: #000 solid 1px;
     width: 100%;
 
+    .nut-collapse-item-content-text {
+      padding: 8px;
+    }
+
     .nut-badge {
       &:last-child {
         margin-right: 8px;
@@ -63,7 +67,7 @@
   }
 
   .value {
-    font-size: 10px;
+    font-size: 12px;
 
     &.consume {
       color: #FF0F23
@@ -133,13 +137,6 @@
           border: #221019 solid 1px;
         }
       }
-
-      .add {
-        width: 100%;
-        background: #7F3D5E;
-      }
-
-
     }
 
     .nut-grid {

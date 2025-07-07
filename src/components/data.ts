@@ -1,23 +1,17 @@
 export type Selection = {
-  type: string;
+  category: string;
   item: Item;
   count: number;
-  modes: Array<{
-    name: string;
-    option: { name: string; resources: Array<Resource> };
-  }>;
+  modes: Map<string, number>;
 };
 
-export type Resource = {
-  name: string;
-  value: number;
-};
+export type Resources = { [key: string]: number };
 
 export type Detail = {
-  resources: Array<Resource>;
+  resources: Resources;
   modes: Array<{
     name: string;
-    options: Array<{ name: string; resources: Array<Resource> }>;
+    options: Array<{ name: string; resources: Resources }>;
   }>;
   count?: number;
 };
@@ -42,39 +36,18 @@ export const data: Data = {
           name: "复制人",
           items: [],
           detail: {
-            resources: [
-              {
-                name: "氧气",
-                value: -100,
-              },
-              {
-                name: "二氧化碳",
-                value: 2,
-              },
-            ],
+            resources: { 氧气: -100, 二氧化碳: 2 },
             modes: [
               {
                 name: "厕所",
                 options: [
                   {
                     name: "抽水马桶",
-                    resources: [
-                      { name: "水", value: -5000 / 600 },
-                      { name: "污染水", value: 11667 / 600 },
-                    ],
+                    resources: { 水: -5000 / 600, 污染水: 11667 / 600 },
                   },
                   {
                     name: "户外厕所",
-                    resources: [
-                      {
-                        name: "泥土",
-                        value: -13333 / 600,
-                      },
-                      {
-                        name: "污染土",
-                        value: 20000 / 600,
-                      },
-                    ],
+                    resources: { 泥土: -13333 / 600, 污染土: 20000 / 600 },
                   },
                 ],
               },
@@ -85,25 +58,22 @@ export const data: Data = {
           name: "仿生人",
           items: [],
           detail: {
-            resources: [
-              { name: "氧气", value: -100 },
-              { name: "粘渣油", value: 80000 / 4 / 600 },
-            ],
+            resources: { 氧气: -100, 粘渣油: 80000 / 4 / 600 },
             modes: [
               {
                 name: "润滑",
                 options: [
                   {
                     name: "原油",
-                    resources: [{ name: "原油", value: -20000 / 600 }],
+                    resources: { 原油: -20000 / 600 },
                   },
                   {
                     name: "植物润滑油",
-                    resources: [{ name: "植物润滑油", value: -20000 / 600 }],
+                    resources: { 植物润滑油: -20000 / 600 },
                   },
                   {
                     name: "齿轮膏",
-                    resources: [{ name: "齿轮膏", value: -20000 / 600 }],
+                    resources: { 齿轮膏: -20000 / 600 },
                   },
                 ],
               },
@@ -116,14 +86,15 @@ export const data: Data = {
 };
 
 const dupe = data.items[0].items[0];
+const category = data.items[0].name;
+const modes = new Map<string, number>();
+dupe.detail!.modes.forEach((mode) => (modes[mode.name] = 0));
 
 export const initialSelections: Array<Selection> = [
   {
-    type: data.items[0].name,
     item: dupe,
     count: 3,
-    modes: dupe.detail!.modes.map((mode) => {
-      return { name: mode.name, option: mode.options[0] };
-    }),
+    category,
+    modes,
   },
 ];

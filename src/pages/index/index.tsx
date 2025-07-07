@@ -7,25 +7,25 @@ import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
-import { Resource } from 'src/components/data';
+import { Resources } from 'src/components/data';
 
 import './index.scss'
 
-const selectionTypes = ['复制人/仿生人', '建筑', '动物', '植物']
+const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物']
 
 function Index() {
 
   const [select, setSelect] = useState<string>('');
   const selections = useContext(SelectionsContext);
-  const [resources, setResources] = useState<Array<Resource>>([])
+  const [resources, setResources] = useState<Resources>({});
 
   function handleSwitchTab(index: number) {
     // TODO: 切换Tabbar
     console.log(index);
   }
 
-  function handleAdd(type) {
-    setSelect(type);
+  function handleAdd(category: string) {
+    setSelect(category);
   }
 
   function onClose() {
@@ -33,44 +33,34 @@ function Index() {
   }
 
   useEffect(() => {
-    const newResources: Array<Resource> = [];
+    const newResources: Resources = {};
     selections.forEach(selection => {
       // 基础
-      selection.item.detail!.resources.forEach(resource => {
-        const resourceItem = newResources.find(r => r.name === resource.name);
-        if (resourceItem) {
-          resourceItem.value = resourceItem.value + resource.value;
-        } else {
-          newResources.push({ ...resource });
-        }
+      Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
+        const resourceValue = selection.count * value;
+        newResources[name] = (newResources[name] || 0) + resourceValue;
       });
       // 模式
       selection.item.detail!.modes.forEach(mode => {
         const modeValue = selection.modes[mode.name] || 0;
         const modeOption = mode.options[modeValue];
-        modeOption.resources.forEach(resource => {
-          const resourceItem = newResources.find(r => r.name === resource.name);
-          if (resourceItem) {
-            resourceItem.value = resourceItem.value + resource.value;
-          } else {
-            newResources.push({ ...resource });
-          }
+        Object.entries(modeOption.resources).forEach(([name, value]) => {
+          const resourceValue = selection.count * value;
+          newResources[name] = (newResources[name] || 0) + resourceValue;
         });
       });
-      // 数量
-      newResources.forEach(resource => resource.value = resource.value * selection.count);
     });
+    console.log(newResources);
     setResources(newResources);
-    console.log(newResources)
   }, [selections])
 
   return (
     <View className='nutui-react-demo'>
-      <Collapse defaultActiveName={selectionTypes} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
-        {selectionTypes.map(type =>
-          <Collapse.Item title={type} name={type} key={type} >
+      <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
+        {selectionCategories.map(category =>
+          <Collapse.Item title={category} name={category} key={category} >
             <Avatar.Group gap='-4'>
-              {selections.filter(s => s.type === type).map(({ count, item }) =>
+              {selections.filter(s => s.category === category).map(({ count, item }) =>
                 <Badge value={count} key={item.name}>
                   <Avatar
                     src={itemIcons[item.name]}
@@ -78,20 +68,20 @@ function Index() {
                   />
                 </Badge>)}
             </Avatar.Group>
-            <Avatar className='avatar-add' shape='square' src={plus} onClick={() => handleAdd(type)} style={{ backgroundColor: '#7F3D5E' }} />
+            <Avatar className='avatar-add' shape='square' src={plus} onClick={() => handleAdd(category)} style={{ backgroundColor: '#7F3D5E' }} />
           </Collapse.Item>)}
       </Collapse>
 
       <Collapse defaultActiveName={['resource', 'food', "power"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="资源" name='resource'>
-          <Grid>
-            {resources.map(resource => {
+          <Grid style={{ width: '100%' }} columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
+            {Object.entries(resources).map(([name, value]) => {
               return (
-                <Grid.Item key={`${resource.name}`} >
-                  <Avatar src={itemIcons[resource.name]} shape='square' />
-                  <Text>{resource.name}</Text>
-                  <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>
-                    {`${resource.value < 0 ? '' : '+'}${Math.round(resource.value)} g/s`}
+                <Grid.Item key={name}>
+                  <Avatar src={itemIcons[name]} shape='square' />
+                  <Text>{name}</Text>
+                  <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
+                    {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}
                   </Text>
                 </Grid.Item>
               )
