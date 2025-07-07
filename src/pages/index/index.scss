@@ -52,10 +52,7 @@
           height: 80%;
         }
       }
-
     }
-
-
 
     .avatar-add {
       .avatar-img {
@@ -65,82 +62,84 @@
     }
   }
 
-  .nut-button {
-    &:active {
-      background-color: #BF7FA8;
-      color: #fff;
+  .value {
+    font-size: 10px;
+
+    &.consume {
+      color: #FF0F23
+    }
+
+    &.produce {
+      color: #64b578;
     }
   }
+}
 
-  .nut-popup {
-    .nut-divider {
-      margin: 0;
+.nut-button {
+  &:active {
+    background-color: #BF7FA8;
+    color: #fff;
+  }
+}
+
+.nut-popup {
+  .nut-divider {
+    margin: 0;
+  }
+
+  .select-content {
+
+    .nut-cell {
+
+      padding: 8px 16px;
+
+      .item-name {
+        margin-left: 8px;
+      }
     }
 
-    .select-content {
+    .select-detail {
 
-      .nut-cell {
-
-        padding: 8px 16px;
-
-        .item-name {
-          margin-left: 8px;
-        }
+      .mode-name {
+        margin-right: 8px;
       }
 
-      .select-detail {
 
-        .mode-name {
+      .nut-radiogroup {
+        .nut-radio {
+          margin-bottom: 0;
           margin-right: 8px;
         }
+      }
 
+      .nut-grid {
+        margin: 0;
+      }
 
-        .nut-radiogroup {
-          .nut-radio {
-            margin-bottom: 0;
-            margin-right: 8px;
-          }
-        }
+      .nut-grid-item-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        row-gap: 4px;
+      }
 
-        .nut-grid {
-          margin: 0;
-        }
+      .nut-radio-button {
+        background-color: rgb(233, 213, 225);
 
-        .nut-grid-item-content {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-direction: column;
-          row-gap: 4px;
-        }
-
-        .nut-radio-button {
-          background-color: rgb(233, 213, 225);
-
-          &.nut-radio-button-active {
-            background-color: #7F3D5E;
-            color: #fff;
-            border: #221019 solid 1px;
-          }
-        }
-
-        .add {
-          width: 100%;
-          background: #7F3D5E;
-        }
-
-        .value {
-          font-size: 12px;
-
-          &.consume {
-            color: #FF0F23
-          }
-
-          &.produce {
-            color: #64b578;
-          }
+        &.nut-radio-button-active {
+          background-color: #7F3D5E;
+          color: #fff;
+          border: #221019 solid 1px;
         }
       }
+
+      .add {
+        width: 100%;
+        background: #7F3D5E;
+      }
+
+
     }
 
     .nut-grid {
@@ -155,7 +154,6 @@
               color: #fff;
             }
           }
-
         }
       }
     }

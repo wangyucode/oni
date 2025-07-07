@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDidShow, useDidHide } from "@tarojs/taro";
 import { SelectionsProvider } from "./components/SelectionsContext";
 // 全局样式

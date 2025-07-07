@@ -1,6 +1,6 @@
 import { Avatar, Button, Cell, Divider, Grid, InputNumber, Popup, Radio, Image } from "@nutui/nutui-react-taro";
-import { data, elementIcons, Item, Resource } from "./data";
-import Icon, { icons } from "./icons";
+import { data, Item, Resource } from "./data";
+import Icon, { itemIcons } from "./icons";
 import { useEffect, useState } from "react";
 import { View, Text } from "@tarojs/components";
 
@@ -25,7 +25,7 @@ function SelectItems({ item, handleSelect }: SelectItemsProps) {
         <Grid columns={item.items.length >= 5 ? 5 : item.items.length} onClick={handleSelect}>
             {item.items.map((item, index) => (
                 <Grid.Item key={index} text={item.name}>
-                    <Icon width={48} height={48} name={item.icon} />
+                    <Icon width={48} height={48} name={item.name} />
                 </Grid.Item>
             ))}
         </Grid>
@@ -63,7 +63,7 @@ function SelectDetail({ item }: SelectDetailProps) {
     return (
         <Cell.Group className="select-detail">
             <Cell align="center">
-                <Image src={icons[item.icon]} width={48} />
+                <Image src={itemIcons[item.name]} width={48} />
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
                 <InputNumber defaultValue={count} min={0} onChange={setCount as any} />
@@ -77,17 +77,15 @@ function SelectDetail({ item }: SelectDetailProps) {
                 </Cell>))}
             <Cell>
                 <Grid style={{ width: '100%' }} columns={resources.length >= 5 ? 5 : resources.length}>
-                    {resources.map((resource, i) => {
-                        const icon = elementIcons.find(e => e.name === resource.name)?.icon;
-                        return (
-                            <Grid.Item key={`resource-${i}`} >
-                                <Image width={48} height={48} src={`https://oxygennotincluded.wiki.gg/zh/images/${icon}/${resource.name}.png`} />
-                                <Text>{resource.name}</Text>
-                                <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>
-                                    {`${resource.value < 0 ? '' : '+'}${resource.value.toFixed(3)} kg/s`}
-                                </Text>
-                            </Grid.Item>)
-                    })}
+                    {resources.map(resource => (
+                        <Grid.Item key={`${resource.name}`} >
+                            <Image width={48} height={48} src={itemIcons[resource.name]} />
+                            <Text>{resource.name}</Text>
+                            <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>
+                                {`${resource.value < 0 ? '' : '+'}${resource.value.toFixed(3)} kg/s`}
+                            </Text>
+                        </Grid.Item>)
+                    )}
                 </Grid>
             </Cell>
             <Cell align="center"><Button className="add" onClick={handleAdd} type="primary">确定</Button></Cell>

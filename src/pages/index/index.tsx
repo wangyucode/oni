@@ -1,12 +1,13 @@
 
-import { useContext, useState } from 'react';
-import { View } from '@tarojs/components'
+import { useContext, useEffect, useState } from 'react';
+import { View, Text } from '@tarojs/components'
 import { Avatar, Badge, Collapse, Grid, Tabbar } from '@nutui/nutui-react-taro'
 
-import Icon, { icons } from 'src/components/icons'
+import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
+import { Resource } from 'src/components/data';
 
 import './index.scss'
 
@@ -16,11 +17,11 @@ function Index() {
 
   const [select, setSelect] = useState<string>('');
   const selections = useContext(SelectionsContext);
+  const [resources, setResources] = useState<Array<Resource>>([])
 
   function handleSwitchTab(index: number) {
     // TODO: 切换Tabbar
-    console.log(index)
-
+    console.log(index);
   }
 
   function handleAdd(type) {
@@ -31,6 +32,38 @@ function Index() {
     setSelect('');
   }
 
+  useEffect(() => {
+    const newResources: Array<Resource> = [];
+    selections.forEach(selection => {
+      // 基础
+      selection.item.detail!.resources.forEach(resource => {
+        const resourceItem = newResources.find(r => r.name === resource.name);
+        if (resourceItem) {
+          resourceItem.value = resourceItem.value + resource.value;
+        } else {
+          newResources.push({ ...resource });
+        }
+      });
+      // 模式
+      selection.item.detail!.modes.forEach(mode => {
+        const modeValue = selection.modes[mode.name] || 0;
+        const modeOption = mode.options[modeValue];
+        modeOption.resources.forEach(resource => {
+          const resourceItem = newResources.find(r => r.name === resource.name);
+          if (resourceItem) {
+            resourceItem.value = resourceItem.value + resource.value;
+          } else {
+            newResources.push({ ...resource });
+          }
+        });
+      });
+      // 数量
+      newResources.forEach(resource => resource.value = resource.value * selection.count);
+    });
+    setResources(newResources);
+    console.log(newResources)
+  }, [selections])
+
   return (
     <View className='nutui-react-demo'>
       <Collapse defaultActiveName={selectionTypes} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
@@ -40,7 +73,7 @@ function Index() {
               {selections.filter(s => s.type === type).map(({ count, item }) =>
                 <Badge value={count} key={item.name}>
                   <Avatar
-                    src={icons[item.icon]}
+                    src={itemIcons[item.name]}
                     shape='square'
                   />
                 </Badge>)}
@@ -51,13 +84,25 @@ function Index() {
 
       <Collapse defaultActiveName={['resource', 'food', "power"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="资源" name='resource'>
-          <Grid></Grid>
+          <Grid>
+            {resources.map(resource => {
+              return (
+                <Grid.Item key={`${resource.name}`} >
+                  <Avatar src={itemIcons[resource.name]} shape='square' />
+                  <Text>{resource.name}</Text>
+                  <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>
+                    {`${resource.value < 0 ? '' : '+'}${resource.value.toFixed(3)} kg/s`}
+                  </Text>
+                </Grid.Item>
+              )
+            })}
+          </Grid>
         </Collapse.Item>
         <Collapse.Item title="食物" name="food">
-          食物
+          暂不支持
         </Collapse.Item>
         <Collapse.Item title="电力" name="power">
-          电力
+          暂不支持
         </Collapse.Item>
       </Collapse>
 
