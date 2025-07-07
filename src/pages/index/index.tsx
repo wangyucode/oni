@@ -7,7 +7,7 @@ import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
-import { Resources } from 'src/components/data';
+import { Item, Resources } from 'src/components/data';
 
 import './index.scss'
 
@@ -16,21 +16,9 @@ const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物'
 function Index() {
 
   const [select, setSelect] = useState<string>('');
+  const [edit, setEdit] = useState<Item | undefined>(undefined);
   const selections = useContext(SelectionsContext);
   const [resources, setResources] = useState<Resources>({});
-
-  function handleSwitchTab(index: number) {
-    // TODO: 切换Tabbar
-    console.log(index);
-  }
-
-  function handleAdd(category: string) {
-    setSelect(category);
-  }
-
-  function onClose() {
-    setSelect('');
-  }
 
   useEffect(() => {
     const newResources: Resources = {};
@@ -50,21 +38,40 @@ function Index() {
         });
       });
     });
-    console.log(newResources);
     setResources(newResources);
   }, [selections])
+
+  function handleSwitchTab(index: number) {
+    // TODO: 切换Tabbar
+    console.log(index);
+  }
+
+  function handleAdd(category: string) {
+    setSelect(category);
+  }
+
+  function onClose() {
+    setSelect('');
+    setEdit(undefined);
+  }
+
+  function handleItemClick(item: Item) {
+    setSelect('');
+    setEdit({ ...item });
+  }
 
   return (
     <View className='nutui-react-demo'>
       <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
-            <Avatar.Group gap='-4'>
+            <Avatar.Group gap="8">
               {selections.filter(s => s.category === category).map(({ count, item }) =>
                 <Badge value={count} key={item.name}>
                   <Avatar
                     src={itemIcons[item.name]}
                     shape='square'
+                    onClick={() => handleItemClick(item)}
                   />
                 </Badge>)}
             </Avatar.Group>
@@ -96,7 +103,7 @@ function Index() {
         </Collapse.Item>
       </Collapse>
 
-      <Select select={select} onClose={onClose} />
+      <Select select={select} onClose={onClose} edit={edit} />
 
       <Tabbar fixed onSwitch={handleSwitchTab}>
         <Tabbar.Item title="产物计算" icon={<Icon name='refine' width={24} height={24} />} />

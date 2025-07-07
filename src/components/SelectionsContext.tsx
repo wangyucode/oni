@@ -6,7 +6,7 @@ export const SelectionsDispatchContext = createContext<Dispatch<SelectionsAction
 export const CategoryStateContext = createContext<[string, Dispatch<SetStateAction<string>>]>(['', () => { }]);
 
 type SelectionsAction = {
-    type: 'add' | 'update' | 'remove';
+    type: 'update' | 'remove';
     payload: Selection;
 }
 
@@ -27,11 +27,17 @@ export function SelectionsProvider({ children }) {
 
 function selectionsReducer(state: Array<Selection>, action: SelectionsAction): Array<Selection> {
     switch (action.type) {
-        case 'add': {
-            return [...state, action.payload];
-        }
         case 'update': {
-            return state.map(selection => selection.item.name === action.payload.item.name ? action.payload : selection);
+            let hasUpdated = false;
+            const newState = state.map(selection => {
+                if (selection.item.name === action.payload.item.name) {
+                    hasUpdated = true;
+                    return action.payload;
+                }
+                return selection;
+            });
+            if (!hasUpdated) newState.push(action.payload);
+            return newState;
         }
         case 'remove': {
             return state.filter(selection => selection.item.name !== action.payload.item.name);

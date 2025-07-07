@@ -19,6 +19,7 @@ interface SelectItemsProps {
 
 interface SelectDetailProps {
     item: Item;
+    category: string;
 }
 
 function SelectItems({ item, handleSelect }: SelectItemsProps) {
@@ -34,13 +35,11 @@ function SelectItems({ item, handleSelect }: SelectItemsProps) {
     );
 }
 
-function SelectDetail({ item }: SelectDetailProps) {
+function SelectDetail({ item, category }: SelectDetailProps) {
     const selections = useContext(SelectionsContext);
     const dispatch = useContext(SelectionsDispatchContext);
-    const [category] = useContext(CategoryStateContext);
     const [resources, setResources] = useState<Resources>({});
     const [selection, setSelection] = useState<Selection>(selections.find(selection => selection.item.name === item.name) || { item, count: 0, modes: new Map<string, number>(), category });
-    const [modes, setModes] = useState<Record<string, number>>({});
 
     useEffect(() => {
         if (!selection) return;
@@ -65,6 +64,12 @@ function SelectDetail({ item }: SelectDetailProps) {
     function handleCountChange(value: number) {
         const newSelection = { ...selection, count: value };
         setSelection(newSelection);
+        dispatch({ type: value > 0 ? 'update' : 'remove', payload: newSelection });
+    }
+
+    function handleModeChange(name: string, value: number) {
+        const newSelection = { ...selection, modes: { ...selection.modes, [name]: value } };
+        setSelection(newSelection);
         dispatch({ type: 'update', payload: newSelection });
     }
 
@@ -79,7 +84,7 @@ function SelectDetail({ item }: SelectDetailProps) {
             {item.detail?.modes.map((mode, i) => (
                 <Cell key={`mode-${i}`} className="mode" align="center">
                     <Text className="mode-name">{mode.name}:</Text>
-                    <Radio.Group defaultValue={modes[mode.name] || 0} direction="horizontal" onChange={v => { setModes({ ...modes, [mode.name]: v as number }) }}>
+                    <Radio.Group defaultValue={selection.modes[mode.name] || 0} direction="horizontal" onChange={v => handleModeChange(mode.name, v as number)}>
                         {mode.options.map((option, j) => (<Radio key={`option-${j}`} value={j} shape="button">{option.name}</Radio>))}
                     </Radio.Group>
                 </Cell>))}
@@ -124,7 +129,7 @@ export default function Select({ select, onClose, edit }: SelectProps) {
 
     return (
         <Popup
-            visible={!!select}
+            visible={!!item}
             position="bottom"
             title={select}
             left={canGoBack ? <Button onClick={goBack}>返回</Button> : null}
@@ -133,7 +138,7 @@ export default function Select({ select, onClose, edit }: SelectProps) {
             <Divider />
             <View className="select-content">
                 {currentItem.detail ?
-                    <SelectDetail item={currentItem} /> :
+                    <SelectDetail item={currentItem} category={select} /> :
                     <SelectItems item={currentItem} handleSelect={handleSelect} />}
             </View>
         </Popup>
