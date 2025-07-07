@@ -91,7 +91,7 @@ function Index() {
                   <Avatar src={itemIcons[resource.name]} shape='square' />
                   <Text>{resource.name}</Text>
                   <Text className={`value ${resource.value < 0 ? "consume" : "produce"}`}>
-                    {`${resource.value < 0 ? '' : '+'}${resource.value.toFixed(3)} kg/s`}
+                    {`${resource.value < 0 ? '' : '+'}${Math.round(resource.value)} g/s`}
                   </Text>
                 </Grid.Item>
               )

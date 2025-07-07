@@ -45,11 +45,11 @@ export const data: Data = {
             resources: [
               {
                 name: "氧气",
-                value: -0.1,
+                value: -100,
               },
               {
                 name: "二氧化碳",
-                value: 0.002,
+                value: 2,
               },
             ],
             modes: [
@@ -59,8 +59,8 @@ export const data: Data = {
                   {
                     name: "抽水马桶",
                     resources: [
-                      { name: "水", value: -5 / 600 },
-                      { name: "污染水", value: 11.7 / 600 },
+                      { name: "水", value: -5000 / 600 },
+                      { name: "污染水", value: 11667 / 600 },
                     ],
                   },
                   {
@@ -68,11 +68,11 @@ export const data: Data = {
                     resources: [
                       {
                         name: "泥土",
-                        value: -13 / 600,
+                        value: -13333 / 600,
                       },
                       {
                         name: "污染土",
-                        value: 19.7 / 600,
+                        value: 20000 / 600,
                       },
                     ],
                   },
@@ -86,8 +86,8 @@ export const data: Data = {
           items: [],
           detail: {
             resources: [
-              { name: "氧气", value: -0.1 },
-              { name: "粘渣油", value: 80 / 4 / 600 },
+              { name: "氧气", value: -100 },
+              { name: "粘渣油", value: 80000 / 4 / 600 },
             ],
             modes: [
               {
@@ -95,15 +95,15 @@ export const data: Data = {
                 options: [
                   {
                     name: "原油",
-                    resources: [{ name: "原油", value: -20 / 600 }],
+                    resources: [{ name: "原油", value: -20000 / 600 }],
                   },
                   {
                     name: "植物润滑油",
-                    resources: [{ name: "植物润滑油", value: -20 / 600 }],
+                    resources: [{ name: "植物润滑油", value: -20000 / 600 }],
                   },
                   {
                     name: "齿轮膏",
-                    resources: [{ name: "齿轮膏", value: -20 / 600 }],
+                    resources: [{ name: "齿轮膏", value: -20000 / 600 }],
                   },
                 ],
               },
