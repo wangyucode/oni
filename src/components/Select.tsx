@@ -4,7 +4,7 @@ import { View, Text } from "@tarojs/components";
 
 import { data, Item, Resources, Selection } from "./data";
 import Icon, { itemIcons } from "./icons";
-import { CategoryStateContext, SelectionsContext, SelectionsDispatchContext } from "./SelectionsContext";
+import { SelectionsContext, SelectionsDispatchContext } from "./SelectionsContext";
 
 interface SelectProps {
     select: string;

@@ -16,7 +16,6 @@ const icons = {
 }
 
 export default function Icon(props: Partial<ImageProps> & { name: string }) {
-    if (!props.name) return null;
     const src = icons[props.name] || itemIcons[props.name];
     return <Image {...props} src={src} />;
 }
@@ -24,6 +23,13 @@ export default function Icon(props: Partial<ImageProps> & { name: string }) {
 export const itemIcons = {
     复制人: dupe,
     仿生人: bionic,
+
+    氧气菜单: "https://oxygennotincluded.wiki.gg/zh/images/4/44/%E6%B0%A7%E6%B0%94%E8%8F%9C%E5%8D%95.png",
+    电解器: "https://oxygennotincluded.wiki.gg/zh/images/0/04/%E7%94%B5%E8%A7%A3%E5%99%A8.png",
+    铁锈脱氧机: "https://oxygennotincluded.wiki.gg/zh/images/2/2a/%E9%93%81%E9%94%88%E8%84%B1%E6%B0%A7%E6%9C%BA.png",
+    空气净化器: "https://oxygennotincluded.wiki.gg/zh/images/b/b7/%E7%A9%BA%E6%B0%94%E5%87%80%E5%8C%96%E5%99%A8.png",
+    碳素脱离器: "https://oxygennotincluded.wiki.gg/zh/images/a/aa/%E7%A2%B3%E7%B4%A0%E8%84%B1%E7%A6%BB%E5%99%A8.png",
+
     磷矿: "https://oxygennotincluded.wiki.gg/zh/images/0/0c/%E7%A3%B7%E7%9F%BF.png",
     肥料: "https://oxygennotincluded.wiki.gg/zh/images/f/fe/%E8%82%A5%E6%96%99.png",
     碎岩: "https://oxygennotincluded.wiki.gg/zh/images/2/2a/%E7%A2%8E%E5%B2%A9.png",

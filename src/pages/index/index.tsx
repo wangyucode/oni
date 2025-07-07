@@ -11,7 +11,8 @@ import { Item, Resources } from 'src/components/data';
 
 import './index.scss'
 
-const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物']
+const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物'];
+const resultCategories = ['资源', '食物', '电力', '热量'];
 
 function Index() {
 
@@ -79,8 +80,8 @@ function Index() {
           </Collapse.Item>)}
       </Collapse>
 
-      <Collapse defaultActiveName={['resource', 'food', "power"]} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
-        <Collapse.Item title="资源" name='resource'>
+      <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
+        <Collapse.Item title="资源" name='资源'>
           <Grid style={{ width: '100%' }} columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
             {Object.entries(resources).map(([name, value]) => {
               return (
@@ -95,10 +96,13 @@ function Index() {
             })}
           </Grid>
         </Collapse.Item>
-        <Collapse.Item title="食物" name="food">
+        <Collapse.Item title="食物" name="食物">
           暂不支持
         </Collapse.Item>
-        <Collapse.Item title="电力" name="power">
+        <Collapse.Item title="电力" name="电力">
+          暂不支持
+        </Collapse.Item>
+        <Collapse.Item title="热量" name="热量">
           暂不支持
         </Collapse.Item>
       </Collapse>
