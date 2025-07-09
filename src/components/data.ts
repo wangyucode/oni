@@ -376,6 +376,43 @@ export const data: Data = {
         },
       ],
     },
+    {
+      name: "相变",
+      items: [
+        {
+          name: "挥发",
+          items: [
+            {
+              name: "污染水",
+              items: [],
+              detail: {
+                resources: {
+                  污染水: -30000 / 600,
+                  污染氧: 30000 / 600,
+                },
+                modes: [],
+              },
+            },
+          ],
+        },
+        {
+          name: "融化",
+          items: [
+            {
+              name: "浓盐冰",
+              items: [],
+              detail: {
+                resources: {
+                  浓盐冰: -64000 / 600,
+                  浓盐水: 64000 / 600,
+                },
+                modes: [],
+              },
+            },
+          ],
+        },
+      ],
+    },
   ],
 };
 

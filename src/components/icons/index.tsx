@@ -43,6 +43,9 @@ export const itemIcons = {
     肉: "https://oxygennotincluded.wiki.gg/zh/images/8/88/%E8%82%89.png",
     硬肉: "https://oxygennotincluded.wiki.gg/zh/images/f/f2/%E7%A1%AC%E8%82%89.png",
 
+    挥发: "https://oxygennotincluded.wiki.gg/zh/images/c/ce/%E6%B1%A1%E6%9F%93%E6%B0%A7.png",
+    融化: "https://oxygennotincluded.wiki.gg/zh/images/a/a9/%E6%B0%B4.png",
+
     磷矿: "https://oxygennotincluded.wiki.gg/zh/images/0/0c/%E7%A3%B7%E7%9F%BF.png",
     肥料: "https://oxygennotincluded.wiki.gg/zh/images/f/fe/%E8%82%A5%E6%96%99.png",
     碎岩: "https://oxygennotincluded.wiki.gg/zh/images/2/2a/%E7%A2%8E%E5%B2%A9.png",

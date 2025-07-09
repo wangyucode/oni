@@ -11,7 +11,7 @@ import { Item, Resources } from 'src/components/data';
 
 import './index.scss'
 
-const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物'];
+const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物', '相变'];
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
 function Index() {
