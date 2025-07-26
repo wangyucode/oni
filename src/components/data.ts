@@ -196,6 +196,37 @@ export const data: Data = {
                 heat: 8000,
               },
             },
+            {
+              name: "碎石机",
+              items: [],
+              detail: {
+                resources: {},
+                modes: [
+                  {
+                    name: "配方",
+                    options: [
+                      {
+                        name: "砂岩",
+                        resources: {
+                          砂岩: -100000 / 40,
+                          沙子: 100000 / 40,
+                        },
+                      },
+                      {
+                        name: "盐",
+                        resources: {
+                          盐: -100000 / 40,
+                          沙子: 100000 / 40,
+                          食盐: 5 / 40,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                power: 240,
+                heat: 16000,
+              },
+            },
           ],
         },
         {

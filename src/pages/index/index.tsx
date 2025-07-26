@@ -39,6 +39,11 @@ function Index() {
         });
       });
     });
+    console.table(Object.entries(newResources).map(([name, value]) => ({
+      resource: name,
+      value: Math.round(value),
+      unit: 'g/s'
+    })));
     setResources(newResources);
   }, [selections])
 
@@ -72,11 +77,12 @@ function Index() {
                   <Avatar
                     src={itemIcons[item.name]}
                     shape='square'
+                    size='48'
                     onClick={() => handleItemClick(item)}
                   />
                 </Badge>)}
             </Avatar.Group>
-            <Avatar className='avatar-add' shape='square' src={plus} onClick={() => handleAdd(category)} style={{ backgroundColor: '#7F3D5E' }} />
+            <Avatar className='avatar-add' size='48' shape='square' src={plus} onClick={() => handleAdd(category)} style={{ backgroundColor: '#7F3D5E' }} />
           </Collapse.Item>)}
       </Collapse>
 
@@ -87,7 +93,7 @@ function Index() {
               return (
                 <Grid.Item key={name}>
                   <Avatar src={itemIcons[name]} shape='square' />
-                  <Text>{name}</Text>
+                  <Text className='resource-name'>{name}</Text>
                   <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
                     {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}
                   </Text>

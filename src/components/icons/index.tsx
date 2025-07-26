@@ -29,6 +29,7 @@ export const itemIcons = {
     铁锈脱氧机: "https://oxygennotincluded.wiki.gg/zh/images/2/2a/%E9%93%81%E9%94%88%E8%84%B1%E6%B0%A7%E6%9C%BA.png",
     空气净化器: "https://oxygennotincluded.wiki.gg/zh/images/b/b7/%E7%A9%BA%E6%B0%94%E5%87%80%E5%8C%96%E5%99%A8.png",
     碳素脱离器: "https://oxygennotincluded.wiki.gg/zh/images/a/aa/%E7%A2%B3%E7%B4%A0%E8%84%B1%E7%A6%BB%E5%99%A8.png",
+    碎石机: "https://oxygennotincluded.wiki.gg/images/e/e0/Rock_Crusher.png",
 
     精炼: refine,
     脱盐器: "https://oxygennotincluded.wiki.gg/zh/images/4/45/%E8%84%B1%E7%9B%90%E5%99%A8.png",
