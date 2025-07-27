@@ -7,7 +7,7 @@ import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
-import { Item, Resources } from 'src/components/data';
+import { Item, Resources, foodCalorieMap } from 'src/components/data';
 
 import './index.scss'
 
@@ -20,31 +20,69 @@ function Index() {
   const [edit, setEdit] = useState<Item | undefined>(undefined);
   const selections = useContext(SelectionsContext);
   const [resources, setResources] = useState<Resources>({});
+  const [totalCalories, setTotalCalories] = useState<number>(0);
+  const [totalPower, setTotalPower] = useState<number>(0);
+  const [totalHeat, setTotalHeat] = useState<number>(0);
 
   useEffect(() => {
     const newResources: Resources = {};
+    const newFoodResources: Resources = {};
+    let newTotalPower = 0;
+    let newTotalHeat = 0;
+
     selections.forEach(selection => {
-      // 基础
+      // 基础资源计算
       Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
         const resourceValue = selection.count * value;
         newResources[name] = (newResources[name] || 0) + resourceValue;
+
+        // 筛选食物资源
+        const foodKeywords = Object.keys(foodCalorieMap);
+        if (foodKeywords.some(keyword => name.includes(keyword))) {
+          newFoodResources[name] = (newFoodResources[name] || 0) + resourceValue;
+        }
       });
-      // 模式
+
+      // 电力计算
+      if (selection.item.detail?.power) {
+        newTotalPower += selection.count * selection.item.detail.power;
+      }
+
+      // 热量计算
+      if (selection.item.detail?.heat) {
+        newTotalHeat += selection.count * selection.item.detail.heat;
+      }
+
+      // 模式资源计算
       selection.item.detail!.modes.forEach(mode => {
         const modeValue = selection.modes[mode.name] || 0;
         const modeOption = mode.options[modeValue];
-        Object.entries(modeOption.resources).forEach(([name, value]) => {
+        Object.entries(modeOption.resources || {}).forEach(([name, value]) => {
           const resourceValue = selection.count * value;
           newResources[name] = (newResources[name] || 0) + resourceValue;
         });
       });
     });
-    console.table(Object.entries(newResources).map(([name, value]) => ({
-      resource: name,
-      value: Math.round(value),
-      unit: 'g/s'
-    })));
+
     setResources(newResources);
+    setTotalPower(newTotalPower);
+    setTotalHeat(newTotalHeat);
+
+    // 计算总卡路里
+    const newTotalCalories = Object.entries(newFoodResources)
+      .reduce((sum, [name, value]) => {
+        const caloriePerGram = foodCalorieMap[name] || 0;
+        return sum + (value * caloriePerGram);
+      }, 0);
+
+    // 计算复制人消耗卡路里 (每个复制人每秒消耗 1000/600 卡路里)
+    const dupeCount = selections
+      .filter(s => s.item.name === '复制人')
+      .reduce((total, s) => total + s.count, 0);
+    const caloriesConsumed = dupeCount * (1000 / 600);
+    const netCalories = newTotalCalories - caloriesConsumed;
+
+    setTotalCalories(netCalories);
   }, [selections])
 
   function handleSwitchTab(index: number) {
@@ -103,13 +141,21 @@ function Index() {
           </Grid>
         </Collapse.Item>
         <Collapse.Item title="食物" name="食物">
-          暂不支持
+          <View className="power-heat-container">
+            <Text className={`value ${totalCalories < 0 ? "consume" : "produce"}`}>
+              {`${totalCalories < 0 ? '' : '+'}${Math.round(totalCalories)} 卡路里/s`}
+            </Text>
+          </View>
         </Collapse.Item>
         <Collapse.Item title="电力" name="电力">
-          暂不支持
+          <View className="power-heat-container">
+            <Text className={`value consume`}>{totalPower} W</Text>
+          </View>
         </Collapse.Item>
         <Collapse.Item title="热量" name="热量">
-          暂不支持
+          <View className="power-heat-container">
+            <Text className={`value produce`}>{totalHeat} kDTU/s</Text>
+          </View>
         </Collapse.Item>
       </Collapse>
 

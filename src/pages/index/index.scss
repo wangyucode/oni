@@ -19,6 +19,7 @@
     padding: 8px 16px;
 
     .nut-collapse-item-title {
+      font-size: 12px;
       color: #fff;
       font-weight: bold;
     }
@@ -69,6 +70,15 @@
         width: 60%;
         height: 60%;
       }
+    }
+  }
+
+  .power-heat-container {
+    text-align: center;
+
+    .value {
+      font-size: 14px;
+      font-weight: bold;
     }
   }
 

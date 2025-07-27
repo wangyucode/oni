@@ -434,8 +434,8 @@ export const data: Data = {
               items: [],
               detail: {
                 resources: {
-                  浓盐冰: -64000 / 600,
-                  浓盐水: 64000 / 600,
+                  浓盐冰: -1000,
+                  浓盐水: 1000,
                 },
                 modes: [],
               },
@@ -445,6 +445,12 @@ export const data: Data = {
       ],
     },
   ],
+};
+
+// 食物卡路里映射表 (1g对应卡路里值)
+export const foodCalorieMap = {
+  肉: 1,
+  烤肉串: 4,
 };
 
 const dupe = data.items[0].items[0];

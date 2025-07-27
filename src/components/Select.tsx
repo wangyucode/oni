@@ -41,6 +41,14 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     const [resources, setResources] = useState<Resources>({});
     const [selection, setSelection] = useState<Selection>(selections.find(selection => selection.item.name === item.name) || { item, count: 0, modes: new Map<string, number>(), category });
 
+    // 资源单位映射表
+    const unitMap = {
+        '复制人/仿生人': '个',
+        '建筑': '台',
+        '植物': '棵',
+        '动物': '只',
+        '相变': 'kg'
+    };
     useEffect(() => {
         if (!selection) return;
         const newResources: Resources = {};
@@ -80,6 +88,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
                 <InputNumber defaultValue={selection.count || 0} min={0} onChange={handleCountChange} />
+                <Text style={{ marginLeft: '8px' }}>{unitMap[category || selection.category] || ''}</Text>
             </Cell>
             {item.detail?.modes.map((mode, i) => (
                 <Cell key={`mode-${i}`} className="mode" align="center">
