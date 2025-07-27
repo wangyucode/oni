@@ -119,14 +119,41 @@
 
       .item-name {
         margin-left: 8px;
+        font-size: 14px;
+        font-weight: bold;
       }
     }
 
     .select-detail {
 
-      .mode-name {
-        margin-right: 8px;
+      .mode {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 24px;
+
+        .mode-name {
+          margin-right: 8px;
+          font-weight: bold;
+        }
+
+        .mode-item {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          gap: 8px;
+
+          .option-name {
+            font-size: 12px;
+            width: 28px;
+          }
+
+          .slider {
+            flex: 1;
+          }
+        }
       }
+
 
 
       .nut-radiogroup {

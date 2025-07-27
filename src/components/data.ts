@@ -2,7 +2,7 @@ export type Selection = {
   category: string;
   item: Item;
   count: number;
-  modes: Map<string, number>;
+  modes: Array<Map<string, number>>;
 };
 
 export type Resources = { [key: string]: number };
@@ -92,28 +92,46 @@ export const data: Data = {
           name: "氧气菜单",
           items: [
             {
+              name: "氧气扩散器",
+              items: [],
+              detail: {
+                resources: { 藻类: -550, 氧气: 500 },
+                modes: [],
+                power: -120,
+                heat: 1500,
+              },
+            },
+            {
+              name: "升华站",
+              items: [],
+              detail: {
+                resources: { 污染土: -1000, 氧气: 660 },
+                modes: [],
+                power: -60,
+                heat: 1000,
+              },
+            },
+            {
               name: "电解器",
               items: [],
               detail: {
                 resources: { 水: -1000, 氧气: 888, 氢气: 112 },
                 modes: [],
-                power: 120,
+                power: -120,
                 heat: 1000,
               },
             },
             {
-              name: "铁锈脱氧机",
+              name: "碳素脱离器",
               items: [],
               detail: {
                 resources: {
-                  铁锈: -750,
-                  盐: -250,
-                  氧气: 570,
-                  氯气: 30,
-                  铁矿: 400,
+                  水: -1000,
+                  二氧化碳: -300,
+                  污染水: 1000,
                 },
                 modes: [],
-                power: 60,
+                power: -120,
                 heat: 1000,
               },
             },
@@ -141,22 +159,151 @@ export const data: Data = {
                     ],
                   },
                 ],
-                power: 5,
+                power: -5,
                 heat: 0,
               },
             },
             {
-              name: "碳素脱离器",
+              name: "藻类箱",
               items: [],
               detail: {
                 resources: {
-                  水: -1000,
-                  二氧化碳: -300,
-                  污染水: 1000,
+                  水: -300,
+                  藻类: -30,
+                  二氧化碳: -1 / 3,
+                },
+                modes: [
+                  {
+                    name: "光照条件",
+                    options: [
+                      {
+                        name: "有",
+                        resources: { 氧气: 44 },
+                      },
+                      {
+                        name: "无",
+                        resources: { 氧气: 40 },
+                      },
+                    ],
+                  },
+                ],
+                power: 0,
+                heat: 0,
+              },
+            },
+            {
+              name: "铁锈脱氧机",
+              items: [],
+              detail: {
+                resources: {
+                  铁锈: -750,
+                  盐: -250,
+                  氧气: 570,
+                  氯气: 30,
+                  铁矿: 400,
                 },
                 modes: [],
-                power: 120,
+                power: -60,
                 heat: 1000,
+              },
+            },
+          ],
+        },
+        {
+          name: "电力",
+          items: [
+            {
+              name: "煤炭发电机",
+              items: [],
+              detail: {
+                resources: { 煤炭: -1000, 二氧化碳: 20 },
+                modes: [],
+                power: 600,
+                heat: 9000,
+              },
+            },
+            {
+              name: "木材燃烧器",
+              items: [],
+              detail: {
+                resources: { 木材: -1200, 二氧化碳: 170 },
+                modes: [],
+                power: 300,
+                heat: 9000,
+              },
+            },
+            {
+              name: "泥炭燃烧器",
+              items: [],
+              detail: {
+                resources: { 泥炭: -1000, 二氧化碳: 40, 污染水: 200 },
+                modes: [],
+                power: 480,
+                heat: 4500,
+              },
+            },
+            {
+              name: "泥炭燃烧器",
+              items: [],
+              detail: {
+                resources: { 泥炭: -1000, 二氧化碳: 40, 污染水: 200 },
+                modes: [],
+                power: 480,
+                heat: 4500,
+              },
+            },
+            {
+              name: "氢气发电机",
+              items: [],
+              detail: {
+                resources: { 氢气: -100 },
+                modes: [],
+                power: 800,
+                heat: 4000,
+              },
+            },
+            {
+              name: "天然气发电机",
+              items: [],
+              detail: {
+                resources: { 天然气: -90, 污染水: 67.5, 二氧化碳: 22.5 },
+                modes: [],
+                power: 800,
+                heat: 10000,
+              },
+            },
+            {
+              name: "石油发电机",
+              items: [],
+              detail: {
+                resources: { 污染水: 750, 二氧化碳: 500 },
+                modes: [
+                  {
+                    name: "可燃液体",
+                    options: [
+                      {
+                        name: "石油",
+                        resources: {
+                          石油: -2000,
+                        },
+                      },
+                      {
+                        name: "乙醇",
+                        resources: {
+                          乙醇: -2000,
+                        },
+                      },
+                      {
+                        name: "生物柴油",
+                        resources: {
+                          生物柴油: -2000,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                power: 2000,
+                heat: 20000,
               },
             },
           ],
@@ -455,8 +602,11 @@ export const foodCalorieMap = {
 
 const dupe = data.items[0].items[0];
 const category = data.items[0].name;
-const modes = new Map<string, number>();
-dupe.detail!.modes.forEach((mode) => (modes[mode.name] = 0));
+const modes = dupe.detail!.modes.map((mode) => {
+  return new Map<string, number>(
+    mode.options.map((option, index) => [option.name, index ? 0 : 100])
+  );
+});
 
 export const initialSelections: Array<Selection> = [
   {

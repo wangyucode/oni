@@ -25,13 +25,24 @@ export const itemIcons = {
     仿生人: bionic,
 
     氧气菜单: "https://oxygennotincluded.wiki.gg/zh/images/4/44/%E6%B0%A7%E6%B0%94%E8%8F%9C%E5%8D%95.png",
+    氧气扩散器: "https://oxygennotincluded.wiki.gg/zh/images/thumb/4/4a/%E6%B0%A7%E6%B0%94%E6%89%A9%E6%95%A3%E5%99%A8.png/100px-%E6%B0%A7%E6%B0%94%E6%89%A9%E6%95%A3%E5%99%A8.png",
     电解器: "https://oxygennotincluded.wiki.gg/zh/images/0/04/%E7%94%B5%E8%A7%A3%E5%99%A8.png",
+    升华站: "https://oxygennotincluded.wiki.gg/zh/images/thumb/f/f8/%E5%8D%87%E5%8D%8E%E7%AB%99.png/100px-%E5%8D%87%E5%8D%8E%E7%AB%99.png",
     铁锈脱氧机: "https://oxygennotincluded.wiki.gg/zh/images/2/2a/%E9%93%81%E9%94%88%E8%84%B1%E6%B0%A7%E6%9C%BA.png",
     空气净化器: "https://oxygennotincluded.wiki.gg/zh/images/b/b7/%E7%A9%BA%E6%B0%94%E5%87%80%E5%8C%96%E5%99%A8.png",
     碳素脱离器: "https://oxygennotincluded.wiki.gg/zh/images/a/aa/%E7%A2%B3%E7%B4%A0%E8%84%B1%E7%A6%BB%E5%99%A8.png",
-    碎石机: "https://oxygennotincluded.wiki.gg/images/e/e0/Rock_Crusher.png",
+    藻类箱: "https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e2/%E8%97%BB%E7%B1%BB%E7%AE%B1.png/100px-%E8%97%BB%E7%B1%BB%E7%AE%B1.png",
+
+    电力: "https://oxygennotincluded.wiki.gg/zh/images/thumb/1/1e/%E7%94%B5%E5%8A%9B%E8%8F%9C%E5%8D%95.png/34px-%E7%94%B5%E5%8A%9B%E8%8F%9C%E5%8D%95.png",
+    煤炭发电机: "https://oxygennotincluded.wiki.gg/zh/images/thumb/1/1d/%E7%85%A4%E7%82%AD%E5%8F%91%E7%94%B5%E6%9C%BA.png/100px-%E7%85%A4%E7%82%AD%E5%8F%91%E7%94%B5%E6%9C%BA.png",
+    木材燃烧器: "https://oxygennotincluded.wiki.gg/zh/images/thumb/9/93/%E6%9C%A8%E6%9D%90%E7%87%83%E7%83%A7%E5%99%A8.png/100px-%E6%9C%A8%E6%9D%90%E7%87%83%E7%83%A7%E5%99%A8.png",
+    泥炭燃烧器: "https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c9/%E6%B3%A5%E7%82%AD%E7%87%83%E7%83%A7%E5%99%A8.png/100px-%E6%B3%A5%E7%82%AD%E7%87%83%E7%83%A7%E5%99%A8.png",
+    氢气发电机: "https://oxygennotincluded.wiki.gg/zh/images/thumb/b/ba/%E6%B0%A2%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png/100px-%E6%B0%A2%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png",
+    天然气发电机: "https://oxygennotincluded.wiki.gg/zh/images/thumb/5/53/%E5%A4%A9%E7%84%B6%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png/100px-%E5%A4%A9%E7%84%B6%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png",
+    石油发电机: "https://oxygennotincluded.wiki.gg/zh/images/thumb/0/04/%E7%9F%B3%E6%B2%B9%E5%8F%91%E7%94%B5%E6%9C%BA.png/100px-%E7%9F%B3%E6%B2%B9%E5%8F%91%E7%94%B5%E6%9C%BA.png",
 
     精炼: refine,
+    碎石机: "https://oxygennotincluded.wiki.gg/images/e/e0/Rock_Crusher.png",
     脱盐器: "https://oxygennotincluded.wiki.gg/zh/images/4/45/%E8%84%B1%E7%9B%90%E5%99%A8.png",
 
     医疗: "https://oxygennotincluded.wiki.gg/zh/images/2/20/%E5%8C%BB%E7%96%97%E8%8F%9C%E5%8D%95.png",

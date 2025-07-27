@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { Button, Cell, Divider, Grid, InputNumber, Popup, Radio, Image } from "@nutui/nutui-react-taro";
-import { View, Text } from "@tarojs/components";
+import { Button, Cell, Divider, Grid, InputNumber, Popup, Radio, Image, Range } from "@nutui/nutui-react-taro";
+import { View, Text, Slider } from "@tarojs/components";
 
 import { data, Item, Resources, Selection } from "./data";
 import Icon, { itemIcons } from "./icons";
@@ -39,7 +39,20 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     const selections = useContext(SelectionsContext);
     const dispatch = useContext(SelectionsDispatchContext);
     const [resources, setResources] = useState<Resources>({});
-    const [selection, setSelection] = useState<Selection>(selections.find(selection => selection.item.name === item.name) || { item, count: 0, modes: new Map<string, number>(), category });
+
+    function getDefaultModes(): Array<Map<string, number>> {
+        const modes = item.detail!.modes.map(mode => {
+            return new Map<string, number>(
+                mode.options.map((option, index) => [option.name, index ? 0 : 100])
+            );
+        });
+        return modes;
+    }
+
+    const [selection, setSelection] = useState<Selection>(
+        selections.find(s => s.item.name === item.name) ||
+        { item, count: 0, modes: getDefaultModes(), category }
+    );
 
     // 资源单位映射表
     const unitMap = {
@@ -49,25 +62,32 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         '动物': '只',
         '相变': 'kg'
     };
+
     useEffect(() => {
         if (!selection) return;
         const newResources: Resources = {};
-        // 基础
+        // 基础资源计算
         Object.entries(item.detail?.resources || {}).forEach(([name, value]) => {
             const resourceValue = selection.count * value;
             newResources[name] = (newResources[name] || 0) + resourceValue;
         });
-        // 模式
-        item.detail?.modes.forEach(mode => {
-            const modeValue = selection?.modes[mode.name] || 0;
-            const modeOption = mode.options[modeValue];
-            Object.entries(modeOption.resources || {}).forEach(([name, value]) => {
-                const resourceValue = selection.count * value;
-                newResources[name] = (newResources[name] || 0) + resourceValue;
+
+        // 模式资源计算（支持百分比）
+        item.detail!.modes.forEach(mode => {
+            const percentages = selection.modes[mode.name] || [];
+            mode.options.forEach((option, index) => {
+                const percentage = percentages[index] || 0;
+                if (percentage <= 0) return;
+
+                const factor = percentage / 100;
+                Object.entries(option.resources || {}).forEach(([name, value]) => {
+                    const resourceValue = selection.count * value * factor;
+                    newResources[name] = (newResources[name] || 0) + resourceValue;
+                });
             });
         });
         setResources(newResources);
-    }, [selections]);
+    }, [selections, selection.count, selection.modes]);
 
     function handleCountChange(value: number) {
         const newSelection = { ...selection, count: value };
@@ -75,8 +95,10 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         dispatch({ type: value > 0 ? 'update' : 'remove', payload: newSelection });
     }
 
-    function handleModeChange(name: string, value: number) {
-        const newSelection = { ...selection, modes: { ...selection.modes, [name]: value } };
+    function handleModePercentageChange(modeIndex: number, option: string, value: number) {
+        selection.modes[modeIndex].set(option, value);
+
+        const newSelection = { ...selection };
         setSelection(newSelection);
         dispatch({ type: newSelection.count > 0 ? 'update' : 'remove', payload: newSelection });
     }
@@ -91,14 +113,31 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                 <Text style={{ marginLeft: '8px' }}>{unitMap[category || selection.category] || ''}</Text>
             </Cell>
             {item.detail?.modes.map((mode, i) => (
-                <Cell key={`mode-${i}`} className="mode" align="center">
+                <Cell key={`mode-${i}`} className="mode">
                     <Text className="mode-name">{mode.name}:</Text>
-                    <Radio.Group defaultValue={selection.modes[mode.name] || 0} direction="horizontal" onChange={v => handleModeChange(mode.name, v as number)}>
-                        {mode.options.map((option, j) => (<Radio key={`option-${j}`} value={j} shape="button">{option.name}</Radio>))}
-                    </Radio.Group>
-                </Cell>))}
+                    {mode.options.map((option, j) => (
+                        <View key={`option-${j}`} className="mode-item">
+                            <Text className="option-name">{option.name}:</Text>
+                            <Range
+                                className="slider"
+                                defaultValue={[selection.modes[j]?.get(option.name) || 0]}
+                                minDescription={null}
+                                maxDescription={null}
+                                max={100}
+                                min={0}
+                                step={1}
+                                // onChange={(value) => handleModePercentageChange(mode.name, j, value[0])}
+                                onChange={(value) => handleModePercentageChange(i, option.name, value as number)}
+                                currentDescription={val => `${val}%`}
+                            />
+                        </View>
+                    ))}
+                </Cell>
+            ))}
             <Cell>
-                <Grid style={{ width: '100%' }} columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
+                <Grid
+                    style={{ width: '100%' }}
+                    columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
                     {Object.entries(resources).map(([name, value]) => (
                         <Grid.Item key={name}>
                             <Image width={48} height={48} src={itemIcons[name]} />
