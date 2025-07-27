@@ -5,6 +5,7 @@ import { View, Text, Slider } from "@tarojs/components";
 import { data, Item, Resources, Selection } from "./data";
 import Icon, { itemIcons } from "./icons";
 import { SelectionsContext, SelectionsDispatchContext } from "./SelectionsContext";
+import ModeError from "./ModeError";
 
 interface SelectProps {
     select: string;
@@ -73,15 +74,16 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         });
 
         // 模式资源计算（支持百分比）
-        item.detail!.modes.forEach(mode => {
-            const percentages = selection.modes[mode.name] || [];
-            mode.options.forEach((option, index) => {
-                const percentage = percentages[index] || 0;
-                if (percentage <= 0) return;
+        item.detail!.modes.forEach((mode, i) => {
+            const optionSelectionMap = selection.modes[i];
+
+            mode.options.forEach(option => {
+                const percentage = optionSelectionMap.get(option.name) || 0;
 
                 const factor = percentage / 100;
                 Object.entries(option.resources || {}).forEach(([name, value]) => {
                     const resourceValue = selection.count * value * factor;
+                    if (!resourceValue) return;
                     newResources[name] = (newResources[name] || 0) + resourceValue;
                 });
             });
@@ -126,12 +128,12 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                                 max={100}
                                 min={0}
                                 step={1}
-                                // onChange={(value) => handleModePercentageChange(mode.name, j, value[0])}
                                 onChange={(value) => handleModePercentageChange(i, option.name, value as number)}
                                 currentDescription={val => `${val}%`}
                             />
                         </View>
                     ))}
+                    <ModeError optionValueMap={selection.modes[i]} modeName={mode.name} />
                 </Cell>
             ))}
             <Cell>
