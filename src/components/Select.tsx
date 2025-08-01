@@ -64,6 +64,11 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         '相变': 'kg'
     };
 
+    let unit = unitMap[category || selection.category] || '';
+    if (unit === 'kg' && item.name === '污染水' && item.parent?.name === '挥发') {
+        unit = '吨';
+    }
+
     useEffect(() => {
         if (!selection) return;
         const newResources: Resources = {};
@@ -112,7 +117,12 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
                 <InputNumber defaultValue={selection.count || 0} min={0} onChange={handleCountChange} />
-                <Text style={{ marginLeft: '8px' }}>{unitMap[category || selection.category] || ''}</Text>
+                <Text style={{ marginLeft: '8px' }}>{unit}</Text>
+            </Cell>
+            <Cell align="center">
+                <Text className="item-power">电力：{item.detail?.power || 0}W</Text>
+                <View style={{ flex: 1 }} />
+                <Text className="item-heat">热量：{item.detail?.heat || 0}复制热</Text>
             </Cell>
             {item.detail?.modes.map((mode, i) => (
                 <Cell key={`mode-${i}`} className="mode">

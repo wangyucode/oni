@@ -122,6 +122,11 @@
         font-size: 14px;
         font-weight: bold;
       }
+
+      .item-power,
+      .item-heat {
+        font-size: 10px;
+      }
     }
 
     .select-detail {
@@ -153,6 +158,7 @@
         .mode-name {
           margin-right: 8px;
           font-weight: bold;
+          font-size: 10px;
         }
 
         .mode-item {
@@ -162,7 +168,7 @@
           width: 100%;
 
           .option-name {
-            font-size: 12px;
+            font-size: 10px;
             width: 54px;
           }
 
