@@ -335,10 +335,6 @@ export const data: Data = {
                     name: "原料",
                     options: [
                       {
-                        name: "隔热质",
-                        resources: { 隔热质: -100000 / 40, 沙子: 100000 / 40 },
-                      },
-                      {
                         name: "页岩",
                         resources: { 页岩: -100000 / 40, 沙子: 100000 / 40 },
                       },
@@ -365,6 +361,10 @@ export const data: Data = {
                       {
                         name: "砂岩",
                         resources: { 砂岩: -100000 / 40, 沙子: 100000 / 40 },
+                      },
+                      {
+                        name: "隔热质",
+                        resources: { 隔热质: -100000 / 40, 沙子: 100000 / 40 },
                       },
                       {
                         name: "铜矿",

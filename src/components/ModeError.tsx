@@ -14,10 +14,10 @@ export default function ModeError({ modeName, optionValueMap }: ModeErrorProps) 
 
     // 根据总和设置错误消息
     if (total < 100) {
-        message = `${modeName}的百分比调整总和小于100%`;
+        message = `${modeName}的百分比调整总为${total}%，小于100%`;
         type = 'warn';
     } else if (total > 100) {
-        message = `${modeName}的百分比调整总和不能大于100%`;
+        message = `${modeName}的百分比调整总为${total}%，大于100%`;
         type = 'error';
     }
 

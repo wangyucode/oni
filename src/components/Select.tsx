@@ -26,8 +26,8 @@ interface SelectDetailProps {
 function SelectItems({ item, handleSelect }: SelectItemsProps) {
 
     return (
-        <Grid columns={item.items.length >= 5 ? 5 : item.items.length} onClick={handleSelect}>
-            {item.items.map((item, index) => (
+        <Grid columns={item.items && item.items.length >= 5 ? 5 : item.items?.length || 0} onClick={handleSelect}>
+            {item.items?.map((item, index) => (
                 <Grid.Item key={index} text={item.name}>
                     <Icon width={48} height={48} name={item.name} />
                 </Grid.Item>
@@ -181,7 +181,7 @@ export default function Select({ select, onClose, edit }: SelectProps) {
     }
 
     function handleSelect({ index }: { index: number }) {
-        const nextItem = currentItem.items[index];
+        const nextItem = currentItem.items![index];
         nextItem.parent = currentItem;
         setCurrentItem(nextItem);
         setCanGoBack(true);
