@@ -53,13 +53,18 @@ function Index() {
         newTotalHeat += selection.count * selection.item.detail.heat;
       }
 
-      // 模式资源计算
-      selection.item.detail!.modes.forEach(mode => {
-        const modeValue = selection.modes[mode.name] || 0;
-        const modeOption = mode.options[modeValue];
-        Object.entries(modeOption.resources || {}).forEach(([name, value]) => {
-          const resourceValue = selection.count * value;
-          newResources[name] = (newResources[name] || 0) + resourceValue;
+      // 模式资源计算（支持百分比）
+      selection.item.detail!.modes.forEach((mode, i) => {
+        const optionSelectionMap = selection.modes[i];
+
+        mode.options.forEach(option => {
+          const percentage = optionSelectionMap.get(option.name) || 0;
+          const factor = percentage / 100;
+          Object.entries(option.resources || {}).forEach(([name, value]) => {
+            const resourceValue = selection.count * value * factor;
+            if (!resourceValue) return;
+            newResources[name] = (newResources[name] || 0) + resourceValue;
+          });
         });
       });
     });
@@ -154,7 +159,7 @@ function Index() {
         </Collapse.Item>
         <Collapse.Item title="热量" name="热量">
           <View className="power-heat-container">
-            <Text className={`value produce`}>{totalHeat} kDTU/s</Text>
+            <Text className={`value produce`}>{totalHeat} 复制热/s</Text>
           </View>
         </Collapse.Item>
       </Collapse>

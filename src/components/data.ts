@@ -153,7 +153,7 @@ export const data: Data = {
                   },
                 ],
                 power: -5,
-                heat: 0,
+                heat: 625,
               },
             },
             {

@@ -132,7 +132,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                             <Text className="option-name">{option.name}:</Text>
                             <Range
                                 className="slider"
-                                defaultValue={[selection.modes[j]?.get(option.name) || 0]}
+                                defaultValue={[selection.modes[i]?.get(option.name) || 0]}
                                 minDescription={null}
                                 maxDescription={null}
                                 max={100}
