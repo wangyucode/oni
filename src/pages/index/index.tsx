@@ -154,12 +154,12 @@ function Index() {
         </Collapse.Item>
         <Collapse.Item title="电力" name="电力">
           <View className="power-heat-container">
-            <Text className={`value consume`}>{totalPower} W</Text>
+            <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>{totalPower} W</Text>
           </View>
         </Collapse.Item>
         <Collapse.Item title="热量" name="热量">
           <View className="power-heat-container">
-            <Text className={`value produce`}>{(totalHeat / 1000).toFixed(1)} 千复制热/秒</Text>
+            <Text className={`value ${totalHeat < 0 ? "consume" : "produce"}`}>{(totalHeat / 1000).toFixed(1)} 千复制热/秒</Text>
           </View>
         </Collapse.Item>
       </Collapse>
