@@ -891,6 +891,212 @@ export const data: Data = {
                 heat: 10000,
               },
             },
+            {
+              name: "聚合物压塑器",
+              detail: {
+                resources: {
+                  塑料: 500,
+                  蒸汽: 8.33,
+                  二氧化碳: 8.33,
+                },
+                modes: [
+                  {
+                    name: "塑料单体",
+                    options: [
+                      {
+                        name: "石油",
+                        resources: {
+                          石油: -833.33,
+                        },
+                      },
+                      {
+                        name: "花蜜",
+                        resources: {
+                          花蜜: -833.33,
+                        },
+                      },
+                      {
+                        name: "树脂",
+                        resources: {
+                          树脂: -833.33,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                power: -240,
+                heat: 32000,
+              },
+            },
+            {
+              name: "藻类蒸馏器",
+              detail: {
+                resources: {
+                  菌泥: -600,
+                  藻类: 200,
+                  污染水: 400,
+                },
+                modes: [],
+                power: -120,
+                heat: 1000,
+              },
+            },
+            {
+              name: "咸乳蜡收集器",
+              detail: {
+                resources: {
+                  咸乳: -1000,
+                  咸乳蜡: 90,
+                  浓盐水: 810,
+                  二氧化碳: 100,
+                },
+                modes: [],
+                power: -480,
+                heat: 8000,
+              },
+            },
+            {
+              name: "泥浆分离器",
+              detail: {
+                resources: {},
+                modes: [
+                  {
+                    name: "泥浆",
+                    options: [
+                      {
+                        name: "污染泥",
+                        resources: {
+                          污染泥: -150000 / 20,
+                          污染水: 90000 / 20,
+                          污染土: 60000 / 20,
+                        },
+                      },
+                      {
+                        name: "泥巴",
+                        resources: {
+                          泥巴: -150000 / 20,
+                          水: 90000 / 20,
+                          泥土: 60000 / 20,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                power: -120,
+                heat: 4000,
+              },
+            },
+            {
+              name: "乙醇蒸馏器",
+              detail: {
+                resources: {
+                  木材: -1000,
+                  乙醇: 500,
+                  污染土: 333.33,
+                  二氧化碳: 166.67,
+                },
+                modes: [],
+                power: -240,
+                heat: 4000,
+              },
+            },
+            {
+              name: "肥料合成器",
+              detail: {
+                resources: {
+                  污染水: -39,
+                  泥土: -65,
+                  磷矿: -26,
+                  肥料: 120,
+                },
+                modes: [],
+                power: -120,
+                heat: 3000,
+              },
+            },
+            {
+              name: "植物粉碎机",
+              detail: {
+                resources: {},
+                modes: [
+                  {
+                    name: "原料",
+                    options: [
+                      {
+                        name: "冰霜麦粒",
+                        resources: {
+                          冰霜麦粒: -10000 / 40,
+                          水: -15000 / 40,
+                          咸乳: 20000 / 40,
+                        },
+                      },
+                      {
+                        name: "火椒粒",
+                        resources: {
+                          火椒粒: -3000 / 40,
+                          水: -17000 / 40,
+                          咸乳: 20000 / 40,
+                        },
+                      },
+                      {
+                        name: "小吃豆",
+                        resources: {
+                          小吃豆: -2000 / 40,
+                          水: -18000 / 40,
+                          咸乳: 20000 / 40,
+                        },
+                      },
+                      {
+                        name: "露珠",
+                        resources: {
+                          露珠: -2000 / 40,
+                          咸乳: 20000 / 40,
+                        },
+                      },
+                      {
+                        name: "菌泥",
+                        resources: {
+                          菌泥: -100000 / 40,
+                          植物润滑油: 70000 / 40,
+                          泥土: 30000 / 40,
+                        },
+                      },
+                      {
+                        name: "海梳蕨叶",
+                        resources: {
+                          海梳蕨叶: -25000 / 40,
+                          水: -75000 / 40,
+                          植物润滑油: 100000 / 40,
+                        },
+                      },
+                      {
+                        name: "树脂",
+                        resources: {
+                          琥珀: -100000 / 40,
+                          树脂: 50000 / 40,
+                          化石: 25000 / 40,
+                          沙子: 25000 / 40,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                power: 0,
+                heat: 2000,
+              },
+            },
+            {
+              name: "堆肥堆",
+              detail: {
+                resources: {
+                  污染土: -100,
+                  泥土: 100,
+                },
+                modes: [],
+                power: 0,
+                heat: 1000,
+              },
+            },
           ],
         },
         {
@@ -898,7 +1104,6 @@ export const data: Data = {
           items: [
             {
               name: "电动烤炉",
-
               detail: {
                 resources: {},
                 modes: [
@@ -1386,15 +1591,61 @@ export const data: Data = {
           items: [
             {
               name: "配药桌",
-
+              detail: {
+                resources: {},
+                modes: [
+                  {
+                    name: "配方",
+                    options: [
+                      {
+                        name: "齿轮膏",
+                        resources: {
+                          粘渣油: -80000 / 100,
+                          水: -200000 / 100,
+                          齿轮膏: 80000 / 100,
+                          污染水: 200000 / 100,
+                        },
+                      },
+                      {
+                        name: "动物油脂齿轮膏",
+                        resources: {
+                          动物油脂: -10000 / 100,
+                          水: -70000 / 100,
+                          动物油脂齿轮膏: 80000 / 100,
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          name: "实用",
+          items: [
+            {
+              name: "油井",
               detail: {
                 resources: {
-                  粘渣油: -80000 / 100,
-                  水: -200000 / 100,
-                  齿轮膏: 80000 / 100,
-                  污染水: 200000 / 100,
+                  水: 1000,
+                  原油: 3300,
                 },
                 modes: [],
+                power: -240,
+                heat: 2000,
+              },
+            },
+            {
+              name: "柴火炉",
+              detail: {
+                resources: {
+                  木材: 25,
+                  二氧化碳: 4,
+                },
+                modes: [],
+                power: 0,
+                heat: 8000,
               },
             },
           ],
@@ -1409,10 +1660,9 @@ export const data: Data = {
           items: [
             {
               name: "好吃哈奇",
-
               detail: {
                 resources: {
-                  肉: 300 / 600,
+                  肉: 2000 / 100,
                 },
                 modes: [
                   {
@@ -1461,7 +1711,7 @@ export const data: Data = {
             {
               name: "草质哈奇",
               detail: {
-                resources: { 肉: 300 / 600 },
+                resources: { 肉: 2000 / 100 },
                 modes: [
                   {
                     name: "食物",
@@ -1510,7 +1760,7 @@ export const data: Data = {
               name: "石壳哈奇",
               detail: {
                 resources: {
-                  肉: 300 / 600,
+                  肉: 2000 / 100,
                 },
                 modes: [
                   {
@@ -1548,7 +1798,7 @@ export const data: Data = {
           name: "霸王鹦",
           detail: {
             resources: {
-              硬肉: ((Math.floor((200 - 5) / 6) * 5000) / 200 - 500) / 600,
+              硬肉: 5000 / 200,
               浓盐冰: 64000 / 600,
             },
             modes: [],

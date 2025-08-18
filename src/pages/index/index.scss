@@ -48,6 +48,17 @@
       padding: 8px;
     }
 
+    .tips {
+      font-size: 11px;
+    }
+
+    .avatar-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
     .nut-badge {
       &:last-child {
         margin-right: 8px;

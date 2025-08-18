@@ -70,6 +70,10 @@ export const itemIcons = {
     "植物粉碎机": "https://oxygennotincluded.wiki.gg/zh/images/thumb/4/4c/%E6%A4%8D%E7%89%A9%E7%B2%89%E7%A2%8E%E6%9C%BA.png/100px-%E6%A4%8D%E7%89%A9%E7%B2%89%E7%A2%8E%E6%9C%BA.png",
     "堆肥堆": "https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e5/%E5%A0%86%E8%82%A5%E5%A0%86.png/100px-%E5%A0%86%E8%82%A5%E5%A0%86.png",
 
+    实用: "https://oxygennotincluded.wiki.gg/zh/images/thumb/d/dc/%E5%AE%9E%E7%94%A8%E8%8F%9C%E5%8D%95.png/48px-%E5%AE%9E%E7%94%A8%E8%8F%9C%E5%8D%95.png",
+    油井: "https://oxygennotincluded.wiki.gg/zh/images/thumb/9/96/%E6%B2%B9%E4%BA%95.png/100px-%E6%B2%B9%E4%BA%95.png",
+    柴火炉: "https://oxygennotincluded.wiki.gg/zh/images/thumb/2/24/%E6%9F%B4%E7%81%AB%E7%82%89.png/100px-%E6%9F%B4%E7%81%AB%E7%82%89.png",
+
     医疗: "https://oxygennotincluded.wiki.gg/zh/images/2/20/%E5%8C%BB%E7%96%97%E8%8F%9C%E5%8D%95.png",
     配药桌: "https://oxygennotincluded.wiki.gg/zh/images/0/0e/%E9%85%8D%E8%8D%AF%E6%A1%8C.png",
 
@@ -454,5 +458,8 @@ export const itemIcons = {
     "汗甜玉米杆": "https://oxygennotincluded.wiki.gg/zh/images/thumb/a/ad/%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png/52px-%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png",
     "汗甜玉米": "https://oxygennotincluded.wiki.gg/zh/images/thumb/a/ad/%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png/52px-%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png",
     "巨蕨": "https://oxygennotincluded.wiki.gg/zh/images/thumb/8/8f/%E5%B7%A8%E8%95%A8.png/29px-%E5%B7%A8%E8%95%A8.png",
-    "巨蕨谷粒": "https://oxygennotincluded.wiki.gg/zh/images/thumb/d/df/%E5%B7%A8%E8%95%A8%E8%B0%B7%E7%B2%92.png/37px-%E5%B7%A8%E8%95%A8%E8%B0%B7%E7%B2%92.png"
+    "巨蕨谷粒": "https://oxygennotincluded.wiki.gg/zh/images/thumb/d/df/%E5%B7%A8%E8%95%A8%E8%B0%B7%E7%B2%92.png/37px-%E5%B7%A8%E8%95%A8%E8%B0%B7%E7%B2%92.png",
+    "露珠": "https://oxygennotincluded.wiki.gg/zh/images/thumb/5/59/%E9%9C%B2%E7%8F%A0.png/27px-%E9%9C%B2%E7%8F%A0.png",
+    "海梳蕨叶": "https://oxygennotincluded.wiki.gg/zh/images/thumb/0/0a/%E6%B5%B7%E6%A2%B3%E8%95%A8%E5%8F%B6.png/49px-%E6%B5%B7%E6%A2%B3%E8%95%A8%E5%8F%B6.png",
+    "动物油脂齿轮膏": "https://oxygennotincluded.wiki.gg/zh/images/thumb/8/82/%E5%8A%A8%E7%89%A9%E6%B2%B9%E8%84%82%E9%BD%BF%E8%BD%AE%E8%86%8F.png/23px-%E5%8A%A8%E7%89%A9%E6%B2%B9%E8%84%82%E9%BD%BF%E8%BD%AE%E8%86%8F.png",
 };

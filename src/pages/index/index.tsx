@@ -109,23 +109,40 @@ function Index() {
     setEdit({ ...item });
   }
 
+  function getTips(category: string) {
+    if (category === '建筑') {
+      return '建筑效率实际通常无法达到100%，实际产量通常略低于理论值';
+    } else if (category === '动物') {
+      return '动物按精养数量计算，实际产量通常略高于理论值';
+    } else if (category === '植物') {
+      return '植物无法立即被收获，实际产量通常略低于理论值';
+    } else if (category === '复制人/仿生人') {
+      return '物质转化包含上厕所/粘渣/润滑，未包含洗澡';
+    } else {
+      return '';
+    }
+  }
+
   return (
     <View className='nutui-react-demo'>
       <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
-            <Avatar.Group gap="8">
-              {selections.filter(s => s.category === category).map(({ count, item }) =>
-                <Badge value={count} key={item.name}>
-                  <Avatar
-                    src={itemIcons[item.name]}
-                    shape='square'
-                    size='48'
-                    onClick={() => handleItemClick(item)}
-                  />
-                </Badge>)}
-            </Avatar.Group>
-            <Avatar className='avatar-add' size='48' shape='square' src={plus} onClick={() => handleAdd(category)} style={{ backgroundColor: '#7F3D5E' }} />
+            <Text className='tips'>{getTips(category)}</Text>
+            <View className='avatar-container'>
+              <Avatar.Group gap="8">
+                {selections.filter(s => s.category === category).map(({ count, item }) =>
+                  <Badge value={count} key={item.name}>
+                    <Avatar
+                      src={itemIcons[item.name]}
+                      shape='square'
+                      size='48'
+                      onClick={() => handleItemClick(item)}
+                    />
+                  </Badge>)}
+              </Avatar.Group>
+              <Avatar className='avatar-add' size='48' shape='square' src={plus} onClick={() => handleAdd(category)} style={{ backgroundColor: '#7F3D5E' }} />
+            </View>
           </Collapse.Item>)}
       </Collapse>
 
