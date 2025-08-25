@@ -113,7 +113,7 @@ function Index() {
     if (category === '建筑') {
       return '建筑效率实际通常无法达到100%，实际产量通常略低于理论值';
     } else if (category === '动物') {
-      return '动物按精养数量计算，实际产量通常略高于理论值';
+      return '动物按精养数量计算，加上散养实际产量通常略高于理论值';
     } else if (category === '植物') {
       return '植物无法立即被收获，实际产量通常略低于理论值';
     } else if (category === '复制人/仿生人') {
