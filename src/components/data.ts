@@ -1656,13 +1656,47 @@ export const data: Data = {
       name: "动物",
       items: [
         {
+          name: "绒犸兔",
+          detail: {
+            resources: {
+              肉: 14000 / 200 / 600,
+              绒犸兔碎糜: 30000 / 600,
+            },
+            modes: [
+              {
+                name: "食物",
+                options: [
+                  {
+                    name: "羽叶果薯",
+                    resources: {
+                      羽叶果薯: -444.4,
+                    },
+                  },
+                  {
+                    name: "果薯条",
+                    resources: {
+                      果薯条: -250,
+                    },
+                  },
+                  {
+                    name: "小吃豆",
+                    resources: {
+                      小吃豆: -1600,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
           name: "好吃哈奇",
           items: [
             {
               name: "好吃哈奇",
               detail: {
                 resources: {
-                  肉: 2000 / 100,
+                  肉: 2000 / 100 / 600,
                 },
                 modes: [
                   {
@@ -2145,7 +2179,7 @@ export const data: Data = {
             {
               name: "草质哈奇",
               detail: {
-                resources: { 肉: 2000 / 100 },
+                resources: { 肉: 2000 / 100 / 600 },
                 modes: [
                   {
                     name: "食物",
@@ -2614,7 +2648,7 @@ export const data: Data = {
               name: "石壳哈奇",
               detail: {
                 resources: {
-                  肉: 2000 / 100,
+                  肉: 2000 / 100 / 600,
                 },
                 modes: [
                   {
@@ -2713,7 +2747,7 @@ export const data: Data = {
               name: "光滑哈奇",
               detail: {
                 resources: {
-                  肉: 2000 / 100,
+                  肉: 2000 / 100 / 600,
                 },
                 modes: [
                   {
@@ -2782,11 +2816,12 @@ export const data: Data = {
             },
           ],
         },
+
         {
           name: "霸王鹦",
           detail: {
             resources: {
-              硬肉: 5000 / 200,
+              硬肉: 5000 / 200 / 600,
               浓盐冰: 64000 / 600,
             },
             modes: [],
