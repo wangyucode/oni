@@ -126,11 +126,13 @@ export const itemIcons = {
     烟雾蛞蝓: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%83%9F%E9%9B%BE%E8%9B%9E%E8%9D%93.png/50px-%E7%83%9F%E9%9B%BE%E8%9B%9E%E8%9D%93.png',
     海绵蛞蝓: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B5%B7%E7%BB%B5%E8%9B%9E%E8%9D%93.png/53px-%E6%B5%B7%E7%BB%B5%E8%9B%9E%E8%9D%93.png',
     尖块兽: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%B0%96%E5%9D%97%E5%85%BD.png/30px-%E5%B0%96%E5%9D%97%E5%85%BD.png',
-
+    异化虫: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%94%9C%E7%B4%A0%E7%94%B2%E8%99%AB.png/36px-%E7%94%9C%E7%B4%A0%E7%94%B2%E8%99%AB.png',
+    壁虎: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%AF%9B%E9%B3%9E%E5%A3%81%E8%99%8E.png/55px-%E6%AF%9B%E9%B3%9E%E5%A3%81%E8%99%8E.png',
 
     挥发: "https://oxygennotincluded.wiki.gg/zh/images/c/ce/%E6%B1%A1%E6%9F%93%E6%B0%A7.png",
     融化: "https://oxygennotincluded.wiki.gg/zh/images/a/a9/%E6%B0%B4.png",
 
+    芦苇纤维: "https://oxygennotincluded.wiki.gg/zh/images/thumb/7/7a/%E8%8A%A6%E8%8B%87%E7%BA%A4%E7%BB%B4.png/43px-%E8%8A%A6%E8%8B%87%E7%BA%A4%E7%BB%B4.png?3056fa",
     移动电源废料: "https://oxygennotincluded.wiki.gg/zh/images/thumb/7/7a/%E7%A7%BB%E5%8A%A8%E7%94%B5%E6%BA%90%E5%BA%9F%E6%96%99.png/24px-%E7%A7%BB%E5%8A%A8%E7%94%B5%E6%BA%90%E5%BA%9F%E6%96%99.png",
     绒犸兔碎糜: "https://oxygennotincluded.wiki.gg/zh/images/thumb/5/5e/%E7%BB%92%E7%8A%B8%E5%85%94%E7%A2%8E%E7%B3%9C.png/32px-%E7%BB%92%E7%8A%B8%E5%85%94%E7%A2%8E%E7%B3%9C.png",
     皇犸兔头冠: "https://oxygennotincluded.wiki.gg/zh/images/thumb/2/29/%E7%9A%87%E7%8A%B8%E5%85%94%E5%A4%B4%E5%86%A0.png/43px-%E7%9A%87%E7%8A%B8%E5%85%94%E5%A4%B4%E5%86%A0.png",
@@ -486,4 +488,6 @@ export const itemIcons = {
     硬肉: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/f/f2/%E7%A1%AC%E8%82%89.png/44px-%E7%A1%AC%E8%82%89.png',
     巨蕨谷粒: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/d/df/%E5%B7%A8%E8%95%A8%E8%B0%B7%E7%B2%92.png/37px-%E5%B7%A8%E8%95%A8%E8%B0%B7%E7%B2%92.png',
     火椒粒: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/8/8f/%E7%81%AB%E6%A4%92%E7%B2%92.png/32px-%E7%81%AB%E6%A4%92%E7%B2%92.png',
+
+    露珠: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/5/59/%E9%9C%B2%E7%8F%A0.png/27px-%E9%9C%B2%E7%8F%A0.png',
 }

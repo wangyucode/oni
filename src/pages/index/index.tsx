@@ -117,7 +117,7 @@ function Index() {
     } else if (category === '植物') {
       return '植物无法立即被收获，实际产量通常略低于理论值';
     } else if (category === '复制人/仿生人') {
-      return '物质转化包含上厕所/粘渣/润滑，未包含洗澡';
+      return '物质转化包含呼吸/上厕所/粘渣/润滑，未包含洗澡';
     } else {
       return '';
     }
