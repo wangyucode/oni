@@ -153,7 +153,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                     columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
                     {Object.entries(resources).map(([name, value]) => (
                         <Grid.Item key={name}>
-                            <Image width={48} height={48} src={itemIcons[name]} />
+                            <Image width={48} src={itemIcons[name]} />
                             <Text>{name}</Text>
                             <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
                                 {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}
