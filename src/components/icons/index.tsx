@@ -130,6 +130,8 @@ export const itemIcons = {
     壁虎: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%AF%9B%E9%B3%9E%E5%A3%81%E8%99%8E.png/55px-%E6%AF%9B%E9%B3%9E%E5%A3%81%E8%99%8E.png',
     哈奇: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%A5%BD%E5%90%83%E5%93%88%E5%A5%87.png/34px-%E5%A5%BD%E5%90%83%E5%93%88%E5%A5%87.png',
     田鼠: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E9%94%B9%E7%8E%AF%E7%94%B0%E9%BC%A0.png/40px-%E9%94%B9%E7%8E%AF%E7%94%B0%E9%BC%A0.png',
+    飞鱼: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%96%B7%E6%B5%AE%E9%A3%9E%E9%B1%BC.png/29px-%E5%96%B7%E6%B5%AE%E9%A3%9E%E9%B1%BC.png',
+    蛞蝓: 'https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%94%B5%E5%BC%A7%E8%9B%9E%E8%9D%93.png/53px-%E7%94%B5%E5%BC%A7%E8%9B%9E%E8%9D%93.png',
 
 
     挥发: "https://oxygennotincluded.wiki.gg/zh/images/c/ce/%E6%B1%A1%E6%9F%93%E6%B0%A7.png",
