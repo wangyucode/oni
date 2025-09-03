@@ -7,7 +7,7 @@ import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
-import { Item, Resources, foodCalorieMap } from 'src/components/data';
+import { Item, Resources, foodCalorieMap, plants } from 'src/components/data';
 
 import './index.scss'
 
@@ -67,6 +67,19 @@ function Index() {
           });
         });
       });
+    });
+
+    // 处理小动物吃植物
+    Object.entries(newResources).forEach(([name, value]) => {
+      if (plants.includes(name)) {
+        const selection = selections.find(s => s.item.name === name);
+        if (selection) {
+          Object.entries(selection.item.detail!.resources).forEach(([n, v]) => {
+            newResources[n] = (newResources[n] || 0) + v * value;
+          });
+          delete newResources[name];
+        }
+      }
     });
 
     setResources(newResources);
@@ -150,12 +163,14 @@ function Index() {
         <Collapse.Item title="资源" name='资源'>
           <Grid style={{ width: '100%' }} columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
             {Object.entries(resources).map(([name, value]) => {
+              const unit = plants.includes(name) ? '棵' : 'g/s';
+              const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
               return (
                 <Grid.Item key={name}>
                   <Avatar src={itemIcons[name]} shape='square' />
                   <Text className='resource-name'>{name}</Text>
                   <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
-                    {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}
+                    {`${valueStr} ${unit}`}
                   </Text>
                 </Grid.Item>
               )

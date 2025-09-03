@@ -127,6 +127,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
             </Cell>
             {item.detail?.modes.map((mode, i) => (
                 <Cell key={`mode-${i}`} className="mode">
+                    <ModeError optionValueMap={selection.modes[i]} modeName={mode.name} />
                     <Text className="mode-name">{mode.name}:</Text>
                     {mode.options.map((option, j) => (
                         <View key={`option-${j}`} className="mode-item">
@@ -144,7 +145,6 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                             />
                         </View>
                     ))}
-                    <ModeError optionValueMap={selection.modes[i]} modeName={mode.name} />
                 </Cell>
             ))}
             <Cell>
