@@ -1,7 +1,7 @@
 
 import { useContext, useEffect, useState } from 'react';
 import { View, Text } from '@tarojs/components'
-import { Avatar, Badge, Collapse, Grid, Tabbar } from '@nutui/nutui-react-taro'
+import { Avatar, Badge, Collapse, Grid } from '@nutui/nutui-react-taro'
 
 import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
@@ -10,7 +10,6 @@ import { SelectionsContext } from 'src/components/SelectionsContext';
 import { Item, Resources, foodCalorieMap, plants } from 'src/components/data';
 
 import './index.scss'
-import Taro from '@tarojs/taro';
 
 const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物', '相变'];
 const resultCategories = ['资源', '食物', '电力', '热量'];
@@ -108,14 +107,6 @@ function Index() {
     setTotalCalories(netCalories);
   }, [selections])
 
-  function handleSwitchTab(index: number) {
-    if (index === 1) {
-      Taro.redirectTo({
-        url: '/pages/about/about',
-      })
-    }
-  }
-
   function handleAdd(category: string) {
     setSelect(category);
   }
@@ -205,11 +196,6 @@ function Index() {
       </Collapse>
 
       <Select select={select} onClose={onClose} edit={edit} />
-
-      <Tabbar fixed onSwitch={handleSwitchTab}>
-        <Tabbar.Item title="产物计算" icon={<Icon name='refine' width={24} height={24} mode='aspectFit' />} />
-        <Tabbar.Item title="关于" icon={<Icon name='ideaDisabled' width={24} height={24} mode='aspectFit' />} />
-      </Tabbar>
     </View>
   )
 }
