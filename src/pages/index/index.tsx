@@ -35,12 +35,6 @@ function Index() {
       Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
         const resourceValue = selection.count * value;
         newResources[name] = (newResources[name] || 0) + resourceValue;
-
-        // 筛选食物资源
-        const foodKeywords = Object.keys(foodCalorieMap);
-        if (foodKeywords.some(keyword => name.includes(keyword))) {
-          newFoodResources[name] = (newFoodResources[name] || 0) + resourceValue;
-        }
       });
 
       // 电力计算
@@ -86,6 +80,16 @@ function Index() {
     setTotalPower(newTotalPower);
     setTotalHeat(newTotalHeat);
 
+
+    // 处理食物
+    Object.entries(newResources).forEach(([name, value]) => {
+      // 筛选食物资源
+      const foodKeywords = Object.keys(foodCalorieMap);
+      if (foodKeywords.some(keyword => name.includes(keyword)) && value > 0) {
+        newFoodResources[name] = (newFoodResources[name] || 0) + value;
+      }
+    });
+
     // 计算总卡路里
     const newTotalCalories = Object.entries(newFoodResources)
       .reduce((sum, [name, value]) => {
@@ -126,7 +130,7 @@ function Index() {
     if (category === '建筑') {
       return '建筑效率实际通常无法达到100%，实际产量通常略低于理论值';
     } else if (category === '动物') {
-      return '动物按精养数量计算，加上散养实际产量通常略高于理论值';
+      return '动物按精养数量计算，加上散养实际产量通常略高于理论值；除帕库鱼和树鼠选择产蛋外，其它动物选择产肉';
     } else if (category === '植物') {
       return '植物无法立即被收获，实际产量通常略低于理论值';
     } else if (category === '复制人/仿生人') {
@@ -180,7 +184,7 @@ function Index() {
         <Collapse.Item title="食物" name="食物">
           <View className="power-heat-container">
             <Text className={`value ${totalCalories < 0 ? "consume" : "produce"}`}>
-              {`${totalCalories < 0 ? '' : '+'}${Math.round(totalCalories)} 卡路里/秒`}
+              {`${totalCalories < 0 ? Math.floor(totalCalories) : '+' + Math.ceil(totalCalories)} 千卡/秒`}
             </Text>
           </View>
         </Collapse.Item>
