@@ -30,7 +30,7 @@ function SelectItems({ item, handleSelect }: SelectItemsProps) {
         <Grid columns={item.items && item.items.length >= 5 ? 5 : item.items?.length || 0} onClick={handleSelect}>
             {item.items?.map((item, index) => (
                 <Grid.Item key={index} text={item.name}>
-                    <Icon width={48} name={item.name} />
+                    <Icon width={48} height={48} name={item.name} mode="aspectFit" />
                 </Grid.Item>
             ))}
         </Grid>
@@ -114,7 +114,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     return (
         <Cell.Group className="select-detail">
             <Cell align="center">
-                <Image src={itemIcons[item.name]} width={48} />
+                <Image src={itemIcons[item.name]} width={48} height={48} mode="aspectFit" />
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
                 <InputNumber defaultValue={selection.count || 0} min={0} onChange={handleCountChange} />

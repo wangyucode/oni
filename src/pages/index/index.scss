@@ -58,21 +58,22 @@
       }
 
       .nut-avatar {
+
         &:active {
           background-color: #BF7FA8 !important;
         }
 
         .avatar-img {
-          width: 80%;
-          height: unset;
+          width: 80% !important;
+          height: 80% !important;
         }
       }
     }
 
     .avatar-add {
       .avatar-img {
-        width: 60%;
-        height: 60%;
+        width: 60% !important;
+        height: 60% !important;
       }
     }
   }

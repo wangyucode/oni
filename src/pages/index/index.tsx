@@ -207,8 +207,8 @@ function Index() {
       <Select select={select} onClose={onClose} edit={edit} />
 
       <Tabbar fixed onSwitch={handleSwitchTab}>
-        <Tabbar.Item title="产物计算" icon={<Icon name='refine' width={24} height={24} />} />
-        <Tabbar.Item title="关于" icon={<Icon name='ideaDisabled' width={24} height={24} />} />
+        <Tabbar.Item title="产物计算" icon={<Icon name='refine' width={24} height={24} mode='aspectFit' />} />
+        <Tabbar.Item title="关于" icon={<Icon name='ideaDisabled' width={24} height={24} mode='aspectFit' />} />
       </Tabbar>
     </View>
   )

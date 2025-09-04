@@ -48,13 +48,13 @@ export default function Support() {
                 <Text className="desc">《oni产物计算器》的更新维护离不开您的支持！您可以通过以下方式支持我们。</Text>
             </View>
             <Cell.Group>
-                <Cell>
+                <Cell className="share-cell" clickable>
                     <Button openType="share" className="share">
                         <Text className="share-title">分享给好友❤️</Text>
                         <ArrowRight />
                     </Button>
                 </Cell>
-                <Cell title="打赏我" extra={<ArrowRight />} onClick={handleReward} />
+                <Cell title="打赏我" extra={<ArrowRight />} onClick={handleReward} clickable />
                 <Cell title="意见反馈QQ群" extra={<Text selectable>1026563022</Text>} />
                 <Cell title="联系我" extra={<Text selectable>wangyu@wycode.cn</Text>} />
             </Cell.Group>
