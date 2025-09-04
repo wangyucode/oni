@@ -1,0 +1,21 @@
+.root {
+    .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: white;
+        gap: 8px;
+        padding: 16px;
+        border-radius: 6px;
+
+        .thanks {
+            width: 128px;
+            height: 128px;
+        }
+
+        .desc {
+            font-size: 14px;
+            color: #333;
+        }
+    }
+}

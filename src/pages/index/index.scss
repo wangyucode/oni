@@ -1,11 +1,4 @@
-.nutui-react-demo {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column; // 默认小屏幕使用column布局
-  background: url('./bg.png') center/cover no-repeat;
-  gap: 16px;
-  padding: 16px 16px 64px 16px;
-  box-sizing: border-box;
+.root {
 
   @media (min-width: 768px) {
     // 大屏幕时改为row布局

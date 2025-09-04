@@ -10,6 +10,7 @@ import { SelectionsContext } from 'src/components/SelectionsContext';
 import { Item, Resources, foodCalorieMap, plants } from 'src/components/data';
 
 import './index.scss'
+import Taro from '@tarojs/taro';
 
 const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物', '相变'];
 const resultCategories = ['资源', '食物', '电力', '热量'];
@@ -108,8 +109,11 @@ function Index() {
   }, [selections])
 
   function handleSwitchTab(index: number) {
-    // TODO: 切换Tabbar
-    console.log(index);
+    if (index === 1) {
+      Taro.redirectTo({
+        url: '/pages/about/about',
+      })
+    }
   }
 
   function handleAdd(category: string) {
@@ -141,7 +145,7 @@ function Index() {
   }
 
   return (
-    <View className='nutui-react-demo'>
+    <View className='root'>
       <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
