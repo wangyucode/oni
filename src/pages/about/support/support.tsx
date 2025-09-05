@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Image, Button } from "@tarojs/components";
+import { View, Text, Image, Button, Navigator } from "@tarojs/components";
 import Taro, { useShareAppMessage } from "@tarojs/taro";
 import { Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
@@ -15,27 +15,27 @@ export default function Support() {
         imageUrl: 'https://oxygennotincluded.wiki.gg/zh/images/e/ea/%E8%B6%85%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA.png',
     }));
 
-    // const [apps, setApps] = useState([]);
+    const [apps, setApps] = useState([]);
 
-    // useEffect(() => {
-    //     Taro.showLoading({
-    //         title: '加载中',
-    //     });
+    useEffect(() => {
+        Taro.showLoading({
+            title: '加载中',
+        });
 
-    //     Taro.request({
-    //         url: 'https://wycode.cn/api/v1/wechat/apps',
-    //         method: 'GET',
-    //         success: (res) => {
-    //             console.log(res);
-    //             if (res.data.success) {
-    //                 setApps(res.data.payload);
-    //             }
-    //         },
-    //         complete: () => {
-    //             Taro.hideLoading();
-    //         }
-    //     })
-    // }, []);
+        Taro.request({
+            url: 'https://wycode.cn/api/v1/wechat/apps',
+            method: 'GET',
+            success: (res) => {
+                console.log(res);
+                if (res.data.success) {
+                    setApps(res.data.payload);
+                }
+            },
+            complete: () => {
+                Taro.hideLoading();
+            }
+        })
+    }, []);
 
     function handleReward() {
         Taro.previewImage({ urls: ["https://wycode.cn/upload/image/fish/reward.jpg"] });
@@ -47,13 +47,27 @@ export default function Support() {
                 <Image className="thanks" src={thanks} />
                 <Text className="desc">《oni产物计算器》的更新维护离不开您的支持！您可以通过以下方式支持我们。</Text>
             </View>
-            <Cell.Group>
+            <Cell.Group className="cells">
                 <Cell className="share-cell" clickable>
                     <Button openType="share" className="share">
                         <Text className="share-title">分享给好友❤️</Text>
                         <ArrowRight />
                     </Button>
                 </Cell>
+                {
+                    apps.map((item: any) => (
+                        <Cell key={item._id} className="app-cell">
+                            <Navigator className="app-navigator" openType="navigate" target="miniProgram" appId={item.appid} version="release">
+                                <Image className="app-img" src={item.img} />
+                                <View className="app-info">
+                                    <Text className="app-name">{item.name}</Text>
+                                    <Text className="app-desc">{item.note}</Text>
+                                </View>
+                                <ArrowRight />
+                            </Navigator>
+                        </Cell>
+                    ))
+                }
                 <Cell title="打赏我" extra={<ArrowRight />} onClick={handleReward} clickable />
                 <Cell title="意见反馈QQ群" extra={<Text selectable>1026563022</Text>} />
                 <Cell title="联系我" extra={<Text selectable>wangyu@wycode.cn</Text>} />
