@@ -1,5 +1,4 @@
 import { SelectionsProvider } from "./components/SelectionsContext";
-
 import "./app.scss";
 
 function App(props) {

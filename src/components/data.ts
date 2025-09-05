@@ -4525,3 +4525,9 @@ export const initialSelections: Array<Selection> = [
     modes,
   },
 ];
+
+export const sharedMessage = {
+  title: "oni产物计算器",
+  path: "/pages/index/index",
+  imageUrl: "https://wycode.cn/upload/image/oni/oni.png",
+};

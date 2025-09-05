@@ -1,5 +1,6 @@
 
 import { useContext, useEffect, useState } from 'react';
+import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { Avatar, Badge, Collapse, Grid } from '@nutui/nutui-react-taro'
 
@@ -7,7 +8,7 @@ import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
-import { Item, Resources, foodCalorieMap, plants } from 'src/components/data';
+import { Item, Resources, foodCalorieMap, plants, sharedMessage } from 'src/components/data';
 
 import './index.scss'
 
@@ -15,6 +16,8 @@ const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物'
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
 function Index() {
+
+  useShareAppMessage(() => sharedMessage);
 
   const [select, setSelect] = useState<string>('');
   const [edit, setEdit] = useState<Item | undefined>(undefined);
@@ -130,6 +133,8 @@ function Index() {
       return '植物无法立即被收获，实际产量通常略低于理论值';
     } else if (category === '复制人/仿生人') {
       return '物质转化包含呼吸/上厕所/粘渣/润滑，未包含洗澡';
+    } else if (category === '相变') {
+      return '包括污染水挥发污染氧；数据待补充';
     } else {
       return '';
     }
@@ -144,7 +149,7 @@ function Index() {
             <View className='avatar-container'>
               <Avatar.Group gap="8">
                 {selections.filter(s => s.category === category).map(({ count, item }) =>
-                  <Badge value={count} key={item.name}>
+                  <Badge value={count} key={item.name} max={999}>
                     <Avatar
                       src={itemIcons[item.name]}
                       shape='square'

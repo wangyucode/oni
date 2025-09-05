@@ -1,13 +1,15 @@
-import Taro from "@tarojs/taro";
+import Taro, { useShareAppMessage } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { Avatar, Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
 
 import icon from 'src/icon.png'
+import { sharedMessage } from "src/components/data";
 import './about.scss'
 
 export default function About() {
 
+    useShareAppMessage(() => sharedMessage);
 
     function handleLogClick() {
         Taro.navigateTo({

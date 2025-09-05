@@ -118,7 +118,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
                 <InputNumber defaultValue={selection.count || 0} min={0} onChange={handleCountChange} />
-                <Text style={{ marginLeft: '8px' }}>{unit}</Text>
+                <Text className="item-unit">{unit}</Text>
             </Cell>
             <Cell align="center">
                 <Text className="item-power">电力：{item.detail?.power || 0}W</Text>
