@@ -17,7 +17,11 @@ const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物'
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
 function Index() {
+  const httpItemIcons = Object.fromEntries(
+    Object.entries(itemIcons).filter(([_, value]) => typeof value === 'string' && value.startsWith('http'))
+  );
 
+  console.log("httpItemIcons", JSON.stringify(httpItemIcons));
   useShareAppMessage(() => sharedMessage);
   const { plantNames, foodCalories } = useContext(DataContext);
 
@@ -136,7 +140,7 @@ function Index() {
     } else if (category === '复制人/仿生人') {
       return '物质转化包含呼吸/上厕所/粘渣/润滑，未包含洗澡';
     } else if (category === '相变') {
-      return '包括污染水挥发污染氧；数据待补充';
+      return '包括挥发、液化、凝固等';
     } else {
       return '';
     }
@@ -151,8 +155,8 @@ function Index() {
             <View className='avatar-container'>
               {selections.filter(s => s.category === category).map(({ count, item }) =>
                 <Badge value={count} key={item.name} max={999}>
-                  <Image
-                    src={itemIcons[item.name]}
+                  <Icon
+                    name={item.name}
                     width={48}
                     height={48}
                     mode='aspectFit'
@@ -172,7 +176,7 @@ function Index() {
               const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
               return (
                 <Grid.Item key={name}>
-                  <Image src={itemIcons[name]} width={48} height={48} mode='aspectFit' />
+                  <Icon name={name} width={48} height={48} mode='aspectFit' />
                   <Text className='resource-name'>{name}</Text>
                   <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
                     {`${valueStr} ${unit}`}
@@ -201,7 +205,7 @@ function Index() {
         </Collapse.Item>
       </Collapse>
 
-      <Select select={select} onClose={onClose} edit={edit} />
+      {select || edit ? <Select select={select} onClose={onClose} edit={edit} /> : null}
     </View>
   )
 }

@@ -10,6 +10,7 @@ function App(props) {
   const [items, setItems] = useState<Array<Item>>([]);
   const [plantNames, setPlantNames] = useState<Array<string>>([]);
   const [foodCalories, setFoodCalories] = useState<FoodCalories>({});
+  const [images, setImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
     Taro.showLoading({
@@ -48,10 +49,20 @@ function App(props) {
         }
       }
     });
+    Taro.request({
+      url: 'https://wycode.cn/api/v1/config?key=ONI_IMAGES',
+      method: 'GET',
+      success: (res) => {
+        console.log('getImages', res);
+        if (res.data.success) {
+          setImages(res.data.payload.data);
+        }
+      }
+    });
   }, []);
 
   return (
-    <DataProvider items={items} plantNames={plantNames} foodCalories={foodCalories}>
+    <DataProvider items={items} plantNames={plantNames} foodCalories={foodCalories} images={images}>
       <SelectionsProvider>
         {props.children}
       </SelectionsProvider>
