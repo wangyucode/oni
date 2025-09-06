@@ -30,7 +30,11 @@ export type Data = {
   items: Array<Item>;
 };
 
-export const plants = [
+export interface FoodCalories {
+  [name: string]: number;
+}
+
+const plants = [
   "六角根",
   "冰霜小麦",
   "刺壳果灌木",
@@ -65,7 +69,7 @@ export const plants = [
   "顶针芦苇",
 ];
 
-export const data: Data = {
+const data: Data = {
   items: [
     {
       name: "复制人/仿生人",
@@ -4449,7 +4453,7 @@ export const data: Data = {
 };
 
 // 食物卡路里映射表 (1g对应卡路里值)
-export const foodCalorieMap = {
+const foodCalorieMap = {
   米虱糕: 1.7,
   米虱: 0.6,
   混合浆果派: 4.2,
@@ -4508,23 +4512,6 @@ export const foodCalorieMap = {
   虫果果酱: 2.4,
   虫果: 0.25,
 };
-
-const dupe = data.items[0].items?.[0] as Item;
-const category = data.items[0].name;
-const modes = dupe.detail!.modes.map((mode) => {
-  return new Map<string, number>(
-    mode.options.map((option, index) => [option.name, index ? 0 : 100])
-  );
-});
-
-export const initialSelections: Array<Selection> = [
-  {
-    item: dupe,
-    count: 3,
-    category,
-    modes,
-  },
-];
 
 export const sharedMessage = {
   title: "oni产物计算器",

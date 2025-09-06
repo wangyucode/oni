@@ -42,20 +42,26 @@
         margin-right: 8px;
       }
 
-      .nut-avatar {
+      .nut-image {
+        border-radius: 4px;
 
         &:active {
           background-color: #BF7FA8 !important;
         }
 
-        .avatar-img {
-          width: 80% !important;
-          height: 80% !important;
+        img {
+          left: 50%;
+          transform: translateX(-50%) translateY(-50%);
         }
       }
     }
 
     .avatar-add {
+      background-color: #7F3D5E;
+      padding: 8px;
+      box-sizing: border-box;
+      border-radius: 4px;
+
       .avatar-img {
         width: 60% !important;
         height: 60% !important;
@@ -72,8 +78,18 @@
     }
   }
 
-  .resource-name {
-    font-size: 12px;
+  .resource-grid {
+    width: 100%;
+
+    .resource-name {
+      font-size: 12px;
+    }
+
+    img {
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+    }
+
   }
 
   .value {
@@ -87,6 +103,8 @@
       color: #64b578;
     }
   }
+
+
 }
 
 .nut-button {
@@ -102,6 +120,7 @@
   }
 
   .select-content {
+    padding-bottom: 32px;
 
     .nut-cell {
 
@@ -120,7 +139,6 @@
     }
 
     .select-detail {
-      padding-top: 16px;
 
       .nut-input-minus,
       .nut-input-add {
@@ -212,5 +230,10 @@
         }
       }
     }
+  }
+
+  img {
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
   }
 }

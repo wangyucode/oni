@@ -1,5 +1,6 @@
-import { createContext, Dispatch, useReducer } from "react";
-import { initialSelections, Selection } from "./data";
+import { createContext, Dispatch, useContext, useEffect, useReducer } from "react";
+import { Item, Selection } from "./data";
+import { DataContext } from "./DataContext";
 
 export const SelectionsContext = createContext<Array<Selection>>([]);
 export const SelectionsDispatchContext = createContext<Dispatch<SelectionsAction>>(() => { });
@@ -10,7 +11,29 @@ type SelectionsAction = {
 }
 
 export function SelectionsProvider({ children }) {
-    const [selections, dispatch] = useReducer(selectionsReducer, initialSelections);
+    const { items } = useContext(DataContext);
+    const [selections, dispatch] = useReducer(selectionsReducer, []);
+
+    useEffect(() => {
+        if (items.length) {
+            const dupe = items[0].items![0] as Item;
+            const category = items[0]!.name;
+            const modes = dupe.detail!.modes.map((mode) => {
+                return new Map<string, number>(
+                    mode.options.map((option, index) => [option.name, index ? 0 : 100])
+                );
+            });
+            dispatch({
+                type: 'update',
+                payload: {
+                    item: dupe,
+                    count: 3,
+                    category,
+                    modes,
+                },
+            });
+        }
+    }, [items]);
 
     return (
         <SelectionsContext.Provider value={selections}>

@@ -34,10 +34,6 @@ export default function Support() {
         })
     }, []);
 
-    function handleReward() {
-        Taro.previewImage({ urls: ["https://wycode.cn/upload/image/fish/reward.jpg"] });
-    }
-
     return (
         <View className='root'>
             <View className="header">
@@ -65,7 +61,6 @@ export default function Support() {
                         </Cell>
                     ))
                 }
-                <Cell title="打赏我" extra={<ArrowRight />} onClick={handleReward} clickable />
                 <Cell title="意见反馈QQ群" extra={<Text selectable>1026563022</Text>} />
                 <Cell title="联系我" extra={<Text selectable>wangyu@wycode.cn</Text>} />
             </Cell.Group>

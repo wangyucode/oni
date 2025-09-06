@@ -2,15 +2,16 @@
 import { useContext, useEffect, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Avatar, Badge, Collapse, Grid } from '@nutui/nutui-react-taro'
+import { Avatar, Badge, Collapse, Grid, Image } from '@nutui/nutui-react-taro'
 
 import Icon, { itemIcons } from 'src/components/icons'
 import plus from 'src/components/icons/plus.png'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
-import { Item, Resources, foodCalorieMap, plants, sharedMessage } from 'src/components/data';
+import { Item, Resources, sharedMessage } from 'src/components/data';
 
 import './index.scss'
+import { DataContext } from 'src/components/DataContext';
 
 const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物', '相变'];
 const resultCategories = ['资源', '食物', '电力', '热量'];
@@ -18,6 +19,7 @@ const resultCategories = ['资源', '食物', '电力', '热量'];
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
+  const { plantNames, foodCalories } = useContext(DataContext);
 
   const [select, setSelect] = useState<string>('');
   const [edit, setEdit] = useState<Item | undefined>(undefined);
@@ -68,7 +70,7 @@ function Index() {
 
     // 处理小动物吃植物
     Object.entries(newResources).forEach(([name, value]) => {
-      if (plants.includes(name)) {
+      if (plantNames.includes(name)) {
         const selection = selections.find(s => s.item.name === name);
         if (selection) {
           Object.entries(selection.item.detail!.resources).forEach(([n, v]) => {
@@ -87,7 +89,7 @@ function Index() {
     // 处理食物
     Object.entries(newResources).forEach(([name, value]) => {
       // 筛选食物资源
-      const foodKeywords = Object.keys(foodCalorieMap);
+      const foodKeywords = Object.keys(foodCalories);
       if (foodKeywords.some(keyword => name.includes(keyword)) && value > 0) {
         newFoodResources[name] = (newFoodResources[name] || 0) + value;
       }
@@ -96,7 +98,7 @@ function Index() {
     // 计算总卡路里
     const newTotalCalories = Object.entries(newFoodResources)
       .reduce((sum, [name, value]) => {
-        const caloriePerGram = foodCalorieMap[name] || 0;
+        const caloriePerGram = foodCalories[name] || 0;
         return sum + (value * caloriePerGram);
       }, 0);
 
@@ -147,31 +149,30 @@ function Index() {
           <Collapse.Item title={category} name={category} key={category} >
             <Text className='tips'>{getTips(category)}</Text>
             <View className='avatar-container'>
-              <Avatar.Group gap="8">
-                {selections.filter(s => s.category === category).map(({ count, item }) =>
-                  <Badge value={count} key={item.name} max={999}>
-                    <Avatar
-                      src={itemIcons[item.name]}
-                      shape='square'
-                      size='48'
-                      onClick={() => handleItemClick(item)}
-                    />
-                  </Badge>)}
-              </Avatar.Group>
-              <Avatar className='avatar-add' size='48' shape='square' src={plus} onClick={() => handleAdd(category)} style={{ backgroundColor: '#7F3D5E' }} />
+              {selections.filter(s => s.category === category).map(({ count, item }) =>
+                <Badge value={count} key={item.name} max={999}>
+                  <Image
+                    src={itemIcons[item.name]}
+                    width={48}
+                    height={48}
+                    mode='aspectFit'
+                    onClick={() => handleItemClick(item)}
+                  />
+                </Badge>)}
+              <Image className='avatar-add' width={48} height={48} src={plus} onClick={() => handleAdd(category)} />
             </View>
           </Collapse.Item>)}
       </Collapse>
 
       <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="资源" name='资源'>
-          <Grid style={{ width: '100%' }} columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
+          <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
             {Object.entries(resources).map(([name, value]) => {
-              const unit = plants.includes(name) ? '棵' : 'g/s';
+              const unit = plantNames.includes(name) ? '棵' : 'g/s';
               const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
               return (
                 <Grid.Item key={name}>
-                  <Avatar src={itemIcons[name]} shape='square' />
+                  <Image src={itemIcons[name]} width={48} height={48} mode='aspectFit' />
                   <Text className='resource-name'>{name}</Text>
                   <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
                     {`${valueStr} ${unit}`}

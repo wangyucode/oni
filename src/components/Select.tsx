@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Button, Cell, Divider, Grid, InputNumber, Popup, Radio, Image, Range } from "@nutui/nutui-react-taro";
-import { View, Text, Slider } from "@tarojs/components";
+import { Button, Cell, Divider, Grid, InputNumber, Popup, Image, Range } from "@nutui/nutui-react-taro";
+import { View, Text } from "@tarojs/components";
 
-import { data, Item, Resources, Selection } from "./data";
+import { Item, Resources, Selection } from "./data";
 import Icon, { itemIcons } from "./icons";
 import { SelectionsContext, SelectionsDispatchContext } from "./SelectionsContext";
 import ModeError from "./ModeError";
+import { DataContext } from "./DataContext";
 
 interface SelectProps {
     select: string;
@@ -111,6 +112,8 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         dispatch({ type: newSelection.count > 0 ? 'update' : 'remove', payload: newSelection });
     }
 
+    console.log(JSON.stringify(itemIcons));
+
     return (
         <Cell.Group className="select-detail">
             <Cell align="center">
@@ -153,7 +156,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                     columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
                     {Object.entries(resources).map(([name, value]) => (
                         <Grid.Item key={name}>
-                            <Image width={48} src={itemIcons[name]} />
+                            <Image width={48} height={48} src={itemIcons[name]} mode="aspectFit" />
                             <Text>{name}</Text>
                             <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
                                 {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}
@@ -167,14 +170,11 @@ function SelectDetail({ item, category }: SelectDetailProps) {
 }
 
 export default function Select({ select, onClose, edit }: SelectProps) {
-
-    let item = edit;
-    if (select) item = data.items.find(item => item.name === select);
-
-    if (!item) return null;
-
+    const { items } = useContext(DataContext);
     const [canGoBack, setCanGoBack] = useState(false);
-    const [currentItem, setCurrentItem] = useState<Item>(item);
+    let item = edit;
+    if (select) item = items.find(item => item.name === select);
+    const [currentItem, setCurrentItem] = useState<Item>(item!);
 
     function goBack() {
         if (!currentItem.parent?.parent) setCanGoBack(false);
@@ -187,6 +187,8 @@ export default function Select({ select, onClose, edit }: SelectProps) {
         setCurrentItem(nextItem);
         setCanGoBack(true);
     }
+
+    if (!currentItem) return null;
 
     return (
         <Popup
