@@ -2,10 +2,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Avatar, Badge, Collapse, Grid, Image } from '@nutui/nutui-react-taro'
+import { Badge, Collapse, Grid } from '@nutui/nutui-react-taro'
 
-import Icon, { itemIcons } from 'src/components/icons'
-import plus from 'src/components/icons/plus.png'
+import Icon from 'src/components/icons'
 import Select from 'src/components/Select';
 import { SelectionsContext } from 'src/components/SelectionsContext';
 import { Item, Resources, sharedMessage } from 'src/components/data';
@@ -17,11 +16,7 @@ const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物'
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
 function Index() {
-  const httpItemIcons = Object.fromEntries(
-    Object.entries(itemIcons).filter(([_, value]) => typeof value === 'string' && value.startsWith('http'))
-  );
 
-  console.log("httpItemIcons", JSON.stringify(httpItemIcons));
   useShareAppMessage(() => sharedMessage);
   const { plantNames, foodCalories } = useContext(DataContext);
 
@@ -168,7 +163,6 @@ function Index() {
             </View>
           </Collapse.Item>)}
       </Collapse>
-
       <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         <Collapse.Item title="资源" name='资源'>
           <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>

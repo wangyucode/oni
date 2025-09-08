@@ -7,6 +7,7 @@ import rightArrow from "./right-arrow.png";
 import dupe from "./dupe.png";
 import bionic from "./bionic.png";
 import plus from "./plus.png";
+import colors from "./colors.svg";
 
 import { useContext } from "react";
 import { DataContext } from "../DataContext";
@@ -23,7 +24,9 @@ const icons = {
 export default function Icon(props: Partial<ImageProps> & { name: string }) {
     const { images } = useContext(DataContext);
     const src = icons[props.name] || itemIcons[props.name] || images[props.name];
-    return <Image {...props} src={src} mode="aspectFit" />;
+    const url = process.env.NODE_ENV === 'development' ? colors : 'https://wycode.cn/upload/oni/images/colors.svg';
+    const filter = (src?.includes('element_liquid') || src?.includes('element_gas')) ? `url('${url}#${props.name}')` : '';
+    return <Image {...props} src={src} mode="aspectFit" style={{ filter }} />;
 }
 
 export const itemIcons = {
