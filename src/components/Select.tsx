@@ -35,7 +35,7 @@ export default function Select({ select, onClose, edit }: SelectProps) {
         <Popup
             visible={!!item}
             position="bottom"
-            title={select}
+            title={currentItem.name}
             left={canGoBack ? <Button onClick={goBack}>返回</Button> : null}
             onClose={onClose}
             closeable>
