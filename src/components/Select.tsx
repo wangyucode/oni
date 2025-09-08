@@ -5,6 +5,7 @@ import { Item } from "./data";
 import { DataContext } from "./DataContext";
 import SelectItems from "./select/SelectItems";
 import SelectDetail from "./select/SelectDetail";
+import { ScrollView } from "@tarojs/components";
 
 interface SelectProps {
     select: string;
@@ -38,13 +39,16 @@ export default function Select({ select, onClose, edit }: SelectProps) {
             title={currentItem.name}
             left={canGoBack ? <Button onClick={goBack}>返回</Button> : null}
             onClose={onClose}
-            closeable>
+            closeable
+            style={{ paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}>
             <Divider />
-            {currentItem.detail ?
-                <SelectDetail item={currentItem} category={select} />
-                :
-                <SelectItems item={currentItem} handleSelect={handleSelect} />
-            }
+            <ScrollView type="nested" scrollY={true} showScrollbar={true} style={{ flex: 1, scrollbarWidth: "thin", maxHeight: process.env.TARO_ENV === 'weapp' ? 'calc(87vh - 72px)' : 'unset' }}>
+                {currentItem.detail ?
+                    <SelectDetail item={currentItem} category={select} />
+                    :
+                    <SelectItems item={currentItem} handleSelect={handleSelect} />
+                }
+            </ScrollView>
         </Popup>
     );
 }

@@ -1,13 +1,20 @@
-page {
+page,
+.taro_page {
     height: 100%;
+    background-image: url('./bg.png');
+    background-size: cover;
+    background-position: top left;
+    overflow: hidden !important;
 }
 
 .root {
     display: flex;
-    min-height: 100%;
+    height: 100%;
     flex-direction: column; // 默认小屏幕使用column布局
-    background: url('./bg.png') center/cover no-repeat;
     gap: 16px;
     padding: 16px;
     box-sizing: border-box;
+    max-height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }

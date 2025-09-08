@@ -89,7 +89,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     return (
         <Cell.Group className="select-detail">
             <Cell align="center">
-                <Icon name={item.name} width={48} height={48} mode="aspectFit" />
+                <Icon name={item.name} width={48} height={48} />
                 <Text className="item-name">{item.name}</Text>
                 <View style={{ flex: 1 }} />
                 <InputNumber defaultValue={selection.count || 0} min={0} onChange={handleCountChange} />
@@ -128,7 +128,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                     columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
                     {Object.entries(resources).map(([name, value]) => (
                         <Grid.Item key={name}>
-                            <Icon name={name} width={48} height={48} mode="aspectFit" />
+                            <Icon name={name} width={48} height={48} />
                             <Text>{name}</Text>
                             <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
                                 {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}

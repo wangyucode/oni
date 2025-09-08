@@ -147,7 +147,7 @@ function Index() {
   }
 
   return (
-    <View className='root'>
+    <View className={`root ${select || edit ? 'select-open' : ''}`}>
       <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
@@ -159,11 +159,12 @@ function Index() {
                     name={item.name}
                     width={48}
                     height={48}
-                    mode='aspectFit'
                     onClick={() => handleItemClick(item)}
                   />
                 </Badge>)}
-              <Image className='avatar-add' width={48} height={48} src={plus} onClick={() => handleAdd(category)} />
+              <View onClick={() => handleAdd(category)}>
+                <Icon className='avatar-add' width={48} height={48} name='plus' />
+              </View>
             </View>
           </Collapse.Item>)}
       </Collapse>
@@ -176,7 +177,7 @@ function Index() {
               const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
               return (
                 <Grid.Item key={name}>
-                  <Icon name={name} width={48} height={48} mode='aspectFit' />
+                  <Icon name={name} width={48} height={48} />
                   <Text className='resource-name'>{name}</Text>
                   <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
                     {`${valueStr} ${unit}`}
