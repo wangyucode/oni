@@ -24,9 +24,7 @@ const icons = {
 export default function Icon(props: Partial<ImageProps> & { name: string }) {
     const { images } = useContext(DataContext);
     const src = icons[props.name] || itemIcons[props.name] || images[props.name];
-    const url = process.env.NODE_ENV === 'development' ? colors : 'https://wycode.cn/upload/oni/images/colors.svg';
-    const filter = (src?.includes('element_liquid') || src?.includes('element_gas')) ? `url('${url}#${props.name}')` : '';
-    return <Image {...props} src={src} mode="aspectFit" style={{ filter }} />;
+    return <Image {...props} src={src} mode="aspectFit" />;
 }
 
 export const itemIcons = {
