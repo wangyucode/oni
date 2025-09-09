@@ -40,10 +40,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         '相变': 'kg'
     };
 
-    let unit = unitMap[category || selection.category] || '';
-    if (unit === 'kg' && item.name === '污染水' && item.parent?.name === '挥发') {
-        unit = '吨';
-    }
+    const unit = unitMap[category || selection.category] || '';
 
     useEffect(() => {
         if (!selection) return;

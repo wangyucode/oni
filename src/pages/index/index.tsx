@@ -135,7 +135,7 @@ function Index() {
     } else if (category === '复制人/仿生人') {
       return '物质转化包含呼吸/上厕所/粘渣/润滑，未包含洗澡';
     } else if (category === '相变') {
-      return '包括挥发、液化、凝固等';
+      return '包括所有物质的相态转化，包括挥发、液化、凝固、熔化、凝结、升华';
     } else {
       return '';
     }

@@ -42,7 +42,7 @@ export default function Select({ select, onClose, edit }: SelectProps) {
             closeable
             style={{ paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}>
             <Divider />
-            <ScrollView type="nested" scrollY={true} showScrollbar={true} style={{ flex: 1, scrollbarWidth: "thin", maxHeight: process.env.TARO_ENV === 'weapp' ? 'calc(87vh - 72px)' : 'unset' }}>
+            <ScrollView type="nested" scrollY={true} showScrollbar={true} style={{ flex: 1, scrollbarWidth: "thin", maxHeight: process.env.TARO_ENV === 'weapp' ? 'calc(87vh - 96px)' : 'unset' }}>
                 {currentItem.detail ?
                     <SelectDetail item={currentItem} category={select} />
                     :
