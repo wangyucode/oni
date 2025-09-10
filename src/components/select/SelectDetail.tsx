@@ -18,6 +18,15 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     const [resources, setResources] = useState<Resources>({});
 
     function getDefaultModes(): Array<Map<string, number>> {
+        if (item.detail!.modes.length === 0) {
+            item.detail!.modes = [{
+                name: '效率',
+                options: [{
+                    name: '效率',
+                    resources: {}
+                }]
+            }]
+        }
         const modes = item.detail!.modes.map(mode => {
             return new Map<string, number>(
                 mode.options.map((option, index) => [option.name, index ? 0 : 100])
@@ -45,11 +54,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     useEffect(() => {
         if (!selection) return;
         const newResources: Resources = {};
-        // 基础资源计算
-        Object.entries(item.detail?.resources || {}).forEach(([name, value]) => {
-            const resourceValue = selection.count * value;
-            newResources[name] = (newResources[name] || 0) + resourceValue;
-        });
+        let totalFactor = 0;
 
         // 模式资源计算（支持百分比）
         item.detail!.modes.forEach((mode, i) => {
@@ -59,12 +64,18 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                 const percentage = optionSelectionMap.get(option.name) || 0;
 
                 const factor = percentage / 100;
+                totalFactor += factor;
                 Object.entries(option.resources || {}).forEach(([name, value]) => {
                     const resourceValue = selection.count * value * factor;
                     if (!resourceValue) return;
                     newResources[name] = (newResources[name] || 0) + resourceValue;
                 });
             });
+        });
+        // 基础资源计算
+        Object.entries(item.detail?.resources || {}).forEach(([name, value]) => {
+            const resourceValue = selection.count * value * totalFactor;
+            newResources[name] = (newResources[name] || 0) + resourceValue;
         });
         setResources(newResources);
     }, [selections, selection.count, selection.modes]);

@@ -35,22 +35,7 @@ function Index() {
     let newTotalHeat = 0;
 
     selections.forEach(selection => {
-      // 基础资源计算
-      Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
-        const resourceValue = selection.count * value;
-        newResources[name] = (newResources[name] || 0) + resourceValue;
-      });
-
-      // 电力计算
-      if (selection.item.detail?.power) {
-        newTotalPower += selection.count * selection.item.detail.power;
-      }
-
-      // 热量计算
-      if (selection.item.detail?.heat) {
-        newTotalHeat += selection.count * selection.item.detail.heat;
-      }
-
+      let totalFactor = 0;
       // 模式资源计算（支持百分比）
       selection.item.detail!.modes.forEach((mode, i) => {
         const optionSelectionMap = selection.modes[i];
@@ -58,6 +43,7 @@ function Index() {
         mode.options.forEach(option => {
           const percentage = optionSelectionMap.get(option.name) || 0;
           const factor = percentage / 100;
+          totalFactor += factor;
           Object.entries(option.resources || {}).forEach(([name, value]) => {
             const resourceValue = selection.count * value * factor;
             if (!resourceValue) return;
@@ -65,6 +51,22 @@ function Index() {
           });
         });
       });
+      // 基础资源计算
+      Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
+        const resourceValue = selection.count * value * totalFactor;
+        newResources[name] = (newResources[name] || 0) + resourceValue;
+      });
+
+      // 电力计算
+      if (selection.item.detail?.power) {
+        newTotalPower += selection.count * selection.item.detail.power * totalFactor;
+      }
+
+      // 热量计算
+      if (selection.item.detail?.heat) {
+        newTotalHeat += selection.count * selection.item.detail.heat * totalFactor;
+      }
+
     });
 
     // 处理小动物吃植物
@@ -190,7 +192,7 @@ function Index() {
         </Collapse.Item>
         <Collapse.Item title="电力" name="电力">
           <View className="power-heat-container">
-            <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>{totalPower} W</Text>
+            <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>{Math.ceil(totalPower)} W</Text>
           </View>
         </Collapse.Item>
         <Collapse.Item title="热量" name="热量">
