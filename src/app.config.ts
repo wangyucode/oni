@@ -32,4 +32,5 @@ export default defineAppConfig({
     ],
   },
   lazyCodeLoading: "requiredComponents",
+  resizable: true,
 });

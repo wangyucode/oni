@@ -16,6 +16,11 @@ function App(props) {
     Taro.showLoading({
       title: '加载数据库...',
     });
+    const appVersion = Taro.getStorageSync('appVersion');
+    if (appVersion !== process.env.TARO_APP_VERSION) {
+      Taro.clearStorageSync();
+      Taro.setStorageSync('appVersion', process.env.TARO_APP_VERSION);
+    }
     Taro.request({
       url: 'https://wycode.cn/api/v1/config?key=ONI_DATA',
       method: 'GET',

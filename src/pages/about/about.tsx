@@ -27,7 +27,7 @@ export default function About() {
         <View className='root'>
             <View className="about-header">
                 <Avatar src={icon} size="large" />
-                <Text className="title">ONI产物计算器1.2</Text>
+                <Text className="title">ONI产物计算器{process.env.TARO_APP_VERSION}</Text>
                 <Text className="desc">本小程序提供《缺氧》产物平衡计算功能，仅作交流学习使用。所使用的物品名称，图标等版权归科雷娱乐所有。</Text>
             </View>
             <Cell.Group className="about-cells">
