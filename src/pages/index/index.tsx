@@ -2,15 +2,17 @@
 import { useContext, useEffect, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Badge, Button, Collapse, Grid } from '@nutui/nutui-react-taro'
+import { Badge, Button, Cell, Collapse, Grid, Switch } from '@nutui/nutui-react-taro'
 
 import Icon from 'src/components/icons'
 import Select from 'src/components/Select';
+import { DataContext } from 'src/components/DataContext';
+import { useUnit } from 'src/components/UnitContext';
 import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
 import { Item, Resources, sharedMessage } from 'src/components/data';
 
 import './index.scss'
-import { DataContext } from 'src/components/DataContext';
+import { Add } from '@nutui/icons-react-taro';
 
 const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物', '相变'];
 const resultCategories = ['资源', '食物', '电力', '热量'];
@@ -19,7 +21,7 @@ function Index() {
 
   useShareAppMessage(() => sharedMessage);
   const { plantNames, foodCalories } = useContext(DataContext);
-
+  const { unitType, toggleUnitType } = useUnit();
   const [select, setSelect] = useState<string>('');
   const [edit, setEdit] = useState<Item | undefined>(undefined);
   const selections = useContext(SelectionsContext);
@@ -149,9 +151,41 @@ function Index() {
     }
   }
 
+  // 单位转换函数
+  const convertResourceValue = (value: number, name: string): { convertedValue: number, unit: string } => {
+    if (unitType === 'g/s') {
+      const unit = plantNames.includes(name) ? '棵/s' : 'g/s';
+      return { convertedValue: value, unit };
+    } else {
+      // 转换为kg/周期: 1周期=600秒，1000g=1kg
+      const convertedValue = value * 600 / 1000;
+      const unit = plantNames.includes(name) ? '棵/周期' : 'kg/周期';
+      return { convertedValue, unit };
+    }
+  };
+
+  const convertCalories = (calories: number): { convertedValue: number, unit: string } => {
+    if (unitType === 'g/s') {
+      return { convertedValue: calories, unit: '千卡/秒' };
+    } else {
+      return { convertedValue: calories * 600, unit: '千卡/周期' };
+    }
+  };
+
+  const convertHeat = (heat: number): { convertedValue: number, unit: string } => {
+    if (unitType === 'g/s') {
+      return { convertedValue: heat / 1000, unit: '千复制热/秒' };
+    } else {
+      return { convertedValue: heat * 600 / 1000, unit: '千复制热/周期' };
+    }
+  };
+
+  const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);
+  const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
+
   return (
     <View className={`root index ${select || edit ? 'select-open' : ''}`}>
-      <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90} className='selection'>
+      <Collapse className='selection' defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
             <Text className='tips'>{getTips(category)}</Text>
@@ -165,9 +199,7 @@ function Index() {
                     onClick={() => handleItemClick(item)}
                   />
                 </Badge>)}
-              <View onClick={() => handleAdd(category)}>
-                <Icon className='avatar-add' width={48} height={48} name='plus' />
-              </View>
+              <Button className='add' onClick={() => handleAdd(category)}><Add width={24} height={24} color='#7f3d5e' /></Button>
             </View>
           </Collapse.Item>)}
       </Collapse>
@@ -176,13 +208,13 @@ function Index() {
           <Collapse.Item title="资源" name='资源'>
             <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
               {Object.entries(resources).map(([name, value]) => {
-                const unit = plantNames.includes(name) ? '棵/s' : 'g/s';
-                const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
+                const { convertedValue, unit } = convertResourceValue(value, name);
+                const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.ceil(convertedValue);
                 return (
                   <Grid.Item key={name}>
                     <Icon name={name} width={48} height={48} />
                     <Text className='resource-name'>{name}</Text>
-                    <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
+                    <Text className={`value ${convertedValue < 0 ? "consume" : "produce"}`}>
                       {`${valueStr} ${unit}`}
                     </Text>
                   </Grid.Item>
@@ -192,23 +224,32 @@ function Index() {
           </Collapse.Item>
           <Collapse.Item title="食物" name="食物">
             <View className="power-heat-container">
-              <Text className={`value ${totalCalories < 0 ? "consume" : "produce"}`}>
-                {`${totalCalories < 0 ? Math.floor(totalCalories) : '+' + Math.ceil(totalCalories)} 千卡/秒`}
+              <Text className={`value ${convertedCalories < 0 ? "consume" : "produce"}`}>
+                {`${convertedCalories < 0 ? Math.floor(convertedCalories) : '+' + Math.ceil(convertedCalories)} ${caloriesUnit}`}
               </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="电力" name="电力">
             <View className="power-heat-container">
-              <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>{Math.ceil(totalPower)} W</Text>
+              <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>
+                {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.ceil(totalPower)} W`}
+              </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="热量" name="热量">
             <View className="power-heat-container">
-              <Text className={`value ${totalHeat < 0 ? "consume" : "produce"}`}>{Math.ceil(totalHeat / 1000)} 千复制热/秒</Text>
+              <Text className={`value ${convertedHeat < 0 ? "consume" : "produce"}`}>
+                {`${convertedHeat < 0 ? Math.floor(convertedHeat) : '+' + Math.ceil(convertedHeat)} ${heatUnit}`}
+              </Text>
             </View>
           </Collapse.Item>
         </Collapse>
-
+        <Cell className='unit-cell' title="切换显示单位" radius={0} extra={
+          <>
+            <Text className='unit-text'>{unitType === 'g/s' ? 'g/s' : 'kg/周期'}</Text>
+            <Switch checked={unitType === 'kg/周期'} onChange={toggleUnitType} />
+          </>
+        } />
         <Button className='reset' size="xlarge" onClick={reset}>清空选择</Button>
       </View>
 

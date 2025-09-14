@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { Text, View } from "@tarojs/components";
-import { Cell, Image, InputNumber, Range, Grid } from "@nutui/nutui-react-taro";
+import { Cell, InputNumber, Range, Grid } from "@nutui/nutui-react-taro";
 
 import { Item, Resources, Selection } from "../data";
-import Icon, { itemIcons } from "../icons";
+import Icon from "../icons";
 import { SelectionsContext, SelectionsDispatchContext } from "../SelectionsContext";
 import ModeError from "../ModeError";
+import { useUnit } from '../UnitContext';
 
 interface SelectDetailProps {
     item: Item;
@@ -16,6 +17,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     const selections = useContext(SelectionsContext);
     const dispatch = useContext(SelectionsDispatchContext);
     const [resources, setResources] = useState<Resources>({});
+    const { unitType } = useUnit();
 
     function getDefaultModes(): Array<Map<string, number>> {
         if (item.detail!.modes.length === 0) {
@@ -94,6 +96,17 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         dispatch({ type: newSelection.count > 0 ? 'update' : 'remove', payload: newSelection });
     }
 
+    // 单位转换函数
+    const convertValue = (value: number): { convertedValue: number, unit: string } => {
+        if (unitType === 'g/s') {
+            return { convertedValue: value, unit: 'g/s' };
+        } else {
+            // 转换为kg/周期: 1周期=600秒，1000g=1kg
+            const convertedValue = value * 600 / 1000;
+            return { convertedValue, unit: 'kg/周期' };
+        }
+    };
+
     return (
         <Cell.Group className="select-detail">
             <Cell align="center">
@@ -134,15 +147,18 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                 <Grid
                     style={{ width: '100%' }}
                     columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
-                    {Object.entries(resources).map(([name, value]) => (
-                        <Grid.Item key={name}>
-                            <Icon name={name} width={48} height={48} />
-                            <Text>{name}</Text>
-                            <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
-                                {`${value < 0 ? Math.floor(value) : '+' + Math.ceil(value)} g/s`}
-                            </Text>
-                        </Grid.Item>))
-                    }
+                    {Object.entries(resources).map(([name, value]) => {
+                        const { convertedValue, unit } = convertValue(value);
+                        return (
+                            <Grid.Item key={name}>
+                                <Icon name={name} width={48} height={48} />
+                                <Text>{name}</Text>
+                                <Text className={`value ${convertedValue < 0 ? "consume" : "produce"}`}>
+                                    {`${convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.ceil(convertedValue)} ${unit}`}
+                                </Text>
+                            </Grid.Item>
+                        )
+                    })}
                 </Grid>
             </Cell>
         </Cell.Group>

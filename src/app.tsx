@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import Taro from "@tarojs/taro";
 
 import { SelectionsProvider } from "./components/SelectionsContext";
-import "./app.scss";
 import { DataProvider } from "./components/DataContext";
 import { FoodCalories, Item } from "./components/data";
+import { UnitProvider } from "./components/UnitContext";
+
+import "./app.scss";
 
 function App(props) {
   const [items, setItems] = useState<Array<Item>>([]);
@@ -69,7 +71,9 @@ function App(props) {
   return (
     <DataProvider items={items} plantNames={plantNames} foodCalories={foodCalories} images={images}>
       <SelectionsProvider>
-        {props.children}
+        <UnitProvider>
+          {props.children}
+        </UnitProvider>
       </SelectionsProvider>
     </DataProvider>
   );

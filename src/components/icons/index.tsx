@@ -6,8 +6,6 @@ import ideaDisabled from "./idea-1.png";
 import rightArrow from "./right-arrow.png";
 import dupe from "./dupe.png";
 import bionic from "./bionic.png";
-import plus from "./plus.png";
-import colors from "./colors.svg";
 
 import { useContext } from "react";
 import { DataContext } from "../DataContext";
@@ -18,7 +16,6 @@ const icons = {
     idea,
     ideaDisabled,
     rightArrow,
-    plus
 }
 
 export default function Icon(props: Partial<ImageProps> & { name: string }) {
