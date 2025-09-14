@@ -14,6 +14,22 @@ function App(props) {
   const [foodCalories, setFoodCalories] = useState<FoodCalories>({});
   const [images, setImages] = useState<Record<string, string>>({});
 
+  function initItemModes(item: Item) {
+    if (item.detail) {
+      if (item.detail.modes.length === 0) {
+        item.detail.modes = [{
+          name: '效率',
+          options: [{
+            name: '效率',
+            resources: {}
+          }]
+        }]
+      }
+    } else if (item.items) {
+      item.items.forEach(initItemModes);
+    }
+  }
+
   useEffect(() => {
     Taro.showLoading({
       title: '加载数据库...',
@@ -29,6 +45,7 @@ function App(props) {
       success: (res) => {
         console.log('getItems', res);
         if (res.data.success) {
+          res.data.payload.data.items.forEach(initItemModes);
           setItems(res.data.payload.data.items);
         }
       },

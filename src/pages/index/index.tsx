@@ -209,7 +209,7 @@ function Index() {
             <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
               {Object.entries(resources).map(([name, value]) => {
                 const { convertedValue, unit } = convertResourceValue(value, name);
-                const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.ceil(convertedValue);
+                const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue);
                 return (
                   <Grid.Item key={name}>
                     <Icon name={name} width={48} height={48} />
@@ -225,21 +225,21 @@ function Index() {
           <Collapse.Item title="食物" name="食物">
             <View className="power-heat-container">
               <Text className={`value ${convertedCalories < 0 ? "consume" : "produce"}`}>
-                {`${convertedCalories < 0 ? Math.floor(convertedCalories) : '+' + Math.ceil(convertedCalories)} ${caloriesUnit}`}
+                {`${convertedCalories < 0 ? Math.floor(convertedCalories) : '+' + Math.floor(convertedCalories)} ${caloriesUnit}`}
               </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="电力" name="电力">
             <View className="power-heat-container">
               <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>
-                {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.ceil(totalPower)} W`}
+                {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.floor(totalPower)} W`}
               </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="热量" name="热量">
             <View className="power-heat-container">
               <Text className={`value ${convertedHeat < 0 ? "consume" : "produce"}`}>
-                {`${convertedHeat < 0 ? Math.floor(convertedHeat) : '+' + Math.ceil(convertedHeat)} ${heatUnit}`}
+                {`${convertedHeat < 0 ? Math.floor(convertedHeat) : '+' + Math.floor(convertedHeat)} ${heatUnit}`}
               </Text>
             </View>
           </Collapse.Item>

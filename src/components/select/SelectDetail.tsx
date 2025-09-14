@@ -20,15 +20,6 @@ function SelectDetail({ item, category }: SelectDetailProps) {
     const { unitType } = useUnit();
 
     function getDefaultModes(): Array<Map<string, number>> {
-        if (item.detail!.modes.length === 0) {
-            item.detail!.modes = [{
-                name: '效率',
-                options: [{
-                    name: '效率',
-                    resources: {}
-                }]
-            }]
-        }
         const modes = item.detail!.modes.map(mode => {
             return new Map<string, number>(
                 mode.options.map((option, index) => [option.name, index ? 0 : 100])
@@ -57,7 +48,6 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         if (!selection) return;
         const newResources: Resources = {};
         let totalFactor = 0;
-
         // 模式资源计算（支持百分比）
         item.detail!.modes.forEach((mode, i) => {
             const optionSelectionMap = selection.modes[i];
@@ -154,7 +144,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                                 <Icon name={name} width={48} height={48} />
                                 <Text>{name}</Text>
                                 <Text className={`value ${convertedValue < 0 ? "consume" : "produce"}`}>
-                                    {`${convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.ceil(convertedValue)} ${unit}`}
+                                    {`${convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue)} ${unit}`}
                                 </Text>
                             </Grid.Item>
                         )

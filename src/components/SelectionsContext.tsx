@@ -68,8 +68,8 @@ function convertFromSavedSelection(savedSelections: Array<SavedSelection>, items
     return savedSelections.map(saved => {
         // 使用category优化查找效率
         const item = findItemByCategoryAndName(items, saved.category, saved.item);
-        if (!item) {
-            throw new Error(`Item not found: ${saved.item} in category ${saved.category}`);
+        if (!item || !item.detail) {
+            throw new Error(`Item not found or without detail: ${saved.item} in category ${saved.category}`);
         }
 
         // 将Record<string, number>数组还原为Map数组
