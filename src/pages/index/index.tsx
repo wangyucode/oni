@@ -1,12 +1,12 @@
 
 import { useContext, useEffect, useState } from 'react';
-import { useShareAppMessage } from '@tarojs/taro';
+import Taro, { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Badge, Collapse, Grid } from '@nutui/nutui-react-taro'
+import { Badge, Button, Collapse, Grid } from '@nutui/nutui-react-taro'
 
 import Icon from 'src/components/icons'
 import Select from 'src/components/Select';
-import { SelectionsContext } from 'src/components/SelectionsContext';
+import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
 import { Item, Resources, sharedMessage } from 'src/components/data';
 
 import './index.scss'
@@ -23,6 +23,7 @@ function Index() {
   const [select, setSelect] = useState<string>('');
   const [edit, setEdit] = useState<Item | undefined>(undefined);
   const selections = useContext(SelectionsContext);
+  const dispatch = useContext(SelectionsDispatchContext);
   const [resources, setResources] = useState<Resources>({});
   const [totalCalories, setTotalCalories] = useState<number>(0);
   const [totalPower, setTotalPower] = useState<number>(0);
@@ -127,6 +128,11 @@ function Index() {
     setEdit({ ...item });
   }
 
+  function reset() {
+    dispatch({ type: 'replace', payload: [] });
+    Taro.removeStorage({ key: 'selections' });
+  }
+
   function getTips(category: string) {
     if (category === '建筑') {
       return '建筑效率实际通常无法达到100%，实际产量通常略低于理论值';
@@ -144,8 +150,8 @@ function Index() {
   }
 
   return (
-    <View className={`root ${select || edit ? 'select-open' : ''}`}>
-      <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
+    <View className={`root index ${select || edit ? 'select-open' : ''}`}>
+      <Collapse defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90} className='selection'>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
             <Text className='tips'>{getTips(category)}</Text>
@@ -165,42 +171,46 @@ function Index() {
             </View>
           </Collapse.Item>)}
       </Collapse>
-      <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
-        <Collapse.Item title="资源" name='资源'>
-          <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
-            {Object.entries(resources).map(([name, value]) => {
-              const unit = plantNames.includes(name) ? '棵' : 'g/s';
-              const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
-              return (
-                <Grid.Item key={name}>
-                  <Icon name={name} width={48} height={48} />
-                  <Text className='resource-name'>{name}</Text>
-                  <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
-                    {`${valueStr} ${unit}`}
-                  </Text>
-                </Grid.Item>
-              )
-            })}
-          </Grid>
-        </Collapse.Item>
-        <Collapse.Item title="食物" name="食物">
-          <View className="power-heat-container">
-            <Text className={`value ${totalCalories < 0 ? "consume" : "produce"}`}>
-              {`${totalCalories < 0 ? Math.floor(totalCalories) : '+' + Math.ceil(totalCalories)} 千卡/秒`}
-            </Text>
-          </View>
-        </Collapse.Item>
-        <Collapse.Item title="电力" name="电力">
-          <View className="power-heat-container">
-            <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>{Math.ceil(totalPower)} W</Text>
-          </View>
-        </Collapse.Item>
-        <Collapse.Item title="热量" name="热量">
-          <View className="power-heat-container">
-            <Text className={`value ${totalHeat < 0 ? "consume" : "produce"}`}>{Math.ceil(totalHeat / 1000)} 千复制热/秒</Text>
-          </View>
-        </Collapse.Item>
-      </Collapse>
+      <View className='result'>
+        <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
+          <Collapse.Item title="资源" name='资源'>
+            <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
+              {Object.entries(resources).map(([name, value]) => {
+                const unit = plantNames.includes(name) ? '棵' : 'g/s';
+                const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
+                return (
+                  <Grid.Item key={name}>
+                    <Icon name={name} width={48} height={48} />
+                    <Text className='resource-name'>{name}</Text>
+                    <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
+                      {`${valueStr} ${unit}`}
+                    </Text>
+                  </Grid.Item>
+                )
+              })}
+            </Grid>
+          </Collapse.Item>
+          <Collapse.Item title="食物" name="食物">
+            <View className="power-heat-container">
+              <Text className={`value ${totalCalories < 0 ? "consume" : "produce"}`}>
+                {`${totalCalories < 0 ? Math.floor(totalCalories) : '+' + Math.ceil(totalCalories)} 千卡/秒`}
+              </Text>
+            </View>
+          </Collapse.Item>
+          <Collapse.Item title="电力" name="电力">
+            <View className="power-heat-container">
+              <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>{Math.ceil(totalPower)} W</Text>
+            </View>
+          </Collapse.Item>
+          <Collapse.Item title="热量" name="热量">
+            <View className="power-heat-container">
+              <Text className={`value ${totalHeat < 0 ? "consume" : "produce"}`}>{Math.ceil(totalHeat / 1000)} 千复制热/秒</Text>
+            </View>
+          </Collapse.Item>
+        </Collapse>
+
+        <Button className='reset' size="xlarge" onClick={reset}>清空选择</Button>
+      </View>
 
       {select || edit ? <Select select={select} onClose={onClose} edit={edit} /> : null}
     </View>

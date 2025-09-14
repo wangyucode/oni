@@ -3,10 +3,11 @@ import { View, Text, Image, Button, Navigator } from "@tarojs/components";
 import Taro, { useShareAppMessage } from "@tarojs/taro";
 import { Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
-
-import icon from 'src/icon.png';
-import './support.scss'
+import BackButton from "src/components/back/BackButton";
 import { sharedMessage } from "src/components/data";
+import icon from 'src/icon.png';
+
+import './support.scss'
 
 export default function Support() {
 
@@ -35,7 +36,8 @@ export default function Support() {
     }, []);
 
     return (
-        <View className='root'>
+        <View className='root support'>
+            {process.env.TARO_ENV === 'h5' && <BackButton />}
             <View className="header">
                 <Image className="icon" src={icon} />
                 <Text className="desc">《oni产物计算器》的更新维护离不开您的支持！您可以通过以下方式支持我。</Text>

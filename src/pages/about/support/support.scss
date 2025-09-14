@@ -1,4 +1,6 @@
-.root {
+.support {
+    gap: 4px;
+
     .header {
         display: flex;
         flex-direction: column;
@@ -82,14 +84,4 @@
         }
     }
 
-}
-
-@media (min-width: 768px) {
-    .header {
-        flex: 1;
-    }
-
-    .cells {
-        flex: 1;
-    }
 }

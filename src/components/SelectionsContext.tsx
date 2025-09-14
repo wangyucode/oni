@@ -2,7 +2,7 @@ import { createContext, Dispatch, useContext, useEffect, useReducer, useRef } fr
 import Taro from "@tarojs/taro";
 import { debounce } from "@tarojs/runtime";
 
-import { Item, Selection } from "./data";
+import { Item, Selection, SavedSelection } from "./data";
 import { DataContext } from "./DataContext";
 
 export const SelectionsContext = createContext<Array<Selection>>([]);
@@ -10,72 +10,134 @@ export const SelectionsDispatchContext = createContext<Dispatch<SelectionsAction
 
 type SelectionsAction = {
     type: 'update' | 'remove' | 'replace';
-    payload: Selection;
+    payload: any;
 }
 
-// 移除Item对象中的parent字段以避免循环引用
-function removeParentFields(item: Item): Item {
-    const { parent, ...itemWithoutParent } = item;
-    if (itemWithoutParent.items) {
-        itemWithoutParent.items = itemWithoutParent.items.map(removeParentFields);
+// 在指定category下查找指定名称的Item
+function findItemByCategoryAndName(items: Array<Item>, category: string, name: string): Item | null {
+    // 先找到对应的category
+    const categoryItem = items.find(item => item.name === category);
+    if (!categoryItem || !categoryItem.items) {
+        return null;
     }
-    return itemWithoutParent;
+
+    // 在category的items中查找指定名称的item
+    return findItemInCategory(categoryItem.items, name);
 }
 
-// 将Map转换为可序列化的对象数组，并移除循环引用
-function convertMapsToSerializable(selections: Array<Selection>): Array<any> {
-    return selections.map(selection => ({
-        ...selection,
-        item: removeParentFields(selection.item),
-        modes: selection.modes.map(map => Array.from(map.entries()))
-    }));
+// 在category的items中递归查找item
+function findItemInCategory(items: Array<Item>, name: string): Item | null {
+    for (const item of items) {
+        if (item.name === name) {
+            return item;
+        }
+        if (item.items) {
+            const found = findItemInCategory(item.items, name);
+            if (found) {
+                return found;
+            }
+        }
+    }
+    return null;
 }
 
-// 将序列化的对象数组转换回Map
-function convertSerializableToMaps(serializedSelections: Array<any>): Array<Selection> {
-    return serializedSelections.map(serialized => ({
-        ...serialized,
-        modes: serialized.modes.map((entries: Array<[string, number]>) => new Map(entries))
-    }));
+// 将Selection转换为SavedSelection用于保存
+function convertToSavedSelection(selections: Array<Selection>): Array<SavedSelection> {
+    return selections.map(selection => {
+        // 将Map数组转换为Record<string, number>数组
+        const modesArray = selection.modes.map(map => {
+            const record: Record<string, number> = {};
+            map.forEach((value, key) => {
+                record[key] = value;
+            });
+            return record;
+        });
+
+        return {
+            category: selection.category,
+            item: selection.item.name,
+            count: selection.count,
+            modes: modesArray
+        };
+    });
+}
+
+// 将SavedSelection还原为Selection
+function convertFromSavedSelection(savedSelections: Array<SavedSelection>, items: Array<Item>): Array<Selection> {
+    return savedSelections.map(saved => {
+        // 使用category优化查找效率
+        const item = findItemByCategoryAndName(items, saved.category, saved.item);
+        if (!item) {
+            throw new Error(`Item not found: ${saved.item} in category ${saved.category}`);
+        }
+
+        // 将Record<string, number>数组还原为Map数组
+        const modes: Array<Map<string, number>> = saved.modes.map(record => {
+            const map = new Map<string, number>();
+            Object.entries(record).forEach(([key, value]) => {
+                map.set(key, value);
+            });
+            return map;
+        });
+
+        return {
+            category: saved.category,
+            item: item,
+            count: saved.count,
+            modes: modes
+        };
+    });
 }
 
 export function SelectionsProvider({ children }) {
     const { items } = useContext(DataContext);
     const [selections, dispatch] = useReducer(selectionsReducer, []);
     const debouncedSaveRef = useRef(debounce((selections: Array<Selection>) => {
-        const serializableSelections = convertMapsToSerializable(selections);
+        const savedSelections = convertToSavedSelection(selections);
         Taro.setStorage({
             key: 'selections',
-            data: serializableSelections,
+            data: savedSelections,
         });
-    }, 5000));
+    }, 1000));
+
+    // 插入初始选择的函数
+    function insertInitSelections() {
+        const dupe = items[0].items![0] as Item;
+        const category = items[0]!.name;
+        const modes = dupe.detail!.modes.map((mode) => {
+            return new Map<string, number>(
+                mode.options.map((option, index) => [option.name, index ? 0 : 100])
+            );
+        });
+        dispatch({
+            type: 'update',
+            payload: {
+                item: dupe,
+                count: 3,
+                category,
+                modes,
+            },
+        });
+    }
 
     useEffect(() => {
         if (items.length) {
-            const savedSelections = Taro.getStorageSync('selections');
+            const savedSelections = Taro.getStorageSync('selections') as Array<SavedSelection>;
             if (savedSelections && savedSelections.length) {
-                const selectionsWithMaps = convertSerializableToMaps(savedSelections);
-                dispatch({
-                    type: 'replace',
-                    payload: selectionsWithMaps as any,
-                });
+                try {
+                    const restoredSelections = convertFromSavedSelection(savedSelections, items);
+                    dispatch({
+                        type: 'replace',
+                        payload: restoredSelections as any,
+                    });
+                } catch (error) {
+                    console.error('Failed to restore selections:', error);
+                    // 如果恢复失败，使用默认选择
+                    insertInitSelections();
+                }
             } else {
-                const dupe = items[0].items![0] as Item;
-                const category = items[0]!.name;
-                const modes = dupe.detail!.modes.map((mode) => {
-                    return new Map<string, number>(
-                        mode.options.map((option, index) => [option.name, index ? 0 : 100])
-                    );
-                });
-                dispatch({
-                    type: 'update',
-                    payload: {
-                        item: dupe,
-                        count: 3,
-                        category,
-                        modes,
-                    },
-                });
+                // 如果没有保存的选择，插入初始选择
+                insertInitSelections();
             }
         }
     }, [items]);
@@ -111,7 +173,7 @@ function selectionsReducer(state: Array<Selection>, action: SelectionsAction): A
             return state.filter(selection => selection.item.name !== action.payload.item.name);
         }
         case 'replace': {
-            return action.payload as unknown as Array<Selection>;
+            return action.payload;
         }
         default: {
             return state;

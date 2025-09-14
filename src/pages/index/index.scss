@@ -4,10 +4,12 @@
     overflow: hidden;
   }
 
-  @media (min-width: 768px) {
-    // 大屏幕时改为row布局
-    flex-direction: row;
-    align-items: flex-start;
+  &.index {
+    @media (min-width: 768px) {
+      // 大屏幕时改为row布局
+      flex-direction: row;
+      align-items: flex-start;
+    }
   }
 
   .nut-collapse-item-header {
@@ -64,6 +66,21 @@
       border-radius: 4px;
       margin-left: 8px;
     }
+  }
+
+  .result,
+  .selection {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .reset {
+    margin-top: 16px;
+    background-color: #7F3D5E;
+    color: #fff;
+    border-color: #000;
+    border-radius: 4px;
   }
 
   .power-heat-container {

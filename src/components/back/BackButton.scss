@@ -1,0 +1,9 @@
+.back {
+    background-color: #f5f5f5;
+    align-self: flex-start;
+
+    .content {
+        display: flex;
+        align-items: center;
+    }
+}
