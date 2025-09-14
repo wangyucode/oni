@@ -28,14 +28,15 @@ function findItemByCategoryAndName(items: Array<Item>, category: string, name: s
 // 在category的items中递归查找item
 function findItemInCategory(items: Array<Item>, name: string): Item | null {
     for (const item of items) {
-        if (item.name === name) {
-            return item;
-        }
         if (item.items) {
             const found = findItemInCategory(item.items, name);
             if (found) {
                 return found;
             }
+        }
+
+        if (item.name === name) {
+            return item;
         }
     }
     return null;
