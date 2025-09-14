@@ -139,7 +139,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                             <Icon name={name} width={48} height={48} />
                             <Text>{name}</Text>
                             <Text className={`value ${value < 0 ? "consume" : "produce"}`}>
-                                {`${value < 0 ? '' : '+'}${Math.round(value)} g/s`}
+                                {`${value < 0 ? Math.floor(value) : '+' + Math.ceil(value)} g/s`}
                             </Text>
                         </Grid.Item>))
                     }

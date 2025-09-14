@@ -9,9 +9,9 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
     date: "2025-7-1",
     designWidth: 375,
     deviceRatio: {
+      375: 2,
       640: 2.34 / 2,
       750: 1,
-      375: 2,
       828: 1.81 / 2,
     },
     sourceRoot: "src",

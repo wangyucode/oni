@@ -176,7 +176,7 @@ function Index() {
           <Collapse.Item title="资源" name='资源'>
             <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
               {Object.entries(resources).map(([name, value]) => {
-                const unit = plantNames.includes(name) ? '棵' : 'g/s';
+                const unit = plantNames.includes(name) ? '棵/s' : 'g/s';
                 const valueStr = value < 0 ? Math.floor(value) : '+' + Math.ceil(value);
                 return (
                   <Grid.Item key={name}>
