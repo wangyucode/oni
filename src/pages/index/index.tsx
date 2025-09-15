@@ -139,7 +139,7 @@ function Index() {
     if (category === '建筑') {
       return '建筑效率实际通常无法达到100%，实际产量通常略低于理论值';
     } else if (category === '动物') {
-      return '动物按精养数量计算，加上散养实际产量通常略高于理论值；除帕库鱼和树鼠选择产蛋外，其它动物选择产肉';
+      return '动物资源消耗和产出按精养数量计算；除帕库鱼和树鼠选择产蛋外，其它动物选择产肉，产量包括散养';
     } else if (category === '植物') {
       return '植物无法立即被收获，实际产量通常略低于理论值';
     } else if (category === '复制人/仿生人') {
@@ -154,7 +154,9 @@ function Index() {
   // 单位转换函数
   const convertResourceValue = (value: number, name: string): { convertedValue: number, unit: string } => {
     if (unitType === 'g/s') {
-      const unit = plantNames.includes(name) ? '棵/s' : 'g/s';
+      const isPlant = plantNames.includes(name);
+      const unit = isPlant ? '棵/s' : 'g/s';
+      if (isPlant) return { convertedValue: value / 1000, unit };
       return { convertedValue: value, unit };
     } else {
       // 转换为kg/周期: 1周期=600秒，1000g=1kg
@@ -250,7 +252,7 @@ function Index() {
             <Switch checked={unitType === 'kg/周期'} onChange={toggleUnitType} />
           </>
         } />
-        <Button className='reset' size="xlarge" onClick={reset}>清空选择</Button>
+        <Button className='reset' size="large" onClick={reset}>清空选择</Button>
       </View>
 
       {select || edit ? <Select select={select} onClose={onClose} edit={edit} /> : null}

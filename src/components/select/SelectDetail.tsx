@@ -7,6 +7,7 @@ import Icon from "../icons";
 import { SelectionsContext, SelectionsDispatchContext } from "../SelectionsContext";
 import ModeError from "../ModeError";
 import { useUnit } from '../UnitContext';
+import { DataContext } from '../DataContext'; // 新增导入
 
 interface SelectDetailProps {
     item: Item;
@@ -16,6 +17,7 @@ interface SelectDetailProps {
 function SelectDetail({ item, category }: SelectDetailProps) {
     const selections = useContext(SelectionsContext);
     const dispatch = useContext(SelectionsDispatchContext);
+    const { plantNames } = useContext(DataContext); // 新增获取 plantNames
     const [resources, setResources] = useState<Resources>({});
     const { unitType } = useUnit();
 
@@ -86,14 +88,18 @@ function SelectDetail({ item, category }: SelectDetailProps) {
         dispatch({ type: newSelection.count > 0 ? 'update' : 'remove', payload: newSelection });
     }
 
-    // 单位转换函数
-    const convertValue = (value: number): { convertedValue: number, unit: string } => {
+    // 单位转换函数 - 修改为统一处理植物单位
+    const convertValue = (value: number, name: string): { convertedValue: number, unit: string } => {
         if (unitType === 'g/s') {
-            return { convertedValue: value, unit: 'g/s' };
+            const isPlant = plantNames.includes(name);
+            const unit = isPlant ? '棵/s' : 'g/s';
+            if (isPlant) return { convertedValue: value / 1000, unit };
+            return { convertedValue: value, unit };
         } else {
             // 转换为kg/周期: 1周期=600秒，1000g=1kg
             const convertedValue = value * 600 / 1000;
-            return { convertedValue, unit: 'kg/周期' };
+            const unit = plantNames.includes(name) ? '棵/周期' : 'kg/周期';
+            return { convertedValue, unit };
         }
     };
 
@@ -138,7 +144,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                     style={{ width: '100%' }}
                     columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
                     {Object.entries(resources).map(([name, value]) => {
-                        const { convertedValue, unit } = convertValue(value);
+                        const { convertedValue, unit } = convertValue(value, name); // 修改调用，传入name参数
                         return (
                             <Grid.Item key={name}>
                                 <Icon name={name} width={48} height={48} />
