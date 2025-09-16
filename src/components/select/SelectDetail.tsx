@@ -7,7 +7,9 @@ import Icon from "../icons";
 import { SelectionsContext, SelectionsDispatchContext } from "../SelectionsContext";
 import ModeError from "../ModeError";
 import { useUnit } from '../UnitContext';
-import { DataContext } from '../DataContext'; // 新增导入
+import { DataContext } from '../DataContext';
+
+import './SelectDetail.scss';
 
 interface SelectDetailProps {
     item: Item;
@@ -17,7 +19,7 @@ interface SelectDetailProps {
 function SelectDetail({ item, category }: SelectDetailProps) {
     const selections = useContext(SelectionsContext);
     const dispatch = useContext(SelectionsDispatchContext);
-    const { plantNames } = useContext(DataContext); // 新增获取 plantNames
+    const { plantNames } = useContext(DataContext);
     const [resources, setResources] = useState<Resources>({});
     const { unitType } = useUnit();
 
@@ -148,7 +150,7 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                         return (
                             <Grid.Item key={name}>
                                 <Icon name={name} width={48} height={48} />
-                                <Text>{name}</Text>
+                                <Text className="resource-name">{name}</Text>
                                 <Text className={`value ${convertedValue < 0 ? "consume" : "produce"}`}>
                                     {`${convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue)} ${unit}`}
                                 </Text>

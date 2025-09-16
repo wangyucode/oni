@@ -1,5 +1,5 @@
+// 根样式
 .root {
-
   &.select-open {
     overflow: hidden;
   }
@@ -12,6 +12,7 @@
     }
   }
 
+  // 折叠面板样式
   .nut-collapse-item-header {
     background-color: #7F3D5E;
     border-bottom: 1px solid #000;
@@ -44,7 +45,6 @@
     }
 
     .nut-badge {
-
       .nut-image {
         border-radius: 4px;
 
@@ -60,7 +60,7 @@
     }
   }
 
-
+  // 选择区域样式
   .selection {
     display: flex;
     flex-direction: column;
@@ -81,11 +81,40 @@
     }
   }
 
+  // 结果区域样式
   .result {
     display: flex;
     flex-direction: column;
     flex: 1;
     gap: 8PX;
+
+    // 资源网格
+    .resource-grid {
+      width: 100%;
+
+      .nut-grid-item-content {
+        row-gap: 2PX;
+      }
+
+      .resource-name {
+        font-size: 0.6rem;
+      }
+
+      img {
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+      }
+    }
+
+    // 电力热量容器
+    .power-heat-container {
+      text-align: center;
+
+      .value {
+        font-size: 0.7rem;
+        font-weight: bold;
+      }
+    }
 
     .reset {
       background-color: #7F3D5E;
@@ -98,6 +127,10 @@
       box-shadow: none;
       border: 1PX solid #000;
 
+      .nut-cell-title {
+        font-weight: bold;
+      }
+
       .unit-text {
         color: #7F3D5E;
         font-weight: bold;
@@ -106,199 +139,16 @@
     }
   }
 
-  .power-heat-container {
-    text-align: center;
-
-    .value {
-      font-size: 0.7rem;
-      font-weight: bold;
-    }
-  }
-
-  .resource-grid {
-    width: 100%;
-
-    .resource-name {
-      font-size: 0.6rem;
-    }
-
-    img {
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
-    }
-
-  }
-
+  // 数值样式
   .value {
     font-size: 0.6rem;
 
     &.consume {
-      color: #FF0F23
+      color: #FF0F23;
     }
 
     &.produce {
       color: #64b578;
     }
-  }
-}
-
-.nut-button {
-  &:active {
-    background-color: #BF7FA8;
-    color: #fff;
-  }
-}
-
-.nut-popup {
-  min-height: unset;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  .nut-popup-title-right {
-    padding: 4px;
-
-    &:active {
-      background-color: #BF7FA8;
-    }
-  }
-
-  .nut-divider {
-    margin: 0;
-  }
-
-  .nut-cell {
-    padding: 8px 16px;
-
-    .item-name {
-      margin-left: 8px;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .item-power,
-    .item-heat {
-      font-size: 10px;
-    }
-  }
-
-  .select-detail {
-
-    .nut-inputnumber {
-      gap: 4px;
-
-      .nut-number-input {
-        width: 24px;
-      }
-
-      .nut-input-minus,
-      .nut-input-add {
-        width: 24px;
-        height: 24px;
-
-        &:active {
-          background-color: #BF7FA8;
-        }
-
-        .nut-icon {
-          width: 100%;
-          height: 100%;
-        }
-      }
-    }
-
-    .item-unit {
-      margin-left: 8px;
-      font-weight: bold;
-    }
-
-    .mode {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      .mode-error {
-        padding: 8px 12px;
-        border-radius: 4px;
-        font-size: 12px;
-        display: inline-block;
-        align-self: stretch;
-
-        &.warn {
-          background-color: #fff8e6;
-          color: #ff9800;
-          border: 1px solid #ffe082;
-        }
-
-        &.error {
-          background-color: #ffebee;
-          color: #f44336;
-        }
-      }
-
-      .mode-name {
-        margin-right: 8px;
-        font-weight: bold;
-        font-size: 10px;
-      }
-
-      .mode-item {
-        display: flex;
-        align-items: center;
-        height: 32px;
-        width: 100%;
-
-        .option-name {
-          font-size: 10px;
-          width: 54px;
-        }
-
-        .slider {
-          flex: 1;
-        }
-      }
-    }
-
-    .nut-grid {
-      margin: 0;
-    }
-
-    .nut-grid-item-content {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      row-gap: 4px;
-    }
-  }
-
-  .nut-grid {
-    margin: 8px;
-
-    .nut-grid-item {
-
-      &:active {
-        .nut-grid-item-content-center {
-          background-color: #BF7FA8;
-
-          .nut-grid-item-text {
-            color: #fff;
-          }
-        }
-      }
-
-      .nut-grid-item-content {
-        padding: 8px 0;
-
-        .nut-grid-item-text {
-          font-size: 10px;
-        }
-      }
-    }
-  }
-
-  img {
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
   }
 }

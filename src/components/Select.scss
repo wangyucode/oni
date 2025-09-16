@@ -1,0 +1,45 @@
+.select-popup {
+    min-height: unset;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .back {
+        div {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .nut-popup-title-right {
+        padding: 4px;
+
+        &:active {
+            background-color: #BF7FA8;
+        }
+    }
+
+    .nut-divider {
+        margin: 0;
+    }
+
+    .nut-cell {
+        padding: 8px 16px;
+
+        .item-name {
+            margin-left: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .item-power,
+        .item-heat {
+            font-size: 12PX;
+        }
+    }
+
+    img {
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
+}
