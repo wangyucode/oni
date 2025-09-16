@@ -67,11 +67,11 @@
     flex: 1;
 
     .add {
-      height: 48Px;
-      width: 48Px;
+      height: 48PX;
+      width: 48PX;
       border-color: #7F3D5E;
       border-radius: 4px;
-      margin-left: 8px;
+      margin-left: 4PX;
 
       .nut-icon {
         display: flex;
@@ -91,12 +91,12 @@
       background-color: #7F3D5E;
       color: #fff;
       border-color: #000;
-      border-radius: 4px;
+      border-radius: 4PX;
     }
 
     .unit-cell {
       box-shadow: none;
-      border: 1px solid #000;
+      border: 1PX solid #000;
 
       .unit-text {
         color: #7F3D5E;

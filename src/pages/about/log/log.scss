@@ -1,3 +1,8 @@
 .log {
     gap: 4px;
+
+    .nut-cell-description {
+        display: flex;
+        flex-direction: column;
+    }
 }
