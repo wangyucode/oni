@@ -6,19 +6,19 @@
         align-items: center;
         flex-direction: column;
         background-color: #fff;
-        border: 1px solid #000;
-        gap: 8px;
-        padding: 16px;
-        border-radius: 6px;
+        border: 1PX solid #000;
+        gap: 8PX;
+        padding: 16PX;
+        border-radius: 6PX;
 
         .title {
-            font-size: 16px;
+            font-size: 16PX;
             font-weight: bold;
             color: #000;
         }
 
         .desc {
-            font-size: 12px;
+            font-size: 12PX;
             color: #333;
         }
     }

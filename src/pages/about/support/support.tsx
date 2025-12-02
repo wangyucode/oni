@@ -46,7 +46,7 @@ export default function Support() {
                 <Cell className="share-cell" clickable>
                     <Button openType="share" className="share">
                         <Text className="share-title">分享给好友❤️</Text>
-                        <ArrowRight />
+                        <ArrowRight size={16} />
                     </Button>
                 </Cell>
                 {
@@ -58,7 +58,7 @@ export default function Support() {
                                     <Text className="app-name">{item.name}</Text>
                                     <Text className="app-desc">{item.note}</Text>
                                 </View>
-                                <ArrowRight />
+                                <ArrowRight size={16} />
                             </Navigator>
                         </Cell>
                     ))

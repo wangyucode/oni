@@ -1,4 +1,4 @@
-import { View } from "@tarojs/components";
+import { View, Text } from "@tarojs/components";
 import { Cell } from "@nutui/nutui-react-taro";
 import { useShareAppMessage } from "@tarojs/taro";
 import { sharedMessage } from "src/components/data";
@@ -18,6 +18,10 @@ export default function Log() {
                 <Cell title="1.3" extra='2025-09-11' description='支持保留上次的选择/计算结果' />
                 <Cell title="1.4" extra='2025-09-14' description='增加清空选择按钮' />
                 <Cell title="1.5.0" extra='2025-09-14' description='新增显示单位切换功能' />
+                {/* <Cell title="1.6.0" extra='2025-09-17' description={<>
+                    <Text>新增滑动条支持数字方式输入</Text>
+                    <Text>新增显示单位切换功能</Text>
+                </>} /> */}
             </Cell.Group>
         </View>
     )

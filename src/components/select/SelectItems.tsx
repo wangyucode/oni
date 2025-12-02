@@ -3,6 +3,8 @@ import { Grid } from "@nutui/nutui-react-taro";
 import { Item } from "../data";
 import Icon from "../icons";
 
+import './SelectItems.scss';
+
 interface SelectItemsProps {
     item: Item;
     handleSelect: (params: { index: number }) => void;

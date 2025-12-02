@@ -1,0 +1,24 @@
+.select-items {
+    margin: 8px;
+
+    .nut-grid-item {
+        &:active {
+            .nut-grid-item-content-center {
+                background-color: #BF7FA8;
+
+                .nut-grid-item-text {
+                    color: #fff;
+                }
+            }
+        }
+
+        .nut-grid-item-content {
+            padding: 8px 0;
+            row-gap: 2PX;
+
+            .nut-grid-item-text {
+                font-size: 10px;
+            }
+        }
+    }
+}

@@ -1,12 +1,14 @@
 import { useContext, useState } from "react";
+import { ScrollView } from "@tarojs/components";
 import { Button, Divider, Popup } from "@nutui/nutui-react-taro";
+import { ArrowLeft } from "@nutui/icons-react-taro";
 
 import { Item } from "./data";
 import { DataContext } from "./DataContext";
 import SelectItems from "./select/SelectItems";
 import SelectDetail from "./select/SelectDetail";
-import { ScrollView } from "@tarojs/components";
 
+import './Select.scss';
 interface SelectProps {
     select: string;
     onClose: () => void;
@@ -34,10 +36,11 @@ export default function Select({ select, onClose, edit }: SelectProps) {
 
     return (
         <Popup
+            className="select-popup"
             visible={!!item}
             position="bottom"
             title={currentItem.name}
-            left={canGoBack ? <Button onClick={goBack}>返回</Button> : null}
+            left={canGoBack ? <Button className="back" onClick={goBack}><ArrowLeft size={16} />返回</Button> : null}
             onClose={onClose}
             closeable
             style={{ paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}>
