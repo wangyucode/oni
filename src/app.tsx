@@ -3,7 +3,7 @@ import Taro from "@tarojs/taro";
 
 import { SelectionsProvider } from "./components/SelectionsContext";
 import { DataProvider } from "./components/DataContext";
-import { FoodCalories, Item } from "./components/data";
+import { FoodCalories, Item, API_BASE } from "./components/data";
 import { UnitProvider } from "./components/UnitContext";
 
 import "./app.scss";
@@ -40,7 +40,7 @@ function App(props) {
       Taro.setStorageSync('appVersion', process.env.TARO_APP_VERSION);
     }
     Taro.request({
-      url: 'https://wycode.cn/api/v1/config?key=ONI_DATA',
+      url: `${API_BASE}/api/v1/config?key=ONI_DATA`,
       method: 'GET',
       success: (res) => {
         console.log('getItems', res);
@@ -54,7 +54,7 @@ function App(props) {
       }
     });
     Taro.request({
-      url: 'https://wycode.cn/api/v1/config?key=ONI_PLANT_NAMES',
+      url: `${API_BASE}/api/v1/config?key=ONI_PLANT_NAMES`,
       method: 'GET',
       success: (res) => {
         console.log('getPlantNames', res);
@@ -64,7 +64,7 @@ function App(props) {
       }
     });
     Taro.request({
-      url: 'https://wycode.cn/api/v1/config?key=ONI_FOOD_CALORIES',
+      url: `${API_BASE}/api/v1/config?key=ONI_FOOD_CALORIES`,
       method: 'GET',
       success: (res) => {
         console.log('getFoodCalories', res);
@@ -74,7 +74,7 @@ function App(props) {
       }
     });
     Taro.request({
-      url: 'https://wycode.cn/api/v1/config?key=ONI_IMAGES',
+      url: `${API_BASE}/api/v1/config?key=ONI_IMAGES`,
       method: 'GET',
       success: (res) => {
         console.log('getImages', res);

@@ -4,7 +4,7 @@ import Taro, { useShareAppMessage } from "@tarojs/taro";
 import { Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
 import BackButton from "src/components/back/BackButton";
-import { sharedMessage } from "src/components/data";
+import { sharedMessage, API_BASE } from "src/components/data";
 import icon from 'src/icon.png';
 
 import './support.scss'
@@ -21,7 +21,7 @@ export default function Support() {
         });
 
         Taro.request({
-            url: 'https://wycode.cn/api/v1/wechat/apps',
+            url: `${API_BASE}/api/v1/wechat/apps`,
             method: 'GET',
             success: (res) => {
                 console.log(res);

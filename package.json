@@ -11,19 +11,9 @@
   },
   "scripts": {
     "build:weapp": "taro build --type weapp",
-    "build:alipay": "taro build --type alipay",
-    "build:tt": "taro build --type tt",
     "build:h5": "taro build --type h5",
-    "build:rn": "taro build --type rn",
-    "build:qq": "taro build --type qq",
-    "build:quickapp": "taro build --type quickapp",
-    "dev:weapp": "pnpm run build:weapp -- --watch",
-    "dev:alipay": "pnpm run build:alipay -- --watch",
-    "dev:tt": "pnpm run build:tt -- --watch",
-    "dev:h5": "pnpm run build:h5 -- --watch",
-    "dev:rn": "pnpm run build:rn -- --watch",
-    "dev:qq": "pnpm run build:qq -- --watch",
-    "dev:quickapp": "pnpm run build:quickapp -- --watch"
+    "dev:weapp": "taro build --type weapp --watch",
+    "dev:h5": "taro build --type h5 --watch"
   },
   "browserslist": [
     "last 3 versions",
@@ -40,10 +30,7 @@
     "@tarojs/helper": "4.1.9",
     "@tarojs/plugin-framework-react": "4.1.9",
     "@tarojs/plugin-html": "4.1.9",
-    "@tarojs/plugin-platform-alipay": "4.1.9",
     "@tarojs/plugin-platform-h5": "4.1.9",
-    "@tarojs/plugin-platform-qq": "4.1.9",
-    "@tarojs/plugin-platform-tt": "4.1.9",
     "@tarojs/plugin-platform-weapp": "4.1.9",
     "@tarojs/react": "4.1.9",
     "@tarojs/runtime": "4.1.9",

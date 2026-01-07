@@ -5,5 +5,15 @@ export default {
     stats: true
   },
   mini: {},
-  h5: {}
+  h5: {
+    devServer: {
+      proxy: {
+        '/api': {
+          target: 'https://wycode.cn',
+          changeOrigin: true,
+          secure: false
+        }
+      }
+    }
+  }
 } satisfies UserConfigExport<'webpack5'>

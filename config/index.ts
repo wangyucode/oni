@@ -10,9 +10,9 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
     designWidth: 375,
     deviceRatio: {
       375: 2,
-      // 640: 2.34 / 2,
-      // 750: 1,
-      // 828: 1.81 / 2,
+      640: 2.34 / 2,
+      750: 1,
+      828: 1.81 / 2,
     },
     sourceRoot: "src",
     outputRoot: `dist/${process.env.TARO_ENV}`,
@@ -85,14 +85,6 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
       },
       htmlPluginOption: {
         favicon: "src/icon.png",
-      },
-    },
-    rn: {
-      appName: "taroDemo",
-      postcss: {
-        cssModules: {
-          enable: false, // 默认为 false，如需使用 css modules 功能，则设为 true
-        },
       },
     },
   };
