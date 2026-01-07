@@ -128,14 +128,24 @@ function SelectDetail({ item, category }: SelectDetailProps) {
                             <Text className="option-name">{option.name}:</Text>
                             <Range
                                 className="slider"
-                                defaultValue={[selection.modes[i]?.get(option.name) || 0]}
+                                value={[selection.modes[i]?.get(option.name) || 0]}
                                 minDescription={null}
                                 maxDescription={null}
                                 max={100}
                                 min={0}
                                 step={1}
-                                onChange={(value) => handleModePercentageChange(i, option.name, value as number)}
+                                onChange={(val) => {
+                                    const value = Array.isArray(val) ? val[0] : val;
+                                    handleModePercentageChange(i, option.name, value as number);
+                                }}
                                 currentDescription={val => `${val}%`}
+                            />
+                            <InputNumber
+                                className="input-number"
+                                value={selection.modes[i]?.get(option.name) || 0}
+                                min={0}
+                                max={100}
+                                onChange={(value) => handleModePercentageChange(i, option.name, Number(value))}
                             />
                         </View>
                     ))}

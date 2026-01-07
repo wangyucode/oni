@@ -53,6 +53,11 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin("tsconfig-paths").use(TsconfigPathsPlugin);
+        chain.merge({
+          ignoreWarnings: [
+            /You don't need `webpackExports`/,
+          ],
+        });
       },
     },
     h5: {
@@ -82,6 +87,11 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin("tsconfig-paths").use(TsconfigPathsPlugin);
+        chain.merge({
+          ignoreWarnings: [
+            /You don't need `webpackExports`/,
+          ],
+        });
       },
       htmlPluginOption: {
         favicon: "src/icon.png",
