@@ -10,16 +10,15 @@ import SelectDetail from "./select/SelectDetail";
 
 import './Select.scss';
 interface SelectProps {
-    select: string;
     onClose: () => void;
     edit?: Item;
 }
 
-export default function Select({ select, onClose, edit }: SelectProps) {
+export default function Select({ onClose, edit }: SelectProps) {
     const { items } = useContext(DataContext);
     const [canGoBack, setCanGoBack] = useState(false);
     let item = edit;
-    if (select) item = items.find(item => item.name === select);
+    // if (select) item = items.find(item => item.name === select);
     const [currentItem, setCurrentItem] = useState<Item>(item!);
 
     function goBack() {
@@ -47,7 +46,7 @@ export default function Select({ select, onClose, edit }: SelectProps) {
             <Divider />
             <ScrollView type="nested" scrollY={true} showScrollbar={true} style={{ flex: 1, scrollbarWidth: "thin", maxHeight: process.env.TARO_ENV === 'weapp' ? 'calc(87vh - 96px)' : 'unset' }}>
                 {currentItem.detail ?
-                    <SelectDetail item={currentItem} category={select} />
+                    <SelectDetail item={currentItem} category={'小动物'} />
                     :
                     <SelectItems item={currentItem} handleSelect={handleSelect} />
                 }

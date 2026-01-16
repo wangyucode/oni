@@ -21,8 +21,8 @@ function Index() {
 
   useShareAppMessage(() => sharedMessage);
   const { plantNames, foodCalories } = useContext(DataContext);
-  const { unitType, toggleUnitType } = useUnit();
-  const [select, setSelect] = useState<string>('');
+  const { unitType } = useUnit();
+  const [isShowSelect, setIsShowSelect] = useState(false);
   const [edit, setEdit] = useState<Item | undefined>(undefined);
   const selections = useContext(SelectionsContext);
   const dispatch = useContext(SelectionsDispatchContext);
@@ -116,17 +116,16 @@ function Index() {
     setTotalCalories(netCalories);
   }, [selections])
 
-  function handleAdd(category: string) {
-    setSelect(category);
+  function handleAdd() {
+    setIsShowSelect(true);
   }
 
   function onClose() {
-    setSelect('');
+    setIsShowSelect(false);
     setEdit(undefined);
   }
 
   function handleItemClick(item: Item) {
-    setSelect('');
     setEdit({ ...item });
   }
 
@@ -186,8 +185,8 @@ function Index() {
   const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
 
   return (
-    <View className={`root index ${select || edit ? 'select-open' : ''}`}>
-      <Collapse className='selection' defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
+    <View className={`root index ${edit ? 'select-open' : ''}`}>
+      {/* <Collapse className='selection' defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
             <Text className='tips'>{getTips(category)}</Text>
@@ -204,7 +203,7 @@ function Index() {
               <Button className='add' onClick={() => handleAdd(category)}><Add width={24} height={24} color='#7f3d5e' /></Button>
             </View>
           </Collapse.Item>)}
-      </Collapse>
+      </Collapse> */}
       <View className='result'>
         <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
           <Collapse.Item title="资源" name='资源'>
@@ -246,16 +245,32 @@ function Index() {
             </View>
           </Collapse.Item>
         </Collapse>
-        <Cell className='unit-cell' title="切换显示单位" radius={0} extra={
-          <>
-            <Text className='unit-text'>{unitType === 'g/s' ? 'g/s' : 'kg/周期'}</Text>
-            <Switch checked={unitType === 'kg/周期'} onChange={toggleUnitType} />
-          </>
-        } />
-        <Button className='reset' size="large" onClick={reset}>清空选择</Button>
+
+        <Collapse 
+        defaultActiveName={['选择']} 
+        
+        expandIcon={<Icon width={12} height={16} name='rightArrow' />} 
+        rotate={90}>
+          <Collapse.Item title="选择" name="选择" extra={<Button className='reset' onClick={reset}>清空选择</Button>}>
+            <View className='avatar-container'>
+              {selections.map(({ count, item }) =>
+                <Badge value={count} key={item.name} max={999}>
+                  <Icon
+                    name={item.name}
+                    width={48}
+                    height={48}
+                    onClick={() => handleItemClick(item)}
+                  />
+                </Badge>)}
+              <Button className='add' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>
+            </View>
+          </Collapse.Item>
+        </Collapse>
+        
+        
       </View>
 
-      {select || edit ? <Select select={select} onClose={onClose} edit={edit} /> : null}
+      {isShowSelect ? <Select onClose={onClose} edit={edit} /> : null}
     </View>
   )
 }

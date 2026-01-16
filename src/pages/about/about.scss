@@ -22,4 +22,15 @@
             color: #333;
         }
     }
+
+    .unit-cell {
+      box-shadow: none;
+      border: 1PX solid #000;
+
+      .unit-text {
+        color: #7F3D5E;
+        font-weight: bold;
+        margin-right: 4PX;
+      }
+    }
 }
