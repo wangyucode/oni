@@ -246,12 +246,12 @@ function Index() {
           </Collapse.Item>
         </Collapse>
 
-        <Collapse 
-        defaultActiveName={['选择']} 
-        
-        expandIcon={<Icon width={12} height={16} name='rightArrow' />} 
-        rotate={90}>
-          <Collapse.Item title="选择" name="选择" extra={<Button className='reset' onClick={reset}>清空选择</Button>}>
+        <Collapse
+          className='selection'
+          defaultActiveName={['选择']}
+          expandIcon={<Icon width={12} height={16} name='rightArrow' />}
+          rotate={90}>
+          <Collapse.Item title="选择" name="选择" extra={<Button className='reset' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
             <View className='avatar-container'>
               {selections.map(({ count, item }) =>
                 <Badge value={count} key={item.name} max={999}>
@@ -266,8 +266,8 @@ function Index() {
             </View>
           </Collapse.Item>
         </Collapse>
-        
-        
+
+
       </View>
 
       {isShowSelect ? <Select onClose={onClose} edit={edit} /> : null}
