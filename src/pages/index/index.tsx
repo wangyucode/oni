@@ -6,10 +6,11 @@ import { Badge, Button, Cell, Collapse, Grid, Switch } from '@nutui/nutui-react-
 
 import Icon from 'src/components/icons'
 import Select from 'src/components/Select';
+import SelectPopup from 'src/components/SelectPopup';
 import { DataContext } from 'src/components/DataContext';
 import { useUnit } from 'src/components/UnitContext';
 import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
-import { Item, Resources, sharedMessage } from 'src/components/data';
+import { Item, Resources, sharedMessage, Menu } from 'src/components/data';
 
 import './index.scss'
 import { Add } from '@nutui/icons-react-taro';
@@ -23,6 +24,7 @@ function Index() {
   const { plantNames, foodCalories } = useContext(DataContext);
   const { unitType } = useUnit();
   const [isShowSelect, setIsShowSelect] = useState(false);
+  const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   const [edit, setEdit] = useState<Item | undefined>(undefined);
   const selections = useContext(SelectionsContext);
   const dispatch = useContext(SelectionsDispatchContext);
@@ -117,7 +119,16 @@ function Index() {
   }, [selections])
 
   function handleAdd() {
-    setIsShowSelect(true);
+    setIsShowSelectPopup(true);
+  }
+
+  function onPopupClose() {
+    setIsShowSelectPopup(false);
+  }
+
+  function handleSelectMenu(menu: Menu) {
+    console.log('Selected menu:', menu);
+    setIsShowSelectPopup(false);
   }
 
   function onClose() {
@@ -271,6 +282,7 @@ function Index() {
       </View>
 
       {isShowSelect ? <Select onClose={onClose} edit={edit} /> : null}
+      <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} onSelect={handleSelectMenu} />
     </View>
   )
 }

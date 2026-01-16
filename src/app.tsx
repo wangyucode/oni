@@ -3,7 +3,7 @@ import Taro from "@tarojs/taro";
 
 import { SelectionsProvider } from "./components/SelectionsContext";
 import { DataProvider } from "./components/DataContext";
-import { FoodCalories, Item, API_BASE } from "./components/data";
+import { FoodCalories, Item, API_BASE, Menu } from "./components/data";
 import { UnitProvider } from "./components/UnitContext";
 
 import "./app.scss";
@@ -13,6 +13,7 @@ function App(props) {
   const [plantNames, setPlantNames] = useState<Array<string>>([]);
   const [foodCalories, setFoodCalories] = useState<FoodCalories>({});
   const [images, setImages] = useState<Record<string, string>>({});
+  const [menus, setMenus] = useState<Array<Menu>>([]);
 
   function initItemModes(item: Item) {
     if (item.detail) {
@@ -83,10 +84,23 @@ function App(props) {
         }
       }
     });
+    Taro.request({
+      url: `${API_BASE}/api/v1/yml/calculator/menu.yml`,
+      header: {
+        'Accept': 'application/json'
+      },
+      method: 'GET',
+      success: (res) => {
+        console.log('getMenus', res);
+        if (res.data.success) {
+          setMenus(res.data.payload);
+        }
+      }
+    });
   }, []);
 
   return (
-    <DataProvider items={items} plantNames={plantNames} foodCalories={foodCalories} images={images}>
+    <DataProvider items={items} plantNames={plantNames} foodCalories={foodCalories} images={images} menus={menus}>
       <SelectionsProvider>
         <UnitProvider>
           {props.children}

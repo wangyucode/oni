@@ -41,6 +41,12 @@ export interface FoodCalories {
   [name: string]: number;
 }
 
+export interface Menu {
+  name: string;
+  icon: string;
+  file: string;
+}
+
 export const API_BASE = process.env.TARO_ENV === 'h5' && process.env.NODE_ENV === 'development'
   ? ''
   : 'https://wycode.cn';
