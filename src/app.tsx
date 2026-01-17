@@ -3,20 +3,15 @@ import Taro from "@tarojs/taro";
 
 import { SelectionsProvider } from "./components/SelectionsContext";
 import { DataProvider } from "./components/DataContext";
-import { FoodCalories, Item, API_BASE, Menu } from "./components/data";
+import { API_BASE, Menu } from "./components/data";
 import { UnitProvider } from "./components/UnitContext";
-import { CalculatorGridModel } from "./components/DataContext";
 
 import "./app.scss";
 
 function App(props) {
-  const [items, setItems] = useState<Array<Item>>([]);
-  const [plantNames, setPlantNames] = useState<Array<string>>([]);
-  const [foodCalories, setFoodCalories] = useState<FoodCalories>({});
-  const [images, setImages] = useState<Record<string, string>>({});
   const [menus, setMenus] = useState<Array<Menu>>([]);
-  const modelsByFileRef = useRef<Record<string, CalculatorGridModel | undefined>>({});
-  const inflightByFileRef = useRef<Record<string, Promise<CalculatorGridModel> | undefined>>({});
+  const modelsByFileRef = useRef<Record<string, unknown | undefined>>({});
+  const inflightByFileRef = useRef<Record<string, Promise<unknown> | undefined>>({});
 
   async function requestJson<T>(url: string): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -47,7 +42,7 @@ function App(props) {
     const inflight = inflightByFileRef.current[file];
     if (inflight) return inflight;
 
-    const requestPromise = requestJson<CalculatorGridModel>(`${API_BASE}/api/v1/yml/calculator/${file}`)
+    const requestPromise = requestJson<unknown>(`${API_BASE}/api/v1/yml/calculator/${file}`)
       .then((model) => {
         modelsByFileRef.current[file] = model;
         return model;
@@ -64,6 +59,9 @@ function App(props) {
     try {
       const nextMenus = await requestJson<Array<Menu>>(`${API_BASE}/api/v1/yml/calculator/menu.yml`);
       setMenus(nextMenus);
+      for (const menu of nextMenus) {
+        void getMenuModel(menu.file);
+      }
     } catch (e: any) {
       setMenus([]);
     }
@@ -81,12 +79,10 @@ function App(props) {
   return (
     <DataProvider
       value={{
-        items,
-        plantNames,
-        foodCalories,
-        images,
-        menus,
-        getMenuModel,
+        getModel: getMenuModel,
+        items: [],
+        plantNames: [],
+        images: {},
       }}
     >
       <SelectionsProvider>

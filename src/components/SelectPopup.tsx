@@ -1,40 +1,86 @@
-import { useContext, useEffect, useState } from "react";
-import { Image, Text, View } from "@tarojs/components";
-import { Button, Grid, Popup } from "@nutui/nutui-react-taro";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { Text, View } from "@tarojs/components";
+import { Button, Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
-import { Menu } from "./data";
-import { CalculatorGridItem, CalculatorGridModel, DataContext } from "./DataContext";
 
 import './SelectPopup.scss';
+import { DataContext } from "./DataContext";
+import MenuGrid from "./MenuGrid";
+import { Menu } from "./data";
+
+type viewType = "menu" | string;
+
+type MenuModelItem = {
+    name: string;
+    icon?: string;
+};
+
+type MenuModel = {
+    columns?: number;
+    items: MenuModelItem[];
+};
 
 interface SelectPopupProps {
     visible: boolean;
     onClose: () => void;
-    onSelectItem?: (item: CalculatorGridItem, menu: Menu) => void;
+    onSelectItem?: (item: MenuModelItem, menu: Menu) => void;
 }
 
 
+function isMenuArray(value: unknown): value is Menu[] {
+    if (!Array.isArray(value)) return false;
+    return value.every((m) => !!m && typeof m === "object" && typeof (m as any).name === "string" && typeof (m as any).icon === "string" && typeof (m as any).file === "string");
+}
+
+function isMenuModel(value: unknown): value is MenuModel {
+    if (!value || typeof value !== "object") return false;
+    return Array.isArray((value as any).items);
+}
+
 export default function SelectPopup({ visible, onClose, onSelectItem }: SelectPopupProps) {
-    const { menus, getMenuModel } = useContext(DataContext);
-    const [view, setView] = useState<"menu" | "grid">("menu");
+    const { getModel } = useContext(DataContext);
+    const [view, setView] = useState<viewType>("menu");
+    const [menus, setMenus] = useState<Menu[] | null>(null);
     const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
-    const [model, setModel] = useState<CalculatorGridModel | null>(null);
+    const [model, setModel] = useState<MenuModel | null>(null);
+
+    const title = useMemo(() => {
+        if (view === "menu") return "类别";
+        return selectedMenu?.name || "";
+    }, [selectedMenu?.name, view]);
 
     useEffect(() => {
         if (!visible) {
             setView("menu");
             setSelectedMenu(null);
             setModel(null);
+            return;
         }
-    }, [visible]);
+        let cancelled = false;
+        setMenus(null);
+        void getModel("menu.yml")
+            .then((data) => {
+                if (cancelled) return;
+                setMenus(isMenuArray(data) ? data : []);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setMenus([]);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [getModel, visible]);
 
     function handleClose() {
         setView("menu");
         setSelectedMenu(null);
+        setModel(null);
         onClose();
     }
 
-    function goBack() {
+    function handleGoBack() {
         setView("menu");
         setSelectedMenu(null);
         setModel(null);
@@ -42,58 +88,65 @@ export default function SelectPopup({ visible, onClose, onSelectItem }: SelectPo
 
     function handleSelectMenu(menu: Menu) {
         setSelectedMenu(menu);
-        setView("grid");
-        setModel(null);
-        void getMenuModel(menu.file).then(setModel).catch(() => { });
+        setView(menu.file);
     }
+
+    useEffect(() => {
+        if (!visible) return;
+        if (view === "menu") return;
+        let cancelled = false;
+        setModel(null);
+        void getModel(view)
+            .then((data) => {
+                if (cancelled) return;
+                setModel(isMenuModel(data) ? data : null);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setModel(null);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [getModel, visible, view]);
+
+    function renderByView(nextView: viewType): JSX.Element | null {
+        if (nextView === "menu") {
+            if (!menus) return null;
+            return <MenuGrid<Menu> columns={3} items={menus} onItemClick={handleSelectMenu} />;
+        }
+
+        if (!model) return null;
+        return (
+            <MenuGrid<MenuModelItem>
+                columns={model.columns || 3}
+                items={model.items}
+                onItemClick={(item) => selectedMenu && onSelectItem?.(item, selectedMenu)}
+            />
+        );
+    }
+
+    const content = renderByView(view);
 
     return (
         <Popup
             className="select-popup"
             visible={visible}
             position="bottom"
-            title={view === "menu" ? "选择类别" : (model?.title || selectedMenu?.name || "加载...")}
-            left={view === "grid" ? <Button className="back" onClick={goBack}><ArrowLeft size={16} />返回</Button> : null}
+            title={title}
+            left={view !== "menu" ? <Button className="back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
             onClose={handleClose}
             closeable
             style={{ height: '50%', paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}
         >
-            {view === "menu" ? (
-                <Grid columns={3} gap={0}>
-                    {menus.map((menu) => (
-                        <Grid.Item
-                            key={menu.name}
-                            onClick={() => handleSelectMenu(menu)}
-                            text={menu.name}
-                        >
-                            <Image src={menu.icon} style={{ width: 64, height: 64 }} mode="aspectFit" />
-                        </Grid.Item>
-                    ))}
-                </Grid>
-            ) : (
-                <View style={{ flex: 1 }}>
-                    {!model ? (
-                        <View style={{ padding: 16 }}>
-                            <Text>加载中...</Text>
-                        </View>
-                    ) : null}
-                    {model ? (
-                        <Grid columns={model.columns || 3} gap={0}>
-                            {model.items.map((item) => (
-                                <Grid.Item
-                                    key={item.name}
-                                    text={item.name}
-                                    onClick={() => selectedMenu && onSelectItem?.(item, selectedMenu)}
-                                >
-                                    {item.icon ? (
-                                        <Image src={item.icon} style={{ width: 64, height: 64 }} mode="aspectFit" />
-                                    ) : null}
-                                </Grid.Item>
-                            ))}
-                        </Grid>
-                    ) : null}
-                </View>
-            )}
+            <View style={{ flex: 1 }}>
+                {content ?? (
+                    <View style={{ padding: 16 }}>
+                        <Text>加载中...</Text>
+                    </View>
+                )}
+            </View>
         </Popup>
     );
 }

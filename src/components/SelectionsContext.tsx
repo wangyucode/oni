@@ -103,9 +103,11 @@ export function SelectionsProvider({ children }) {
 
     // 插入初始选择的函数
     function insertInitSelections() {
-        const dupe = items[0].items![0] as Item;
-        const category = items[0]!.name;
-        const modes = dupe.detail!.modes.map((mode) => {
+        const categoryItem = items[0] as Item | undefined;
+        const dupe = categoryItem?.items?.[0];
+        if (!categoryItem?.name || !dupe?.detail?.modes) return;
+        const category = categoryItem.name;
+        const modes = dupe.detail.modes.map((mode) => {
             return new Map<string, number>(
                 mode.options.map((option, index) => [option.name, index ? 0 : 100])
             );

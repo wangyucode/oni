@@ -21,7 +21,7 @@ const resultCategories = ['资源', '食物', '电力', '热量'];
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
-  const { plantNames, foodCalories } = useContext(DataContext);
+  const { plantNames } = useContext(DataContext);
   const { unitType } = useUnit();
   const [isShowSelect, setIsShowSelect] = useState(false);
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
@@ -39,83 +39,83 @@ function Index() {
     let newTotalPower = 0;
     let newTotalHeat = 0;
 
-    selections.forEach(selection => {
-      let totalFactor = 0;
-      // 模式资源计算（支持百分比）
-      selection.item.detail!.modes.forEach((mode, i) => {
-        const optionSelectionMap = selection.modes[i];
+    // selections.forEach(selection => {
+    //   let totalFactor = 0;
+    //   // 模式资源计算（支持百分比）
+    //   selection.item.detail!.modes.forEach((mode, i) => {
+    //     const optionSelectionMap = selection.modes[i];
 
-        mode.options.forEach(option => {
-          const percentage = optionSelectionMap.get(option.name) || 0;
-          const factor = percentage / 100;
-          totalFactor += factor;
-          Object.entries(option.resources || {}).forEach(([name, value]) => {
-            const resourceValue = selection.count * value * factor;
-            if (!resourceValue) return;
-            newResources[name] = (newResources[name] || 0) + resourceValue;
-          });
-        });
-      });
-      // 基础资源计算
-      Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
-        const resourceValue = selection.count * value * totalFactor;
-        newResources[name] = (newResources[name] || 0) + resourceValue;
-      });
+    //     mode.options.forEach(option => {
+    //       const percentage = optionSelectionMap.get(option.name) || 0;
+    //       const factor = percentage / 100;
+    //       totalFactor += factor;
+    //       Object.entries(option.resources || {}).forEach(([name, value]) => {
+    //         const resourceValue = selection.count * value * factor;
+    //         if (!resourceValue) return;
+    //         newResources[name] = (newResources[name] || 0) + resourceValue;
+    //       });
+    //     });
+    //   });
+    //   // 基础资源计算
+    //   Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
+    //     const resourceValue = selection.count * value * totalFactor;
+    //     newResources[name] = (newResources[name] || 0) + resourceValue;
+    //   });
 
-      // 电力计算
-      if (selection.item.detail?.power) {
-        newTotalPower += selection.count * selection.item.detail.power * totalFactor;
-      }
+    //   // 电力计算
+    //   if (selection.item.detail?.power) {
+    //     newTotalPower += selection.count * selection.item.detail.power * totalFactor;
+    //   }
 
-      // 热量计算
-      if (selection.item.detail?.heat) {
-        newTotalHeat += selection.count * selection.item.detail.heat * totalFactor;
-      }
+    //   // 热量计算
+    //   if (selection.item.detail?.heat) {
+    //     newTotalHeat += selection.count * selection.item.detail.heat * totalFactor;
+    //   }
 
-    });
+    // });
 
     // 处理小动物吃植物
-    Object.entries(newResources).forEach(([name, value]) => {
-      if (plantNames.includes(name)) {
-        const selection = selections.find(s => s.item.name === name);
-        if (selection) {
-          Object.entries(selection.item.detail!.resources).forEach(([n, v]) => {
-            newResources[n] = (newResources[n] || 0) + v * value;
-          });
-          delete newResources[name];
-        }
-      }
-    });
+    // Object.entries(newResources).forEach(([name, value]) => {
+    //   if (plantNames.includes(name)) {
+    //     const selection = selections.find(s => s.item.name === name);
+    //     if (selection) {
+    //       Object.entries(selection.item.detail!.resources).forEach(([n, v]) => {
+    //         newResources[n] = (newResources[n] || 0) + v * value;
+    //       });
+    //       delete newResources[name];
+    //     }
+    //   }
+    // });
 
-    setResources(newResources);
-    setTotalPower(newTotalPower);
-    setTotalHeat(newTotalHeat);
+    // setResources(newResources);
+    // setTotalPower(newTotalPower);
+    // setTotalHeat(newTotalHeat);
 
 
     // 处理食物
-    Object.entries(newResources).forEach(([name, value]) => {
-      // 筛选食物资源
-      const foodKeywords = Object.keys(foodCalories);
-      if (foodKeywords.some(keyword => name.includes(keyword)) && value > 0) {
-        newFoodResources[name] = (newFoodResources[name] || 0) + value;
-      }
-    });
+    // Object.entries(newResources).forEach(([name, value]) => {
+    //   // 筛选食物资源
+    //   const foodKeywords = Object.keys(foodCalories);
+    //   if (foodKeywords.some(keyword => name.includes(keyword)) && value > 0) {
+    //     newFoodResources[name] = (newFoodResources[name] || 0) + value;
+    //   }
+    // });
 
     // 计算总卡路里
-    const newTotalCalories = Object.entries(newFoodResources)
-      .reduce((sum, [name, value]) => {
-        const caloriePerGram = foodCalories[name] || 0;
-        return sum + (value * caloriePerGram);
-      }, 0);
+    // const newTotalCalories = Object.entries(newFoodResources)
+    //   .reduce((sum, [name, value]) => {
+    //     const caloriePerGram = foodCalories[name] || 0;
+    //     return sum + (value * caloriePerGram);
+    //   }, 0);
 
-    // 计算复制人消耗卡路里 (每个复制人每秒消耗 1000/600 卡路里)
-    const dupeCount = selections
-      .filter(s => s.item.name === '复制人')
-      .reduce((total, s) => total + s.count, 0);
-    const caloriesConsumed = dupeCount * (1000 / 600);
-    const netCalories = newTotalCalories - caloriesConsumed;
+    // // 计算复制人消耗卡路里 (每个复制人每秒消耗 1000/600 卡路里)
+    // const dupeCount = selections
+    //   .filter(s => s.item.name === '复制人')
+    //   .reduce((total, s) => total + s.count, 0);
+    // const caloriesConsumed = dupeCount * (1000 / 600);
+    // const netCalories = newTotalCalories - caloriesConsumed;
 
-    setTotalCalories(netCalories);
+    // setTotalCalories(netCalories);
   }, [selections])
 
   function handleAdd() {
