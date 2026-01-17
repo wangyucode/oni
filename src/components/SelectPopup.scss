@@ -13,26 +13,40 @@
         }
     }
 
-    .nut-grid {
+    .back {
+        .nut-button-children {
+            align-items: center;
+        }
+    }
 
-        .nut-grid-item {
-            border: 1PX solid #ddd;
-            &:active {
-                .nut-grid-item-content-center {
-                    background-color: #BF7FA8;
+    .content {
+        flex: 1;
+        padding: 16px 0;
 
-                    .nut-grid-item-text {
-                        color: #fff;
+        .nut-grid {
+
+            .nut-grid-item {
+                border: 1PX solid #ddd;
+
+                &:active {
+                    .nut-grid-item-content-center {
+                        background-color: #BF7FA8;
+
+                        .nut-grid-item-text {
+                            color: #fff;
+                        }
                     }
+                }
+
+                .nut-grid-item-content {
+                    padding: 8px 0;
+                    row-gap: 2PX;
                 }
             }
 
-            .nut-grid-item-content {
-                padding: 8px 0;
-                row-gap: 2PX;
-            }
         }
-
     }
+
+
 
 }

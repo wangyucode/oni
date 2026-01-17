@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Taro from "@tarojs/taro";
 
-import { DataProvider } from "./components/DataContext";
+import { DataProvider, type DataContextValue } from "./components/DataContext";
 import { API_BASE, Menu } from "./components/data";
 import { UnitProvider } from "./components/UnitContext";
 
 import "./app.scss";
 
 function App(props) {
-  const modelsByFileRef = useRef<Record<string, unknown | undefined>>({});
-  const inflightByFileRef = useRef<Record<string, Promise<unknown> | undefined>>({});
+  const modelsByFileRef = useRef<Record<string, unknown[] | undefined>>({});
+  const inflightByFileRef = useRef<Record<string, Promise<unknown[]> | undefined>>({});
 
   async function requestJson<T>(url: string): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -33,28 +33,28 @@ function App(props) {
     });
   }
 
-  const getModel = useCallback(async (file: string) => {
+  const getModel: DataContextValue["getModel"] = useCallback(async <T = unknown,>(file: string) => {
     const cached = modelsByFileRef.current[file];
-    if (cached) return cached;
+    if (cached) return cached as T[];
 
     const inflight = inflightByFileRef.current[file];
-    if (inflight) return inflight;
+    if (inflight) return inflight as Promise<T[]>;
 
-    const requestPromise = requestJson<unknown>(`${API_BASE}/api/v1/yml/calculator/${file}`)
+    const requestPromise = requestJson<unknown[]>(`${API_BASE}/api/v1/yml/calculator/${file}`)
       .then((model) => {
         modelsByFileRef.current[file] = model;
-        return model;
+        return model as T[];
       })
       .finally(() => {
         delete inflightByFileRef.current[file];
       });
 
     inflightByFileRef.current[file] = requestPromise;
-    return requestPromise;
+    return requestPromise as Promise<T[]>;
   }, []);
 
   const bootstrap = useCallback(async () => {
-      const menus = await getModel('menu.yml') as Array<Menu>;
+      const menus = await getModel<Menu>('menu.yml');
       for (const menu of menus) {
         void getModel(menu.file);
       }

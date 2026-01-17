@@ -261,8 +261,6 @@ function Index() {
             </View>
           </Collapse.Item>
         </Collapse>
-
-
       </View>
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
     </View>

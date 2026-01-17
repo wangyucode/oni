@@ -8,123 +8,60 @@ import { DataContext } from "./DataContext";
 import MenuGrid from "./MenuGrid";
 import { Menu } from "./data";
 
-type viewType = "menu" | string;
-
-type MenuModelItem = {
-    name: string;
-    icon?: string;
-};
-
-type MenuModel = {
-    columns?: number;
-    items: MenuModelItem[];
-};
+type viewType = "menu.yml" | string;
 
 interface SelectPopupProps {
     visible: boolean;
     onClose: () => void;
-    onSelectItem?: (item: MenuModelItem, menu: Menu) => void;
 }
 
-
-function isMenuArray(value: unknown): value is Menu[] {
-    if (!Array.isArray(value)) return false;
-    return value.every((m) => !!m && typeof m === "object" && typeof (m as any).name === "string" && typeof (m as any).icon === "string" && typeof (m as any).file === "string");
-}
-
-function isMenuModel(value: unknown): value is MenuModel {
-    if (!value || typeof value !== "object") return false;
-    return Array.isArray((value as any).items);
-}
-
-export default function SelectPopup({ visible, onClose, onSelectItem }: SelectPopupProps) {
+export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
     const { getModel } = useContext(DataContext);
-    const [view, setView] = useState<viewType>("menu");
-    const [menus, setMenus] = useState<Menu[] | null>(null);
+    const [view, setView] = useState<viewType>("menu.yml");
+    const [backStack, setBackStack] = useState<viewType[]>(["menu.yml"]);
+    const [items, setItems] = useState<Menu[]>([]);
     const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
-    const [model, setModel] = useState<MenuModel | null>(null);
 
     const title = useMemo(() => {
-        if (view === "menu") return "类别";
+        if (view === "menu.yml") return "类别";
         return selectedMenu?.name || "";
     }, [selectedMenu?.name, view]);
 
-    useEffect(() => {
-        if (!visible) {
-            setView("menu");
-            setSelectedMenu(null);
-            setModel(null);
-            return;
-        }
-        let cancelled = false;
-        setMenus(null);
-        void getModel("menu.yml")
-            .then((data) => {
-                if (cancelled) return;
-                setMenus(isMenuArray(data) ? data : []);
-            })
-            .catch(() => {
-                if (cancelled) return;
-                setMenus([]);
-            });
 
-        return () => {
-            cancelled = true;
-        };
-    }, [getModel, visible]);
+    useEffect(() => {
+        if (!visible) return;
+        getModel<Menu>(view).then((model) => {
+            console.log(model);
+            if(visible) setItems(model);
+        });
+    }, [view, visible]);
 
     function handleClose() {
-        setView("menu");
+        setView("menu.yml");
         setSelectedMenu(null);
-        setModel(null);
         onClose();
     }
 
     function handleGoBack() {
-        setView("menu");
+        if (backStack.length <= 1) return;
+        setBackStack(backStack.slice(0, -1));
+        setView(backStack[backStack.length - 2]);
         setSelectedMenu(null);
-        setModel(null);
     }
 
     function handleSelectMenu(menu: Menu) {
         setSelectedMenu(menu);
-        setView(menu.file);
+        setBackStack([...backStack, menu.file || "menu.yml"]);
+        setView(menu.file || "menu.yml");
     }
 
-    useEffect(() => {
-        if (!visible) return;
-        if (view === "menu") return;
-        let cancelled = false;
-        setModel(null);
-        void getModel(view)
-            .then((data) => {
-                if (cancelled) return;
-                setModel(isMenuModel(data) ? data : null);
-            })
-            .catch(() => {
-                if (cancelled) return;
-                setModel(null);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [getModel, visible, view]);
-
     function renderByView(nextView: viewType): JSX.Element | null {
-        if (nextView === "menu") {
-            if (!menus) return null;
-            return <MenuGrid<Menu> columns={3} items={menus} onItemClick={handleSelectMenu} />;
+        if (nextView === "menu.yml") {
+            if (!items.length) return null;
+            return <MenuGrid<Menu> columns={3} items={items} onItemClick={handleSelectMenu} />;
+        } else {
+            return null;
         }
-
-        if (!model) return null;
-        return (
-            <MenuGrid<MenuModelItem>
-                columns={model.columns || 3}
-                items={model.items}
-                onItemClick={(item) => selectedMenu && onSelectItem?.(item, selectedMenu)}
-            />
-        );
     }
 
     const content = renderByView(view);
@@ -135,12 +72,12 @@ export default function SelectPopup({ visible, onClose, onSelectItem }: SelectPo
             visible={visible}
             position="bottom"
             title={title}
-            left={view !== "menu" ? <Button className="back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
+            left={backStack.length > 1 ? <Button className="back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
             onClose={handleClose}
             closeable
             style={{ height: '50%', paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}
         >
-            <View style={{ flex: 1 }}>
+            <View className="content">
                 {content ?? (
                     <View style={{ padding: 16 }}>
                         <Text>加载中...</Text>
