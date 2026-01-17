@@ -2,42 +2,40 @@
 import { useContext, useEffect, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Badge, Button, Cell, Collapse, Grid, Switch } from '@nutui/nutui-react-taro'
+import { Badge, Button, Collapse, Grid } from '@nutui/nutui-react-taro'
 
 import Icon from 'src/components/icons'
-import Select from 'src/components/Select';
 import SelectPopup from 'src/components/SelectPopup';
-import { DataContext } from 'src/components/DataContext';
 import { useUnit } from 'src/components/UnitContext';
-import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
-import { Item, Resources, sharedMessage } from 'src/components/data';
+// import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
+import { sharedMessage } from 'src/components/data';
 
 import './index.scss'
 import { Add } from '@nutui/icons-react-taro';
 
-const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物', '相变'];
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
-  const { plantNames } = useContext(DataContext);
+  const plantNames = ['番茄', '胡萝卜', '玉米', '青椒', '洋葱', '葡萄'];
   const { unitType } = useUnit();
-  const [isShowSelect, setIsShowSelect] = useState(false);
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
-  const [edit, setEdit] = useState<Item | undefined>(undefined);
-  const selections = useContext(SelectionsContext);
-  const dispatch = useContext(SelectionsDispatchContext);
-  const [resources, setResources] = useState<Resources>({});
+  // const [edit, setEdit] = useState<Item | undefined>(undefined);
+  // const selections = useContext(SelectionsContext);
+  // const dispatch = useContext(SelectionsDispatchContext);
+  const selections: Array<any> = [];
+  const dispatch = (action: any) => {};
+  const [resources, setResources] = useState<Record<string, number>>({});
   const [totalCalories, setTotalCalories] = useState<number>(0);
   const [totalPower, setTotalPower] = useState<number>(0);
   const [totalHeat, setTotalHeat] = useState<number>(0);
 
   useEffect(() => {
-    const newResources: Resources = {};
-    const newFoodResources: Resources = {};
-    let newTotalPower = 0;
-    let newTotalHeat = 0;
+    // const newResources: Resources = {};
+    // const newFoodResources: Resources = {};
+    // let newTotalPower = 0;
+    // let newTotalHeat = 0;
 
     // selections.forEach(selection => {
     //   let totalFactor = 0;
@@ -126,15 +124,6 @@ function Index() {
     setIsShowSelectPopup(false);
   }
 
-  function onClose() {
-    setIsShowSelect(false);
-    setEdit(undefined);
-  }
-
-  function handleItemClick(item: Item) {
-    setEdit({ ...item });
-  }
-
   function reset() {
     dispatch({ type: 'replace', payload: [] });
     Taro.removeStorage({ key: 'selections' });
@@ -191,7 +180,7 @@ function Index() {
   const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
 
   return (
-    <View className={`root index ${edit ? 'select-open' : ''}`}>
+    <View className='root index'>
       {/* <Collapse className='selection' defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
         {selectionCategories.map(category =>
           <Collapse.Item title={category} name={category} key={category} >
@@ -265,7 +254,7 @@ function Index() {
                     name={item.name}
                     width={48}
                     height={48}
-                    onClick={() => handleItemClick(item)}
+                    // onClick={() => handleItemClick(item)}
                   />
                 </Badge>)}
               <Button className='add' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>
@@ -275,8 +264,6 @@ function Index() {
 
 
       </View>
-
-      {isShowSelect ? <Select onClose={onClose} edit={edit} /> : null}
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
     </View>
   )

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Taro from "@tarojs/taro";
 
-import { SelectionsProvider } from "./components/SelectionsContext";
 import { DataProvider } from "./components/DataContext";
 import { API_BASE, Menu } from "./components/data";
 import { UnitProvider } from "./components/UnitContext";
@@ -9,7 +8,6 @@ import { UnitProvider } from "./components/UnitContext";
 import "./app.scss";
 
 function App(props) {
-  const [menus, setMenus] = useState<Array<Menu>>([]);
   const modelsByFileRef = useRef<Record<string, unknown | undefined>>({});
   const inflightByFileRef = useRef<Record<string, Promise<unknown> | undefined>>({});
 
@@ -35,7 +33,7 @@ function App(props) {
     });
   }
 
-  const getMenuModel = useCallback(async (file: string) => {
+  const getModel = useCallback(async (file: string) => {
     const cached = modelsByFileRef.current[file];
     if (cached) return cached;
 
@@ -56,15 +54,10 @@ function App(props) {
   }, []);
 
   const bootstrap = useCallback(async () => {
-    try {
-      const nextMenus = await requestJson<Array<Menu>>(`${API_BASE}/api/v1/yml/calculator/menu.yml`);
-      setMenus(nextMenus);
-      for (const menu of nextMenus) {
-        void getMenuModel(menu.file);
+      const menus = await getModel('menu.yml') as Array<Menu>;
+      for (const menu of menus) {
+        void getModel(menu.file);
       }
-    } catch (e: any) {
-      setMenus([]);
-    }
   }, []);
 
   useEffect(() => {
@@ -79,17 +72,14 @@ function App(props) {
   return (
     <DataProvider
       value={{
-        getModel: getMenuModel,
-        items: [],
-        plantNames: [],
-        images: {},
+        getModel
       }}
     >
-      <SelectionsProvider>
+      {/* <SelectionsProvider> */}
         <UnitProvider>
           {props.children}
         </UnitProvider>
-      </SelectionsProvider>
+      {/* </SelectionsProvider> */}
     </DataProvider>
   );
 }
