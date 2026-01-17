@@ -10,7 +10,7 @@ import SelectPopup from 'src/components/SelectPopup';
 import { DataContext } from 'src/components/DataContext';
 import { useUnit } from 'src/components/UnitContext';
 import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
-import { Item, Resources, sharedMessage, Menu } from 'src/components/data';
+import { Item, Resources, sharedMessage } from 'src/components/data';
 
 import './index.scss'
 import { Add } from '@nutui/icons-react-taro';
@@ -123,11 +123,6 @@ function Index() {
   }
 
   function onPopupClose() {
-    setIsShowSelectPopup(false);
-  }
-
-  function handleSelectMenu(menu: Menu) {
-    console.log('Selected menu:', menu);
     setIsShowSelectPopup(false);
   }
 
@@ -282,7 +277,7 @@ function Index() {
       </View>
 
       {isShowSelect ? <Select onClose={onClose} edit={edit} /> : null}
-      <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} onSelect={handleSelectMenu} />
+      <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
     </View>
   )
 }

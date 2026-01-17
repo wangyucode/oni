@@ -1,20 +1,39 @@
 import { createContext, ReactNode } from "react";
 import { FoodCalories, Item, Menu } from "./data";
 
-export const DataContext = createContext<DataProviderValue>({ items: [], plantNames: [], foodCalories: {}, images: {}, menus: [] });
+export type CalculatorGridItem = {
+    name: string;
+    icon?: string;
+};
 
-interface DataProviderValue {
+export type CalculatorGridModel = {
+    title?: string;
+    columns?: number;
+    items: Array<CalculatorGridItem>;
+};
+
+export interface DataContextValue {
     items: Array<Item>;
     plantNames: Array<string>;
     foodCalories: FoodCalories;
     images: Record<string, string>;
     menus: Array<Menu>;
+
+    getMenuModel: (file: string) => Promise<CalculatorGridModel>;
 }
 
-export function DataProvider({ children, items, plantNames, foodCalories, images, menus }: DataProviderValue & { children: ReactNode }) {
+export const DataContext = createContext<DataContextValue>({
+    items: [],
+    plantNames: [],
+    foodCalories: {},
+    images: {},
+    menus: [],
+    getMenuModel: async () => ({ items: [] }),
+});
 
+export function DataProvider({ children, value }: { children: ReactNode; value: DataContextValue }) {
     return (
-        <DataContext.Provider value={{ items, plantNames, foodCalories, images, menus }}>
+        <DataContext.Provider value={value}>
             {children}
         </DataContext.Provider>
     )
