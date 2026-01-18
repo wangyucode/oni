@@ -6,65 +6,110 @@ import { ArrowLeft } from "@nutui/icons-react-taro";
 import './SelectPopup.scss';
 import { DataContext } from "./DataContext";
 import MenuGrid from "./MenuGrid";
-import { Menu } from "./data";
+import { Detail, Link, Menu } from "./data";
 
-type viewType = "menu.yml" | string;
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null;
+}
+
+function isMenu(value: unknown): value is Menu {
+    if (!isRecord(value)) return false;
+    return typeof value.title === "string" && Array.isArray(value.items);
+}
+
+function isLink(value: unknown): value is Link {
+    if (!isRecord(value)) return false;
+    return typeof value.name === "string" && typeof value.icon === "string";
+}
+
+function normalizeRootMenu(payload: unknown): Menu {
+    if (isMenu(payload)) return payload;
+    if (Array.isArray(payload)) {
+        if (payload.every(isMenu)) {
+            return {
+                title: "类别",
+                items: payload.map((menu) => ({ name: menu.title, icon: "", menu })),
+            };
+        }
+        if (payload.every(isLink)) {
+            return {
+                title: "类别",
+                items: payload,
+            };
+        }
+    }
+    return { title: "类别", items: [] };
+}
 
 interface SelectPopupProps {
     visible: boolean;
     onClose: () => void;
+    onSelectDetail?: (detail: Detail) => void;
 }
 
-export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
+export default function SelectPopup({ visible, onClose, onSelectDetail }: SelectPopupProps) {
     const { getModel } = useContext(DataContext);
-    const [view, setView] = useState<viewType>("menu.yml");
-    const [backStack, setBackStack] = useState<viewType[]>(["menu.yml"]);
-    const [items, setItems] = useState<Menu[]>([]);
-    const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+    const [rootMenu, setRootMenu] = useState<Menu | null>(null);
+    const [currentMenu, setCurrentMenu] = useState<Menu | null>(null);
+    const [backStack, setBackStack] = useState<Menu[]>([]);
 
     const title = useMemo(() => {
-        if (view === "menu.yml") return "类别";
-        return selectedMenu?.name || "";
-    }, [selectedMenu?.name, view]);
-
+        return currentMenu?.title || "类别";
+    }, [currentMenu?.title]);
 
     useEffect(() => {
         if (!visible) return;
-        getModel<Menu>(view).then((model) => {
-            console.log(model);
-            if(visible) setItems(model);
-        });
-    }, [view, visible]);
+        let cancelled = false;
+        (async () => {
+            if (rootMenu) {
+                setCurrentMenu(rootMenu);
+                setBackStack([rootMenu]);
+                return;
+            }
+            const payload = await getModel<unknown>("index.yml");
+            const model = normalizeRootMenu(payload);
+            if (cancelled || !visible) return;
+            setRootMenu(model);
+            setCurrentMenu(model);
+            setBackStack([model]);
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [visible, rootMenu, getModel]);
 
     function handleClose() {
-        setView("menu.yml");
-        setSelectedMenu(null);
+        setCurrentMenu(rootMenu);
+        setBackStack(rootMenu ? [rootMenu] : []);
         onClose();
     }
 
     function handleGoBack() {
         if (backStack.length <= 1) return;
-        setBackStack(backStack.slice(0, -1));
-        setView(backStack[backStack.length - 2]);
-        setSelectedMenu(null);
+        const nextStack = backStack.slice(0, -1);
+        setBackStack(nextStack);
+        setCurrentMenu(nextStack[nextStack.length - 1] || null);
     }
 
-    function handleSelectMenu(menu: Menu) {
-        setSelectedMenu(menu);
-        setBackStack([...backStack, menu.file || "menu.yml"]);
-        setView(menu.file || "menu.yml");
-    }
-
-    function renderByView(nextView: viewType): JSX.Element | null {
-        if (nextView === "menu.yml") {
-            if (!items.length) return null;
-            return <MenuGrid<Menu> columns={3} items={items} onItemClick={handleSelectMenu} />;
-        } else {
-            return null;
+    function handleSelectLink(link: Link) {
+        if (link.menu) {
+            setBackStack([...backStack, link.menu]);
+            setCurrentMenu(link.menu);
+            return;
+        }
+        if (link.detail) {
+            onSelectDetail?.(link.detail);
+            handleClose();
         }
     }
 
-    const content = renderByView(view);
+    function renderMenu(menu: Menu | null): JSX.Element | null {
+        if (!menu) return null;
+        if (!menu.items?.length) return null;
+        return <MenuGrid<Link> columns={3} items={menu.items} onItemClick={handleSelectLink} />;
+    }
+
+    const content = renderMenu(currentMenu);
 
     return (
         <Popup

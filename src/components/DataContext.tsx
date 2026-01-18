@@ -1,11 +1,11 @@
 import { createContext, ReactNode } from "react";
 
 export interface DataContextValue {
-    getModel<T = unknown>(file: string): Promise<T[]>;
+    getModel<T = unknown>(file: string): Promise<T>;
 }
 
 export const DataContext = createContext<DataContextValue>({
-    getModel: async <T = unknown,>(_file: string) => [] as T[]
+    getModel: async <T = unknown,>(_file: string) => undefined as unknown as T
 });
 
 export function DataProvider({ children, value }: { children: ReactNode; value: DataContextValue }) {
