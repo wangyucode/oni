@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Taro from "@tarojs/taro";
 
-import { DataProvider, type DataContextValue } from "./components/DataContext";
+import { DataProvider } from "./components/DataContext";
 import { API_BASE, Menu } from "./components/data";
 import { UnitProvider } from "./components/UnitContext";
 
 import "./app.scss";
 
 function App(props) {
-  const modelsByFileRef = useRef<Record<string, unknown | undefined>>({});
-  const inflightByFileRef = useRef<Record<string, Promise<unknown> | undefined>>({});
+  const [data, setData] = useState<Menu | null>(null);
 
   async function requestJson<T>(url: string): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -33,28 +32,13 @@ function App(props) {
     });
   }
 
-  const getModel: DataContextValue["getModel"] = useCallback(async <T = unknown,>(file: string) => {
-    const cached = modelsByFileRef.current[file];
-    if (cached !== undefined) return cached as T;
-
-    const inflight = inflightByFileRef.current[file];
-    if (inflight) return inflight as Promise<T>;
-
-    const requestPromise = requestJson<T>(`${API_BASE}/api/v1/yml/calculator/${file}`)
-      .then((model) => {
-        modelsByFileRef.current[file] = model;
-        return model as T;
-      })
-      .finally(() => {
-        delete inflightByFileRef.current[file];
-      });
-
-    inflightByFileRef.current[file] = requestPromise;
-    return requestPromise as Promise<T>;
-  }, []);
-
-  const bootstrap = useCallback(async () => {
-      await getModel<unknown>('index.yml');
+  const fetchData = useCallback(async () => {
+    try {
+      const payload = await requestJson<Menu>(`${API_BASE}/api/v1/yml/calculator/index.yml`);
+      setData(payload);
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   useEffect(() => {
@@ -63,15 +47,11 @@ function App(props) {
       Taro.clearStorageSync();
       Taro.setStorageSync('appVersion', process.env.TARO_APP_VERSION);
     }
-    void bootstrap();
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   return (
-    <DataProvider
-      value={{
-        getModel
-      }}
-    >
+    <DataProvider value={data}>
       {/* <SelectionsProvider> */}
         <UnitProvider>
           {props.children}

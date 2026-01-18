@@ -1,14 +1,10 @@
 import { createContext, ReactNode } from "react";
+import { Menu } from "./data";
 
-export interface DataContextValue {
-    getModel<T = unknown>(file: string): Promise<T>;
-}
+export const DataContext = createContext<Menu| null>(null);
 
-export const DataContext = createContext<DataContextValue>({
-    getModel: async <T = unknown,>(_file: string) => undefined as unknown as T
-});
 
-export function DataProvider({ children, value }: { children: ReactNode; value: DataContextValue }) {
+export function DataProvider({ children, value }: { children: ReactNode; value: Menu | null }) {
     return (
         <DataContext.Provider value={value}>
             {children}
