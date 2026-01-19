@@ -18,6 +18,7 @@ export interface Detail {
 
 export interface DupeDetail {
   resources: ResourceMap;
+  calorie?: string;
   power?: string;
   modes: Mode[];
 }
