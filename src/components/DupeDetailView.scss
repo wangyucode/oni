@@ -121,32 +121,5 @@
     color: #999;
   }
 
-  &__resourceGrid {
-    width: 100%;
 
-    .nut-grid-item-content {
-      row-gap: 2px;
-    }
-
-    img {
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
-    }
-  }
-
-  &__resourceName {
-    font-size: 12px;
-  }
-
-  &__value {
-    font-size: 12px;
-
-    &.consume {
-      color: #ff0f23;
-    }
-
-    &.produce {
-      color: #64b578;
-    }
-  }
 }

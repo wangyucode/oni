@@ -4,8 +4,9 @@ import { Collapse, Grid, InputNumber, Radio, RadioGroup, Range } from "@nutui/nu
 
 import "./DupeDetailView.scss";
 import { Detail, DupeDetail } from "./data";
+import ResourceGrid, { ResourceItem } from "./ResourceGrid";
+import { useUnit } from "./UnitContext";
 import Icon from "./icons";
-import { transValue, useUnit } from "./UnitContext";
 
 export type DupeDetailViewProps = {
   detail: Detail;
@@ -43,7 +44,7 @@ function buildDefaultModeSelections(dupe: DupeDetail): Array<Map<string, number>
 export default function DupeDetailView({ detail }: DupeDetailViewProps) {
   if (!isDupeDetail(detail.detail)) return null;
   const dupe = detail.detail;
-  const { weightUnit, timeUnit } = useUnit();
+  const { timeUnit } = useUnit();
 
   const [count, setCount] = useState<number>(1);
   const [modeSelections, setModeSelections] = useState<Array<Map<string, number>>>(() =>
@@ -55,19 +56,11 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
     setModeSelections(buildDefaultModeSelections(dupe));
   }, [detail.name]);
 
-  const convertResourceValue = (value: number, name: string): { convertedValue: number; unit: string } => {
-
-    return {
-      convertedValue: transValue(value, weightUnit, timeUnit),
-      unit: `${weightUnit}/${timeUnit}`
-    };
-  };
-
   const convertCalories = (calories: number): { convertedValue: number; unit: string } => {
-    if (timeUnit === '周期') {
-      return { convertedValue: calories * 600, unit: "千卡/周期" };
+    if (timeUnit === '秒') {
+      return { convertedValue: calories / 600 * 1000, unit: "卡路里/秒" };
     }
-    return { convertedValue: calories, unit: "千卡/秒" };
+    return { convertedValue: calories, unit: "千卡/周期" };
   };
 
   const { resources, totalFactor, totalPower, totalCalories } = useMemo(() => {
@@ -108,6 +101,14 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
       totalCalories: nextTotalCalories,
     };
   }, [count, dupe.calorie, dupe.modes, dupe.power, dupe.resources, modeSelections]);
+
+  const resourceItems = useMemo<ResourceItem[]>(() => {
+    return Object.entries(resources).map(([name, value]) => ({
+      name,
+      value,
+      count: 1
+    }));
+  }, [resources]);
 
   const isDupe = detail.name.includes("复制人");
   const isBionic = detail.name.includes("仿生人");
@@ -160,7 +161,10 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
       <View className="dupe-detail-view__section">
         <Text className="dupe-detail-view__sectionTitle">模式</Text>
         {dupe.modes?.length ? (
-          <Collapse defaultActiveName={dupe.modes.map((_, i) => String(i))}>
+          <Collapse 
+          defaultActiveName={dupe.modes.map((_, i) => String(i))}
+          expandIcon={<Icon width={12} height={16} name='rightArrow' />}
+                    rotate={90}>
             {dupe.modes.map((mode, modeIndex) => (
               <Collapse.Item title={mode.name} name={String(modeIndex)} key={`${mode.name}-${modeIndex}`}>
                 <View className="dupe-detail-view__mode">
@@ -248,33 +252,7 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
 
       <View className="dupe-detail-view__section">
         <Text className="dupe-detail-view__sectionTitle">资源</Text>
-        {Object.keys(resources).length ? (
-          <Grid
-            className="dupe-detail-view__resourceGrid"
-            style={{ width: "100%" }}
-            columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}
-          >
-            {Object.entries(resources)
-              .sort(([a], [b]) => a.localeCompare(b, "zh-CN"))
-              .map(([name, value]) => {
-                const { convertedValue, unit } = convertResourceValue(value, name);
-                const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : "+" + Math.floor(convertedValue);
-                return (
-                  <Grid.Item key={name}>
-                    <Icon name={name} width={48} height={48} />
-                    <Text className="dupe-detail-view__resourceName">{name}</Text>
-                    <Text className={`dupe-detail-view__value ${convertedValue < 0 ? "consume" : "produce"}`}>
-                      {`${valueStr} ${unit}`}
-                    </Text>
-                  </Grid.Item>
-                );
-              })}
-          </Grid>
-        ) : (
-          <View className="dupe-detail-view__empty">
-            <Text>无</Text>
-          </View>
-        )}
+        <ResourceGrid items={resourceItems} />
       </View>
     </View>
   );

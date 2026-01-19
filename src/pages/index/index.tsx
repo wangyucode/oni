@@ -2,11 +2,12 @@
 import { useEffect, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Badge, Button, Collapse, Grid } from '@nutui/nutui-react-taro'
+import { Badge, Button, Collapse } from '@nutui/nutui-react-taro'
 
 import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
-import { transValue, useUnit } from 'src/components/UnitContext';
+import ResourceGrid, { ResourceItem } from 'src/components/ResourceGrid';
+import { useUnit } from 'src/components/UnitContext';
 // import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
 import { sharedMessage } from 'src/components/data';
 
@@ -18,8 +19,7 @@ const resultCategories = ['资源', '食物', '电力', '热量'];
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
-  const plantNames = ['番茄', '胡萝卜', '玉米', '青椒', '洋葱', '葡萄'];
-  const { weightUnit, timeUnit } = useUnit();
+  const { timeUnit } = useUnit();
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   // const [edit, setEdit] = useState<Item | undefined>(undefined);
   // const selections = useContext(SelectionsContext);
@@ -132,35 +132,18 @@ function Index() {
   function getTips(category: string) {
     if (category === '建筑') {
       return '建筑效率实际通常无法达到100%，实际产量通常略低于理论值';
-    } else if (category === '动物') {
+    } else if (category === '小动物') {
       return '动物资源消耗和产出按精养数量计算；除帕库鱼和树鼠选择产蛋外，其它动物选择产肉，产量包括散养';
     } else if (category === '植物') {
       return '植物无法立即被收获，实际产量通常略低于理论值';
     } else if (category === '复制人/仿生人') {
       return '物质转化包含呼吸/上厕所/粘渣/润滑，未包含洗澡';
-    } else if (category === '相变') {
+    } else if (category === '元素相变') {
       return '包括所有物质的相态转化，包括挥发、液化、凝固、熔化、凝结、升华';
-    } else {
+    } else if (category === '间歇泉') {
       return '';
     }
   }
-
-  // 单位转换函数
-  const convertResourceValue = (value: number, name: string): { convertedValue: number, unit: string } => {
-    const isPlant = plantNames.includes(name);
-    if (isPlant) {
-      const plantCountPerS = value / 1000;
-      if (timeUnit === '周期') {
-        return { convertedValue: plantCountPerS * 600, unit: '棵/周期' };
-      }
-      return { convertedValue: plantCountPerS, unit: '棵/秒' };
-    }
-
-    return {
-      convertedValue: transValue(value, weightUnit, timeUnit),
-      unit: `${weightUnit}/${timeUnit}`
-    };
-  };
 
   const convertCalories = (calories: number): { convertedValue: number, unit: string } => {
     if (timeUnit === '周期') {
@@ -203,21 +186,7 @@ function Index() {
       <View className='result'>
         <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
           <Collapse.Item title="资源" name='资源'>
-            <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
-              {Object.entries(resources).map(([name, value]) => {
-                const { convertedValue, unit } = convertResourceValue(value, name);
-                const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue);
-                return (
-                  <Grid.Item key={name}>
-                    <Icon name={name} width={48} height={48} />
-                    <Text className='resource-name'>{name}</Text>
-                    <Text className={`value ${convertedValue < 0 ? "consume" : "produce"}`}>
-                      {`${valueStr} ${unit}`}
-                    </Text>
-                  </Grid.Item>
-                )
-              })}
-            </Grid>
+            <ResourceGrid items={[]} />
           </Collapse.Item>
           <Collapse.Item title="食物" name="食物">
             <View className="power-heat-container">

@@ -87,23 +87,7 @@
     flex: 1;
     gap: 8PX;
 
-    // 资源网格
-    .resource-grid {
-      width: 100%;
 
-      .nut-grid-item-content {
-        row-gap: 2PX;
-      }
-
-      .resource-name {
-        font-size: 12PX;
-      }
-
-      img {
-        left: 50%;
-        transform: translateX(-50%) translateY(-50%);
-      }
-    }
 
     // 电力热量容器
     .power-heat-container {

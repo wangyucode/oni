@@ -16,7 +16,7 @@ interface SelectPopupProps {
 }
 
 export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
-    const menu = useContext(DataContext);
+    const { data: menu } = useContext(DataContext);
     const [rootMenu, setRootMenu] = useState<Menu | null>(menu);
     const [currentMenu, setCurrentMenu] = useState<Menu | null>(null);
     const [backStack, setBackStack] = useState<Menu[]>([]);
