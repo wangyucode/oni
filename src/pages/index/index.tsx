@@ -1,12 +1,12 @@
 
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { Badge, Button, Collapse, Grid } from '@nutui/nutui-react-taro'
 
 import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
-import { useUnit } from 'src/components/UnitContext';
+import { transValue, useUnit } from 'src/components/UnitContext';
 // import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
 import { sharedMessage } from 'src/components/data';
 
@@ -19,7 +19,7 @@ function Index() {
 
   useShareAppMessage(() => sharedMessage);
   const plantNames = ['番茄', '胡萝卜', '玉米', '青椒', '洋葱', '葡萄'];
-  const { unitType } = useUnit();
+  const { weightUnit, timeUnit } = useUnit();
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   // const [edit, setEdit] = useState<Item | undefined>(undefined);
   // const selections = useContext(SelectionsContext);
@@ -147,33 +147,34 @@ function Index() {
 
   // 单位转换函数
   const convertResourceValue = (value: number, name: string): { convertedValue: number, unit: string } => {
-    if (unitType === 'g/s') {
-      const isPlant = plantNames.includes(name);
-      const unit = isPlant ? '棵/s' : 'g/s';
-      if (isPlant) return { convertedValue: value / 1000, unit };
-      return { convertedValue: value, unit };
-    } else {
-      // 转换为kg/周期: 1周期=600秒，1000g=1kg
-      const convertedValue = value * 600 / 1000;
-      const unit = plantNames.includes(name) ? '棵/周期' : 'kg/周期';
-      return { convertedValue, unit };
+    const isPlant = plantNames.includes(name);
+    if (isPlant) {
+      const plantCountPerS = value / 1000;
+      if (timeUnit === '周期') {
+        return { convertedValue: plantCountPerS * 600, unit: '棵/周期' };
+      }
+      return { convertedValue: plantCountPerS, unit: '棵/秒' };
     }
+
+    return {
+      convertedValue: transValue(value, weightUnit, timeUnit),
+      unit: `${weightUnit}/${timeUnit}`
+    };
   };
 
   const convertCalories = (calories: number): { convertedValue: number, unit: string } => {
-    if (unitType === 'g/s') {
-      return { convertedValue: calories, unit: '千卡/秒' };
-    } else {
+    if (timeUnit === '周期') {
       return { convertedValue: calories * 600, unit: '千卡/周期' };
     }
+    return { convertedValue: calories, unit: '千卡/秒' };
   };
 
   const convertHeat = (heat: number): { convertedValue: number, unit: string } => {
-    if (unitType === 'g/s') {
-      return { convertedValue: heat / 1000, unit: '千复制热/秒' };
-    } else {
-      return { convertedValue: heat * 600 / 1000, unit: '千复制热/周期' };
+    const kHeat = heat / 1000;
+    if (timeUnit === '周期') {
+      return { convertedValue: kHeat * 600, unit: '千复制热/周期' };
     }
+    return { convertedValue: kHeat, unit: '千复制热/秒' };
   };
 
   const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);

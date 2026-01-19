@@ -12,9 +12,21 @@ import './about.scss'
 
 export default function About() {
 
-    const { unitType, toggleUnitType } = useUnit();
+    const { weightUnit, timeUnit, toggleWeightUnit, toggleTimeUnit } = useUnit();
 
     useShareAppMessage(() => sharedMessage);
+
+    const isKgCycle = weightUnit === '千克' && timeUnit === '周期';
+
+    const toggleMode = (val: boolean) => {
+        if (val) {
+            toggleWeightUnit();
+            toggleTimeUnit();
+        } else {
+            toggleWeightUnit();
+            toggleTimeUnit();
+        }
+    }
 
     function handleLogClick() {
         Taro.navigateTo({
@@ -43,13 +55,11 @@ export default function About() {
             <Cell.Group className="about-cells">
                 <Cell className='unit-cell' align="center" title="切换显示单位" extra={
                       <>
-                        <Text className='unit-text'>{unitType === 'g/s' ? 'g/s' : 'kg/周期'}</Text>
-                        <Switch checked={unitType === 'kg/周期'} onChange={toggleUnitType} />
+                        <Text className='unit-text'>{isKgCycle ? '千克/周期' : '克/秒'}</Text>
+                        <Switch checked={isKgCycle} onChange={toggleMode} />
                       </>
                     } />
-            </Cell.Group>
-
-            
+            </Cell.Group>          
         </View>
     )
 }

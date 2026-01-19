@@ -3,9 +3,9 @@ import { Image, Text, View } from "@tarojs/components";
 import { Collapse, Grid, InputNumber, Radio, RadioGroup, Range } from "@nutui/nutui-react-taro";
 
 import "./DupeDetailView.scss";
-import { Detail, DupeDetail, ResourceMap } from "./data";
+import { Detail, DupeDetail } from "./data";
 import Icon from "./icons";
-import { useUnit } from "./UnitContext";
+import { transValue, useUnit } from "./UnitContext";
 
 export type DupeDetailViewProps = {
   detail: Detail;
@@ -21,12 +21,6 @@ function isDupeDetail(detail: Detail["detail"]): detail is DupeDetail {
     !("life" in detail)
   );
 }
-
-function sortedEntries(map: ResourceMap): Array<[string, string]> {
-  return Object.entries(map).sort(([a], [b]) => a.localeCompare(b, "zh-CN"));
-}
-
-const plantNames = ["番茄", "胡萝卜", "玉米", "青椒", "洋葱", "葡萄"];
 
 function parseNumber(raw: string | undefined): number {
   if (!raw) return 0;
@@ -49,7 +43,7 @@ function buildDefaultModeSelections(dupe: DupeDetail): Array<Map<string, number>
 export default function DupeDetailView({ detail }: DupeDetailViewProps) {
   if (!isDupeDetail(detail.detail)) return null;
   const dupe = detail.detail;
-  const { unitType } = useUnit();
+  const { weightUnit, timeUnit } = useUnit();
 
   const [count, setCount] = useState<number>(1);
   const [modeSelections, setModeSelections] = useState<Array<Map<string, number>>>(() =>
@@ -62,22 +56,18 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
   }, [detail.name]);
 
   const convertResourceValue = (value: number, name: string): { convertedValue: number; unit: string } => {
-    if (unitType === "g/s") {
-      const isPlant = plantNames.includes(name);
-      const unit = isPlant ? "棵/s" : "g/s";
-      if (isPlant) return { convertedValue: value / 1000, unit };
-      return { convertedValue: value, unit };
-    }
-    const convertedValue = (value * 600) / 1000;
-    const unit = plantNames.includes(name) ? "棵/周期" : "kg/周期";
-    return { convertedValue, unit };
+
+    return {
+      convertedValue: transValue(value, weightUnit, timeUnit),
+      unit: `${weightUnit}/${timeUnit}`
+    };
   };
 
   const convertCalories = (calories: number): { convertedValue: number; unit: string } => {
-    if (unitType === "g/s") {
-      return { convertedValue: calories, unit: "千卡/秒" };
+    if (timeUnit === '周期') {
+      return { convertedValue: calories * 600, unit: "千卡/周期" };
     }
-    return { convertedValue: calories * 600, unit: "千卡/周期" };
+    return { convertedValue: calories, unit: "千卡/秒" };
   };
 
   const { resources, totalFactor, totalPower, totalCalories } = useMemo(() => {
