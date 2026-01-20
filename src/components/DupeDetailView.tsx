@@ -118,7 +118,7 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
     <View className="dupe-detail-view">
       <View className="dupe-detail-view__header">
         {detail.icon ? (
-          <Image src={detail.icon} className="dupe-detail-view__icon" mode="aspectFit" />
+          <Image src={detail.icon} className="dupe-detail-view__icon" mode="aspectFit" style={detail.iconFilter ? { filter: detail.iconFilter } : undefined} />
         ) : null}
         <Text className="dupe-detail-view__name">{detail.name}</Text>
         <View style={{ flex: 1 }} />

@@ -61,10 +61,12 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
       {sortedResources.map(([name, value]) => {
         const { convertedValue, unit } = convertResourceValue(value);
         const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue);
-        const iconSrc = iconMap.get(name);
+        const iconData = iconMap.get(name);
+        const iconSrc = iconData?.icon;
+        const iconFilter = iconData?.iconFilter;
         return (
           <Grid.Item key={name}>
-            {iconSrc ? <Image src={iconSrc} width={48} height={48} mode="aspectFit" /> : <Icon name={name} width={48} height={48} />}
+            {iconSrc ? <Image src={iconSrc} width={48} height={48} mode="aspectFit" style={iconFilter ? { filter: iconFilter } : undefined} /> : <Icon name={name} width={48} height={48} />}
             <Text className='resource-grid__name'>{name}</Text>
             <Text className={`resource-grid__value ${convertedValue < 0 ? "consume" : "produce"}`}>
               {`${valueStr} ${unit}`}

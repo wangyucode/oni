@@ -7,6 +7,7 @@ import './MenuGrid.scss';
 export type MenuGridItem = {
   name: string;
   icon?: string;
+  iconFilter?: string;
 };
 
 export type MenuGridProps<TItem extends MenuGridItem = MenuGridItem> = {
@@ -24,7 +25,7 @@ export default function MenuGrid<TItem extends MenuGridItem = MenuGridItem>({
     <Grid columns={columns} gap={0}>
       {items.map((item) => (
         <Grid.Item key={item.name} text={item.name} onClick={() => onItemClick?.(item)}>
-          {item.icon ? <Image src={item.icon} className="menu-grid-icon" mode="aspectFit" /> : null}
+          {item.icon ? <Image src={item.icon} className="menu-grid-icon" mode="aspectFit" style={item.iconFilter ? { filter: item.iconFilter } : undefined} /> : null}
         </Grid.Item>
       ))}
     </Grid>

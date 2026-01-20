@@ -6,6 +6,7 @@ export interface Menu {
 export interface Link {
   name: string;
   icon: string;
+  iconFilter?: string;
   menu?: Menu;
   detail?: Detail;
 }
@@ -13,6 +14,7 @@ export interface Link {
 export interface Detail {
   name: string;
   icon: string;
+  iconFilter?: string;
   detail: DupeDetail | BuildingDetail | CreatureDetail | PlantDetail | TransDetail | GeyserDetail;
 }
 

@@ -4,10 +4,15 @@ import { API_BASE, Menu } from "./data";
 
 export interface DataContextType {
     data: Menu | null;
-    iconMap: Map<string, string>;
+    iconMap: Map<string, IconData>;
     loading: boolean;
     error: Error | null;
     refresh: () => void;
+}
+
+export interface IconData {
+    icon: string;
+    iconFilter?: string;
 }
 
 export const DataContext = createContext<DataContextType>({
@@ -67,13 +72,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }, [fetchData]);
 
     const iconMap = useMemo(() => {
-        const map = new Map<string, string>();
+        const map = new Map<string, IconData>();
         if (!data) return map;
 
         const traverse = (m: Menu) => {
             m.items.forEach(item => {
                 if (item.name && item.icon) {
-                    map.set(item.name, item.icon);
+                    map.set(item.name, {
+                        icon: item.icon,
+                        iconFilter: item.iconFilter
+                    });
                 }
                 if (item.menu) {
                     traverse(item.menu);
