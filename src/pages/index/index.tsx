@@ -6,13 +6,14 @@ import { Badge, Button, Collapse } from '@nutui/nutui-react-taro'
 
 import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
-import ResourceGrid, { ResourceItem } from 'src/components/ResourceGrid';
+import ResourceGrid from 'src/components/ResourceGrid';
 import { useUnit } from 'src/components/UnitContext';
 // import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
 import { sharedMessage } from 'src/components/data';
 
 import './index.scss'
 import { Add } from '@nutui/icons-react-taro';
+import GlobalSvgFilters from 'src/components/GlobalSvgFilters';
 
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
@@ -233,6 +234,7 @@ function Index() {
         </Collapse>
       </View>
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
+      <GlobalSvgFilters />
     </View>
   )
 }

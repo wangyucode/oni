@@ -3,6 +3,7 @@ import { View } from '@tarojs/components';
 import { DataContext } from './DataContext';
 
 export default function GlobalSvgFilters() {
+    if (process.env.TARO_ENV !== 'h5') return null;
     const { iconMap } = useContext(DataContext);
 
     const filters = useMemo(() => {

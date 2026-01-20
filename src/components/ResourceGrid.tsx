@@ -1,11 +1,12 @@
 import React, { useMemo, useContext } from 'react';
 import { View, Text } from '@tarojs/components';
-import { Grid, Image } from '@nutui/nutui-react-taro';
+import { Grid } from '@nutui/nutui-react-taro';
 import Icon from './icons';
 import { useUnit, transValue } from './UnitContext';
 import { DataContext } from './DataContext';
 import './ResourceGrid.scss';
 import { calculateGridColumns } from './utils';
+import FilteredImage from './FilteredImage';
 
 export interface ResourceItem {
   name: string;
@@ -66,7 +67,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
         const iconFilter = iconData?.iconFilter;
         return (
           <Grid.Item key={name}>
-            {iconSrc ? <Image src={iconSrc} width={48} height={48} mode="aspectFit" style={iconFilter ? { filter: iconFilter } : undefined} /> : <Icon name={name} width={48} height={48} />}
+            {iconSrc ? <FilteredImage src={iconSrc} iconFilter={iconFilter} style={{ width: 48, height: 48 }} mode="aspectFit" /> : <Icon name={name} width={48} height={48} />}
             <Text className='resource-grid__name'>{name}</Text>
             <Text className={`resource-grid__value ${convertedValue < 0 ? "consume" : "produce"}`}>
               {`${valueStr} ${unit}`}

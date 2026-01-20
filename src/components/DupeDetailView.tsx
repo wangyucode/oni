@@ -7,6 +7,7 @@ import { Detail, DupeDetail } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useUnit } from "./UnitContext";
 import Icon from "./icons";
+import FilteredImage from "./FilteredImage";
 
 export type DupeDetailViewProps = {
   detail: Detail;
@@ -118,7 +119,7 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
     <View className="dupe-detail-view">
       <View className="dupe-detail-view__header">
         {detail.icon ? (
-          <Image src={detail.icon} className="dupe-detail-view__icon" mode="aspectFit" style={detail.iconFilter ? { filter: detail.iconFilter } : undefined} />
+          <FilteredImage src={detail.icon} iconFilter={detail.iconFilter} className="dupe-detail-view__icon" mode="aspectFit" />
         ) : null}
         <Text className="dupe-detail-view__name">{detail.name}</Text>
         <View style={{ flex: 1 }} />
