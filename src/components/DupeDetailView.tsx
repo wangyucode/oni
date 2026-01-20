@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Image, Text, View } from "@tarojs/components";
-import { Collapse, Grid, InputNumber, Radio, RadioGroup, Range } from "@nutui/nutui-react-taro";
+import { Button, Collapse, Grid, InputNumber, Radio, RadioGroup, Range } from "@nutui/nutui-react-taro";
 
 import "./DupeDetailView.scss";
 import { Detail, DupeDetail } from "./data";
@@ -8,9 +8,12 @@ import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useUnit } from "./UnitContext";
 import Icon from "./icons";
 import FilteredImage from "./FilteredImage";
+import { useSelectionsActions } from "./SelectionsContext";
 
 export type DupeDetailViewProps = {
   detail: Detail;
+  categoryPath?: string[];
+  onConfirmed?: () => void;
 };
 
 function isDupeDetail(detail: Detail["detail"]): detail is DupeDetail {
@@ -42,10 +45,11 @@ function buildDefaultModeSelections(dupe: DupeDetail): Array<Map<string, number>
   });
 }
 
-export default function DupeDetailView({ detail }: DupeDetailViewProps) {
+export default function DupeDetailView({ detail, categoryPath = [], onConfirmed }: DupeDetailViewProps) {
   if (!isDupeDetail(detail.detail)) return null;
   const dupe = detail.detail;
   const { timeUnit } = useUnit();
+  const { upsert } = useSelectionsActions();
 
   const [count, setCount] = useState<number>(1);
   const [modeSelections, setModeSelections] = useState<Array<Map<string, number>>>(() =>
@@ -115,6 +119,16 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
   const isBionic = detail.name.includes("仿生人");
   const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);
 
+  function handleConfirm(): void {
+    upsert({
+      detail,
+      count,
+      modeSelections,
+      categoryPath,
+    });
+    onConfirmed?.();
+  }
+
   return (
     <View className="dupe-detail-view">
       <View className="dupe-detail-view__header">
@@ -132,6 +146,7 @@ export default function DupeDetailView({ detail }: DupeDetailViewProps) {
               setCount(Number.isFinite(next) ? next : 0);
             }}
           />
+          <Button onClick={handleConfirm} type="primary">确认</Button>
         </View>
       </View>
 

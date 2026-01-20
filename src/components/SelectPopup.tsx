@@ -26,6 +26,10 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         return selectedDetail?.name || currentMenu?.title || "类别";
     }, [currentMenu?.title, selectedDetail?.name]);
 
+    const categoryPath = useMemo(() => {
+        return backStack.slice(1).map((m) => m.title).filter(Boolean);
+    }, [backStack]);
+
     useEffect(() => {
         if (!visible) return;
         if (rootMenu) {
@@ -89,7 +93,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
     }
 
     const content = selectedDetail && isDupeDetail(selectedDetail.detail)
-        ? <DupeDetailView detail={selectedDetail} />
+        ? <DupeDetailView detail={selectedDetail} categoryPath={categoryPath} onConfirmed={handleClose} />
         : renderMenu(currentMenu);
 
     return (

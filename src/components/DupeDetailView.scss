@@ -18,11 +18,12 @@
     width: 120px;
     display: flex;
     justify-content: flex-end;
+    gap: 16px;
   }
 
   &__icon {
-    width: 28px;
-    height: 28px;
+    width: 48px;
+    height: 48px;
   }
 
   &__name {

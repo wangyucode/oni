@@ -1,17 +1,17 @@
 import { DataProvider } from "./components/DataContext";
 import { UnitProvider } from "./components/UnitContext";
+import { SelectionsProvider } from "./components/SelectionsContext";
 
 import "./app.scss";
 
 function App(props) {
   return (
     <DataProvider>
-      {/* <SelectionsProvider> */}
+      <SelectionsProvider>
         <UnitProvider>
           {props.children}
         </UnitProvider>
-        
-      {/* </SelectionsProvider> */}
+      </SelectionsProvider>
     </DataProvider>
   );
 }

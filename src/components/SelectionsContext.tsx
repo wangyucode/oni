@@ -1,185 +1,271 @@
-// import { createContext, Dispatch, useContext, useEffect, useReducer, useRef } from "react";
-// import Taro from "@tarojs/taro";
-// import { debounce } from "@tarojs/runtime";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer, useRef } from "react";
+import Taro from "@tarojs/taro";
+import { debounce } from "@tarojs/runtime";
 
-// import { Item, Selection, SavedSelection } from "./data";
-// import { DataContext } from "./DataContext";
+import { Detail } from "./data";
+import { ResourceItem } from "./ResourceGrid";
+import { calculateSelectionTotals } from "./selection/calc";
 
-// export const SelectionsContext = createContext<Array<Selection>>([]);
-// export const SelectionsDispatchContext = createContext<Dispatch<SelectionsAction>>(() => { });
+export type SelectionEntry = {
+  key: string;
+  categoryPath: string[];
+  detail: Detail;
+  count: number;
+  modeSelections: Array<Map<string, number>>;
+};
 
-// type SelectionsAction = {
-//     type: 'update' | 'remove' | 'replace';
-//     payload: any;
-// }
+type SavedSelectionEntry = Omit<SelectionEntry, "modeSelections"> & {
+  modeSelections: Array<Record<string, number>>;
+};
 
-// // 在指定category下查找指定名称的Item
-// function findItemByCategoryAndName(items: Array<Item>, category: string, name: string): Item | null {
-//     // 先找到对应的category
-//     const categoryItem = items.find(item => item.name === category);
-//     if (!categoryItem || !categoryItem.items) {
-//         return null;
-//     }
+export type SelectionsSummary = {
+  resources: Record<string, number>;
+  resourceItems: ResourceItem[];
+  totalPower: number;
+  totalHeat: number;
+  totalCalories: number;
+};
 
-//     // 在category的items中查找指定名称的item
-//     return findItemInCategory(categoryItem.items, name);
-// }
+export type SelectionsContextValue = {
+  selections: SelectionEntry[];
+  summary: SelectionsSummary;
+};
 
-// // 在category的items中递归查找item
-// function findItemInCategory(items: Array<Item>, name: string): Item | null {
-//     for (const item of items) {
-//         if (item.items) {
-//             const found = findItemInCategory(item.items, name);
-//             if (found) {
-//                 return found;
-//             }
-//         }
+type UpsertPayload = {
+  detail: Detail;
+  count: number;
+  modeSelections: Array<Map<string, number>>;
+  categoryPath: string[];
+};
 
-//         if (item.name === name) {
-//             return item;
-//         }
-//     }
-//     return null;
-// }
+export type SelectionsActions = {
+  upsert: (payload: UpsertPayload) => void;
+  remove: (key: string) => void;
+  clear: () => void;
+};
 
-// // 将Selection转换为SavedSelection用于保存
-// function convertToSavedSelection(selections: Array<Selection>): Array<SavedSelection> {
-//     return selections.map(selection => {
-//         // 将Map数组转换为Record<string, number>数组
-//         const modesArray = selection.modes.map(map => {
-//             const record: Record<string, number> = {};
-//             map.forEach((value, key) => {
-//                 record[key] = value;
-//             });
-//             return record;
-//         });
+export const SelectionsContext = createContext<SelectionsContextValue>({
+  selections: [],
+  summary: {
+    resources: {},
+    resourceItems: [],
+    totalPower: 0,
+    totalHeat: 0,
+    totalCalories: 0,
+  },
+});
 
-//         return {
-//             category: selection.category,
-//             item: selection.item.name,
-//             count: selection.count,
-//             modes: modesArray
-//         };
-//     });
-// }
+export const SelectionsActionsContext = createContext<SelectionsActions>({
+  upsert: () => {},
+  remove: () => {},
+  clear: () => {},
+});
 
-// // 将SavedSelection还原为Selection
-// function convertFromSavedSelection(savedSelections: Array<SavedSelection>, items: Array<Item>): Array<Selection> {
-//     return savedSelections.map(saved => {
-//         // 使用category优化查找效率
-//         const item = findItemByCategoryAndName(items, saved.category, saved.item);
-//         if (!item || !item.detail) {
-//             throw new Error(`Item not found or without detail: ${saved.item} in category ${saved.category}`);
-//         }
+function createSelectionKey(categoryPath: string[], detailName: string): string {
+  const prefix = categoryPath.filter(Boolean).join("/");
+  return `${prefix}::${detailName}`;
+}
 
-//         // 将Record<string, number>数组还原为Map数组
-//         const modes: Array<Map<string, number>> = saved.modes.map(record => {
-//             const map = new Map<string, number>();
-//             Object.entries(record).forEach(([key, value]) => {
-//                 map.set(key, value);
-//             });
-//             return map;
-//         });
+function serializeModeSelections(modeSelections: Array<Map<string, number>>): Array<Record<string, number>> {
+  return modeSelections.map((map) => {
+    const record: Record<string, number> = {};
+    map.forEach((value, key) => {
+      record[key] = value;
+    });
+    return record;
+  });
+}
 
-//         return {
-//             category: saved.category,
-//             item: item,
-//             count: saved.count,
-//             modes: modes
-//         };
-//     });
-// }
+function deserializeModeSelections(modeSelections: Array<Record<string, number>>): Array<Map<string, number>> {
+  return modeSelections.map((record) => {
+    const map = new Map<string, number>();
+    Object.entries(record || {}).forEach(([key, value]) => {
+      map.set(key, Number(value) || 0);
+    });
+    return map;
+  });
+}
 
-// export function SelectionsProvider({ children }) {
-//     const { items } = useContext(DataContext);
-//     const [selections, dispatch] = useReducer(selectionsReducer, []);
-//     const debouncedSaveRef = useRef(debounce((selections: Array<Selection>) => {
-//         const savedSelections = convertToSavedSelection(selections);
-//         Taro.setStorage({
-//             key: 'selections',
-//             data: savedSelections,
-//         });
-//     }, 1000));
+function sortSelections(selections: SelectionEntry[]): SelectionEntry[] {
+  return selections
+    .slice()
+    .sort((a, b) => {
+      const aPath = a.categoryPath.join("/");
+      const bPath = b.categoryPath.join("/");
+      const byPath = aPath.localeCompare(bPath, "zh-CN");
+      if (byPath) return byPath;
+      return a.detail.name.localeCompare(b.detail.name, "zh-CN");
+    });
+}
 
-//     // 插入初始选择的函数
-//     function insertInitSelections() {
-//         const categoryItem = items[0] as Item | undefined;
-//         const dupe = categoryItem?.items?.[0];
-//         if (!categoryItem?.name || !dupe?.detail?.modes) return;
-//         const category = categoryItem.name;
-//         const modes = dupe.detail.modes.map((mode) => {
-//             return new Map<string, number>(
-//                 mode.options.map((option, index) => [option.name, index ? 0 : 100])
-//             );
-//         });
-//         dispatch({
-//             type: 'update',
-//             payload: {
-//                 item: dupe,
-//                 count: 3,
-//                 category,
-//                 modes,
-//             },
-//         });
-//     }
+type SelectionsState = {
+  selections: SelectionEntry[];
+};
 
-//     useEffect(() => {
-//         if (items.length) {
-//             const savedSelections = Taro.getStorageSync('selections') as Array<SavedSelection>;
-//             if (savedSelections && savedSelections.length) {
-//                 try {
-//                     const restoredSelections = convertFromSavedSelection(savedSelections, items);
-//                     dispatch({
-//                         type: 'replace',
-//                         payload: restoredSelections as any,
-//                     });
-//                 } catch (error) {
-//                     console.error('Failed to restore selections:', error);
-//                     // 如果恢复失败，使用默认选择
-//                     insertInitSelections();
-//                 }
-//             } else {
-//                 // 如果没有保存的选择，插入初始选择
-//                 insertInitSelections();
-//             }
-//         }
-//     }, [items]);
+type SelectionsAction =
+  | { type: "upsert"; payload: UpsertPayload }
+  | { type: "remove"; payload: { key: string } }
+  | { type: "replace"; payload: { selections: SelectionEntry[] } }
+  | { type: "clear" };
 
-//     useEffect(() => {
-//         if (selections.length) debouncedSaveRef.current(selections);
-//     }, [selections]);
+function selectionsReducer(state: SelectionsState, action: SelectionsAction): SelectionsState {
+  switch (action.type) {
+    case "upsert": {
+      const key = createSelectionKey(action.payload.categoryPath, action.payload.detail.name);
+      if (action.payload.count <= 0) {
+        return {
+          selections: state.selections.filter((s) => s.key !== key),
+        };
+      }
+      const nextEntry: SelectionEntry = {
+        key,
+        categoryPath: action.payload.categoryPath,
+        detail: action.payload.detail,
+        count: action.payload.count,
+        modeSelections: action.payload.modeSelections,
+      };
 
-//     return (
-//         <SelectionsContext.Provider value={selections}>
-//             <SelectionsDispatchContext.Provider value={dispatch}>
-//                 {children}
-//             </SelectionsDispatchContext.Provider>
-//         </SelectionsContext.Provider>
-//     )
-// }
+      const existingIndex = state.selections.findIndex((s) => s.key === key);
+      const nextSelections = state.selections.slice();
+      if (existingIndex >= 0) {
+        nextSelections[existingIndex] = nextEntry;
+      } else {
+        nextSelections.push(nextEntry);
+      }
+      return { selections: sortSelections(nextSelections) };
+    }
+    case "remove": {
+      return {
+        selections: state.selections.filter((s) => s.key !== action.payload.key),
+      };
+    }
+    case "replace": {
+      return {
+        selections: sortSelections(action.payload.selections),
+      };
+    }
+    case "clear": {
+      return { selections: [] };
+    }
+    default: {
+      return state;
+    }
+  }
+}
 
-// function selectionsReducer(state: Array<Selection>, action: SelectionsAction): Array<Selection> {
-//     switch (action.type) {
-//         case 'update': {
-//             let hasUpdated = false;
-//             const newState = state.map(selection => {
-//                 if (selection.item.name === action.payload.item.name) {
-//                     hasUpdated = true;
-//                     return action.payload;
-//                 }
-//                 return selection;
-//             });
-//             if (!hasUpdated) newState.push(action.payload);
-//             return newState;
-//         }
-//         case 'remove': {
-//             return state.filter(selection => selection.item.name !== action.payload.item.name);
-//         }
-//         case 'replace': {
-//             return action.payload;
-//         }
-//         default: {
-//             return state;
-//         }
-//     }
-// }
+function buildSummary(selections: SelectionEntry[]): SelectionsSummary {
+  const resources: Record<string, number> = {};
+  let totalPower = 0;
+  let totalHeat = 0;
+  let totalCalories = 0;
+
+  selections.forEach((selection) => {
+    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections);
+    totalPower += totals.totalPower;
+    totalHeat += totals.totalHeat;
+    totalCalories += totals.totalCalories;
+
+    Object.entries(totals.resources).forEach(([name, value]) => {
+      resources[name] = (resources[name] || 0) + value;
+    });
+  });
+
+  const resourceItems: ResourceItem[] = Object.entries(resources).map(([name, value]) => ({
+    name,
+    value,
+    count: 1,
+  }));
+
+  return {
+    resources,
+    resourceItems,
+    totalPower,
+    totalHeat,
+    totalCalories,
+  };
+}
+
+export function SelectionsProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(selectionsReducer, { selections: [] });
+  const hydratedRef = useRef(false);
+
+  const debouncedSaveRef = useRef(
+    debounce((selections: SelectionEntry[]) => {
+      const saved: SavedSelectionEntry[] = selections.map((s) => ({
+        key: s.key,
+        categoryPath: s.categoryPath,
+        detail: s.detail,
+        count: s.count,
+        modeSelections: serializeModeSelections(s.modeSelections),
+      }));
+      Taro.setStorage({
+        key: "selections",
+        data: saved,
+      });
+    }, 800)
+  );
+
+  useEffect(() => {
+    const saved = Taro.getStorageSync("selections") as SavedSelectionEntry[] | undefined;
+    if (Array.isArray(saved) && saved.length) {
+      const restored: SelectionEntry[] = saved
+        .filter((s) => s && typeof s === "object")
+        .map((s) => ({
+          key: String((s as any).key || createSelectionKey((s as any).categoryPath || [], (s as any).detail?.name || "")),
+          categoryPath: Array.isArray((s as any).categoryPath) ? (s as any).categoryPath.map(String) : [],
+          detail: (s as any).detail as Detail,
+          count: Number((s as any).count) || 0,
+          modeSelections: deserializeModeSelections((s as any).modeSelections || []),
+        }))
+        .filter((s) => s.detail && s.detail.name && s.count > 0);
+
+      dispatch({ type: "replace", payload: { selections: restored } });
+    }
+    hydratedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    if (!state.selections.length) {
+      Taro.removeStorage({ key: "selections" });
+      return;
+    }
+    debouncedSaveRef.current(state.selections);
+  }, [state.selections]);
+
+  const summary = useMemo(() => buildSummary(state.selections), [state.selections]);
+
+  const actions = useMemo<SelectionsActions>(
+    () => ({
+      upsert: (payload) => dispatch({ type: "upsert", payload }),
+      remove: (key) => dispatch({ type: "remove", payload: { key } }),
+      clear: () => {
+        dispatch({ type: "clear" });
+        Taro.removeStorage({ key: "selections" });
+      },
+    }),
+    []
+  );
+
+  const value = useMemo<SelectionsContextValue>(
+    () => ({
+      selections: state.selections,
+      summary,
+    }),
+    [state.selections, summary]
+  );
+
+  return (
+    <SelectionsContext.Provider value={value}>
+      <SelectionsActionsContext.Provider value={actions}>{children}</SelectionsActionsContext.Provider>
+    </SelectionsContext.Provider>
+  );
+}
+
+export function useSelections() {
+  return useContext(SelectionsContext);
+}
+
+export function useSelectionsActions() {
+  return useContext(SelectionsActionsContext);
+}
