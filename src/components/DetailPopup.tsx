@@ -1,0 +1,53 @@
+import { useMemo } from "react";
+import { View } from "@tarojs/components";
+import { Popup } from "@nutui/nutui-react-taro";
+
+import "./DetailPopup.scss";
+import { Link } from "./data";
+import DupeDetailView from "./DupeDetailView";
+import { SelectionEntry } from "./SelectionsContext";
+
+interface DetailPopupProps {
+  visible: boolean;
+  entry: SelectionEntry | null;
+  onClose: () => void;
+}
+
+export default function DetailPopup({ visible, entry, onClose }: DetailPopupProps) {
+  const link = useMemo<Link | null>(() => {
+    if (!entry) return null;
+    return {
+      name: entry.item.name,
+      icon: entry.item.icon || "",
+      iconFilter: entry.item.iconFilter,
+      detail: entry.detail,
+    };
+  }, [entry]);
+
+  return (
+    <Popup
+      className="detail-popup"
+      visible={visible && Boolean(entry)}
+      position="bottom"
+      title={entry?.item.name || "详情"}
+      onClose={onClose}
+      closeable
+      style={{ height: "50%", paddingBottom: process.env.TARO_ENV === "h5" ? 50 : 0 }}
+    >
+      <View className="content">
+        {entry && link ? (
+          <DupeDetailView
+            link={link}
+            categoryPath={entry.categoryPath}
+            mode="edit"
+            editKey={entry.key}
+            initialCount={entry.count}
+            initialModeSelections={entry.modeSelections}
+            onConfirmed={onClose}
+          />
+        ) : null}
+      </View>
+    </Popup>
+  );
+}
+

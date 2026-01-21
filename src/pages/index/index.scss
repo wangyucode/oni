@@ -4,14 +4,6 @@
     overflow: hidden;
   }
 
-  &.index {
-    @media (min-width: 768px) {
-      // 大屏幕时改为row布局
-      flex-direction: row;
-      align-items: flex-start;
-    }
-  }
-
   // 折叠面板样式
   .nut-collapse-item-header {
     background-color: #7F3D5E;

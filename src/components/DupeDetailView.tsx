@@ -24,6 +24,10 @@ import {
 export type DupeDetailViewProps = {
   link: Link;
   categoryPath?: string[];
+  mode?: "add" | "edit";
+  editKey?: string;
+  initialCount?: number;
+  initialModeSelections?: ModeSelections;
   onConfirmed?: () => void;
 };
 
@@ -46,19 +50,37 @@ function parseNumber(raw: string | undefined): number {
   return Number.isFinite(value) ? value : 0;
 }
 
-export default function DupeDetailView({ link, categoryPath = [], onConfirmed }: DupeDetailViewProps) {
+export default function DupeDetailView({
+  link,
+  categoryPath = [],
+  mode = "add",
+  editKey,
+  initialCount,
+  initialModeSelections,
+  onConfirmed,
+}: DupeDetailViewProps) {
   if (!isDupeDetail(link.detail)) return null;
   const dupe = link.detail;
   const { timeUnit } = useUnit();
-  const { upsert } = useSelectionsActions();
+  const { upsert, update } = useSelectionsActions();
 
-  const [count, setCount] = useState<number>(1);
-  const [modeSelections, setModeSelections] = useState<ModeSelections>(() => buildDefaultModeSelections(dupe));
+  const [count, setCount] = useState<number>(
+    mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1
+  );
+  const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
+    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(dupe, initialModeSelections);
+    return buildDefaultModeSelections(dupe);
+  });
 
   useEffect(() => {
+    if (mode === "edit") {
+      setCount(Math.max(0, Number(initialCount ?? 1) || 0));
+      setModeSelections(initialModeSelections ? normalizeModeSelections(dupe, initialModeSelections) : buildDefaultModeSelections(dupe));
+      return;
+    }
     setCount(1);
     setModeSelections(buildDefaultModeSelections(dupe));
-  }, [link.name]);
+  }, [link.name, dupe, mode, initialCount, initialModeSelections]);
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
 
@@ -119,14 +141,20 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
   const isBionic = link.name.includes("仿生人");
   const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);
 
-  function handleAdd(): void {
-    upsert({
+  function handlePrimaryAction(): void {
+    const payload = {
       item: { name: link.name, icon: link.icon, iconFilter: link.iconFilter },
       detail: dupe,
       count,
       modeSelections,
       categoryPath,
-    });
+    };
+    if (mode === "edit" && editKey) {
+      update(editKey, payload);
+      onConfirmed?.();
+      return;
+    }
+    upsert(payload);
     onConfirmed?.();
   }
 
@@ -147,7 +175,7 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
               setCount(Number.isFinite(next) ? next : 0);
             }}
           />
-          <Button onClick={handleAdd} type="primary">添加</Button>
+          <Button onClick={handlePrimaryAction} type="primary">{mode === "edit" ? "确认" : "添加"}</Button>
         </View>
       </View>
 

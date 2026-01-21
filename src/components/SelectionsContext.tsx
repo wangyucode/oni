@@ -49,6 +49,7 @@ type UpsertPayload = {
 
 export type SelectionsActions = {
   upsert: (payload: UpsertPayload) => void;
+  update: (fromKey: string, payload: UpsertPayload) => void;
   remove: (key: string) => void;
   clear: () => void;
 };
@@ -66,13 +67,63 @@ export const SelectionsContext = createContext<SelectionsContextValue>({
 
 export const SelectionsActionsContext = createContext<SelectionsActions>({
   upsert: () => {},
+  update: () => {},
   remove: () => {},
   clear: () => {},
 });
 
-function createSelectionKey(categoryPath: string[], itemName: string): string {
-  const prefix = categoryPath.filter(Boolean).join("/");
-  return `${prefix}::${itemName}`;
+function inferDetailKind(detail: LinkDetail): string {
+  const anyDetail = detail as any;
+  if (anyDetail && typeof anyDetail === "object") {
+    if ("heat" in anyDetail) return "building";
+    if ("life" in anyDetail) return "life";
+    if ("resources" in anyDetail) return "dupe";
+    if ("modes" in anyDetail) return "modes";
+  }
+  return "unknown";
+}
+
+function serializeBooleanRecord(record: Record<string, boolean> | undefined): string {
+  const entries = Object.entries(record || {}).sort(([a], [b]) => a.localeCompare(b, "zh-CN"));
+  return entries.map(([k, v]) => `${encodeURIComponent(k)}=${v ? 1 : 0}`).join(",");
+}
+
+function serializeNumberRecord(record: Record<string, number> | undefined): string {
+  const entries = Object.entries(record || {}).sort(([a], [b]) => a.localeCompare(b, "zh-CN"));
+  return entries
+    .map(([k, v]) => `${encodeURIComponent(k)}=${Number.isFinite(Number(v)) ? Number(v) : 0}`)
+    .join(",");
+}
+
+function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
+  const normalized = normalizeModeSelections(detail, raw);
+  return normalized
+    .map((sel) => {
+      if (sel.type === "radio") return `r:${encodeURIComponent(sel.selected || "")}`;
+      if (sel.type === "checkbox") return `c:${serializeBooleanRecord(sel.checked)}`;
+      if (sel.type === "slider") return `s:${serializeNumberRecord(sel.values)}`;
+      return "u:";
+    })
+    .join("|");
+}
+
+function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {
+  const kind = inferDetailKind(detail);
+  const modeKey = serializeModeSelections(detail, modeSelections);
+  return `${kind}::${itemName}::${modeKey}`;
+}
+
+function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
+  const byKey = new Map<string, SelectionEntry>();
+  selections.forEach((s) => {
+    const existing = byKey.get(s.key);
+    if (!existing) {
+      byKey.set(s.key, s);
+      return;
+    }
+    byKey.set(s.key, { ...existing, count: existing.count + s.count });
+  });
+  return Array.from(byKey.values()).filter((s) => s.count > 0);
 }
 
 function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
@@ -116,10 +167,8 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   if (!item?.name) return null;
   if (!detail || !Array.isArray(detail.modes)) return null;
 
-  const key =
-    typeof raw.key === "string" && raw.key
-      ? raw.key
-      : createSelectionKey(categoryPath, item.name);
+  const modeSelections = normalizeModeSelections(detail as LinkDetail, raw.modeSelections);
+  const key = createSelectionKey(item.name, detail as LinkDetail, modeSelections);
 
   return {
     key,
@@ -127,7 +176,7 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
     item,
     detail: detail as LinkDetail,
     count,
-    modeSelections: normalizeModeSelections(detail as LinkDetail, raw.modeSelections),
+    modeSelections,
   };
 }
 
@@ -139,7 +188,9 @@ function sortSelections(selections: SelectionEntry[]): SelectionEntry[] {
       const bPath = b.categoryPath.join("/");
       const byPath = aPath.localeCompare(bPath, "zh-CN");
       if (byPath) return byPath;
-      return a.item.name.localeCompare(b.item.name, "zh-CN");
+      const byName = a.item.name.localeCompare(b.item.name, "zh-CN");
+      if (byName) return byName;
+      return a.key.localeCompare(b.key, "zh-CN");
     });
 }
 
@@ -199,6 +250,7 @@ type SelectionsState = {
 
 type SelectionsAction =
   | { type: "upsert"; payload: UpsertPayload }
+  | { type: "update"; payload: { fromKey: string; next: UpsertPayload } }
   | { type: "remove"; payload: { key: string } }
   | { type: "replace"; payload: { selections: SelectionEntry[] } }
   | { type: "clear" };
@@ -206,28 +258,78 @@ type SelectionsAction =
 function selectionsReducer(state: SelectionsState, action: SelectionsAction): SelectionsState {
   switch (action.type) {
     case "upsert": {
-      const key = createSelectionKey(action.payload.categoryPath, action.payload.item.name);
+      const normalizedModeSelections = normalizeModeSelections(action.payload.detail, action.payload.modeSelections);
+      const key = createSelectionKey(action.payload.item.name, action.payload.detail, normalizedModeSelections);
       if (action.payload.count <= 0) {
         return {
           selections: state.selections.filter((s) => s.key !== key),
         };
       }
-      const nextEntry: SelectionEntry = {
-        key,
-        categoryPath: action.payload.categoryPath,
-        item: action.payload.item,
-        detail: action.payload.detail,
-        count: action.payload.count,
-        modeSelections: action.payload.modeSelections,
-      };
 
       const existingIndex = state.selections.findIndex((s) => s.key === key);
       const nextSelections = state.selections.slice();
       if (existingIndex >= 0) {
-        nextSelections[existingIndex] = nextEntry;
+        const existing = nextSelections[existingIndex];
+        const nextCount = existing.count + action.payload.count;
+        if (nextCount <= 0) {
+          nextSelections.splice(existingIndex, 1);
+        } else {
+          nextSelections[existingIndex] = {
+            ...existing,
+            item: action.payload.item,
+            detail: action.payload.detail,
+            modeSelections: normalizedModeSelections,
+            count: nextCount,
+          };
+        }
       } else {
-        nextSelections.push(nextEntry);
+        nextSelections.push({
+          key,
+          categoryPath: action.payload.categoryPath,
+          item: action.payload.item,
+          detail: action.payload.detail,
+          count: action.payload.count,
+          modeSelections: normalizedModeSelections,
+        });
       }
+      return { selections: sortSelections(nextSelections) };
+    }
+    case "update": {
+      const normalizedModeSelections = normalizeModeSelections(action.payload.next.detail, action.payload.next.modeSelections);
+      const nextKey = createSelectionKey(action.payload.next.item.name, action.payload.next.detail, normalizedModeSelections);
+      const fromKey = action.payload.fromKey;
+
+      const baseSelections = state.selections.filter((s) => s.key !== fromKey);
+      const count = action.payload.next.count;
+
+      if (count <= 0) {
+        return { selections: sortSelections(baseSelections) };
+      }
+
+      const existingIndex = baseSelections.findIndex((s) => s.key === nextKey);
+      const nextSelections = baseSelections.slice();
+
+      if (existingIndex >= 0) {
+        const existing = nextSelections[existingIndex];
+        nextSelections[existingIndex] = {
+          ...existing,
+          item: action.payload.next.item,
+          detail: action.payload.next.detail,
+          modeSelections: normalizedModeSelections,
+          categoryPath: action.payload.next.categoryPath,
+          count: existing.count + count,
+        };
+      } else {
+        nextSelections.push({
+          key: nextKey,
+          item: action.payload.next.item,
+          detail: action.payload.next.detail,
+          modeSelections: normalizedModeSelections,
+          categoryPath: action.payload.next.categoryPath,
+          count,
+        });
+      }
+
       return { selections: sortSelections(nextSelections) };
     }
     case "remove": {
@@ -237,7 +339,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
     }
     case "replace": {
       return {
-        selections: sortSelections(action.payload.selections),
+        selections: sortSelections(mergeSelectionsByKey(action.payload.selections)),
       };
     }
     case "clear": {
@@ -378,6 +480,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
   const actions = useMemo<SelectionsActions>(
     () => ({
       upsert: (payload) => dispatch({ type: "upsert", payload }),
+      update: (fromKey, payload) => dispatch({ type: "update", payload: { fromKey, next: payload } }),
       remove: (key) => dispatch({ type: "remove", payload: { key } }),
       clear: () => {
         dispatch({ type: "clear" });

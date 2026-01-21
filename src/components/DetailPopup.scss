@@ -1,0 +1,13 @@
+.detail-popup {
+  min-height: unset;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .content {
+    flex: 1;
+    padding: 8px;
+    overflow-y: auto;
+  }
+}
+

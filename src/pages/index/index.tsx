@@ -8,9 +8,10 @@ import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
 import ResourceGrid from 'src/components/ResourceGrid';
 import { useUnit } from 'src/components/UnitContext';
-import { useSelections, useSelectionsActions } from 'src/components/SelectionsContext';
+import { SelectionEntry, useSelections, useSelectionsActions } from 'src/components/SelectionsContext';
 import { sharedMessage } from 'src/components/data';
 import FilteredImage from 'src/components/FilteredImage';
+import DetailPopup from 'src/components/DetailPopup';
 
 import './index.scss'
 import { Add } from '@nutui/icons-react-taro';
@@ -23,6 +24,8 @@ function Index() {
   useShareAppMessage(() => sharedMessage);
   const { timeUnit } = useUnit();
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
+  const [isShowDetailPopup, setIsShowDetailPopup] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<SelectionEntry | null>(null);
   const { selections, summary } = useSelections();
   const { clear } = useSelectionsActions();
   const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
@@ -33,6 +36,11 @@ function Index() {
 
   function onPopupClose() {
     setIsShowSelectPopup(false);
+  }
+
+  function onDetailPopupClose() {
+    setIsShowDetailPopup(false);
+    setEditingEntry(null);
   }
 
   function reset() {
@@ -94,25 +102,34 @@ function Index() {
           rotate={90}>
           <Collapse.Item title="选择" name="选择" extra={<Button className='reset' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
             <View className='avatar-container'>
-              {selections.map(({ key, count, item }) =>
-                <Badge value={count} key={key} max={999}>
-                  {item.icon ? (
-                    <FilteredImage
-                      src={item.icon}
-                      iconFilter={item.iconFilter}
-                      style={{ width: 48, height: 48 }}
-                      mode="aspectFit"
-                    />
-                  ) : (
-                    <Icon name={item.name} width={48} height={48} />
-                  )}
-                </Badge>)}
+              {selections.map((selection) =>
+                <View
+                  key={selection.key}
+                  onClick={() => {
+                    setEditingEntry(selection);
+                    setIsShowDetailPopup(true);
+                  }}
+                >
+                  <Badge value={selection.count} max={999}>
+                    {selection.item.icon ? (
+                      <FilteredImage
+                        src={selection.item.icon}
+                        iconFilter={selection.item.iconFilter}
+                        style={{ width: 48, height: 48 }}
+                        mode="aspectFit"
+                      />
+                    ) : (
+                      <Icon name={selection.item.name} width={48} height={48} />
+                    )}
+                  </Badge>
+                </View>)}
               <Button className='add' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>
             </View>
           </Collapse.Item>
         </Collapse>
       </View>
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
+      <DetailPopup visible={isShowDetailPopup} entry={editingEntry} onClose={onDetailPopupClose} />
       <GlobalSvgFilters />
     </View>
   )
