@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { Badge, Button, Collapse } from '@nutui/nutui-react-taro'
@@ -12,6 +12,8 @@ import { SelectionEntry, useSelections, useSelectionsActions } from 'src/compone
 import { sharedMessage } from 'src/components/data';
 import FilteredImage from 'src/components/FilteredImage';
 import DetailPopup from 'src/components/DetailPopup';
+import { DataContext } from 'src/components/DataContext';
+import { getIconData } from 'src/components/utils';
 
 import './index.scss'
 import { Add } from '@nutui/icons-react-taro';
@@ -29,6 +31,7 @@ function Index() {
   const { selections, summary } = useSelections();
   const { clear } = useSelectionsActions();
   const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
+  const { iconMap } = useContext(DataContext);
 
   function handleAdd() {
     setIsShowSelectPopup(true);
@@ -111,16 +114,18 @@ function Index() {
                   }}
                 >
                   <Badge value={selection.count} max={999}>
-                    {selection.item.icon ? (
+                    {(() => {
+                      const iconData = getIconData(iconMap, selection.item.name, selection.item.icon);
+                      if (!iconData?.icon) return <Icon name={selection.item.name} width={48} height={48} />;
+                      return (
                       <FilteredImage
-                        src={selection.item.icon}
-                        iconFilter={selection.item.iconFilter}
+                        src={iconData.icon}
+                        iconFilter={iconData.iconFilter}
                         style={{ width: 48, height: 48 }}
                         mode="aspectFit"
                       />
-                    ) : (
-                      <Icon name={selection.item.name} width={48} height={48} />
-                    )}
+                      );
+                    })()}
                   </Badge>
                 </View>)}
               <Button className='add' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>

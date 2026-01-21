@@ -3,7 +3,7 @@ import { View } from "@tarojs/components";
 import { Popup } from "@nutui/nutui-react-taro";
 
 import "./DetailPopup.scss";
-import { Link } from "./data";
+import { DetailLink, Link } from "./data";
 import LinkDetailView from "./LinkDetailView";
 import { SelectionEntry } from "./SelectionsContext";
 
@@ -14,12 +14,11 @@ interface DetailPopupProps {
 }
 
 export default function DetailPopup({ visible, entry, onClose }: DetailPopupProps) {
-  const link = useMemo<Link | null>(() => {
+  const link = useMemo<DetailLink | null>(() => {
     if (!entry) return null;
     return {
       name: entry.item.name,
       icon: entry.item.icon || "",
-      iconFilter: entry.item.iconFilter,
       detail: entry.detail,
     };
   }, [entry]);

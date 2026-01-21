@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import Taro from "@tarojs/taro";
-import { API_BASE, Menu } from "./data";
+import { API_BASE, Images, Menu, ORIGIN_BASE } from "./data";
 
 export interface DataContextType {
     data: Menu | null;
@@ -25,6 +25,7 @@ export const DataContext = createContext<DataContextType>({
 
 export function DataProvider({ children }: { children: ReactNode }) {
     const [data, setData] = useState<Menu | null>(null);
+    const [images, setImages] = useState<Images | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
@@ -52,8 +53,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setLoading(true);
         setError(null);
         try {
-            const payload = await requestJson<Menu>(`${API_BASE}/api/v1/yml/calculator/index.yml`);
-            setData(payload);
+            const [menu, imageMap] = await Promise.all([
+                requestJson<Menu>(`${API_BASE}/api/v1/yml/calculator/index.yml`),
+                requestJson<Images>(`${API_BASE}/api/v1/yml/calculator/images.yml`),
+            ]);
+            setData(menu);
+            setImages(imageMap);
         } catch (e) {
             console.error(e);
             setError(e instanceof Error ? e : new Error(String(e)));
@@ -73,24 +78,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     const iconMap = useMemo(() => {
         const map = new Map<string, IconData>();
-        if (!data) return map;
+        if (!images) return map;
 
-        const traverse = (m: Menu) => {
-            m.items.forEach(item => {
-                if (item.name && item.icon) {
-                    map.set(item.name, {
-                        icon: item.icon,
-                        iconFilter: item.iconFilter
-                    });
-                }
-                if (item.menu) {
-                    traverse(item.menu);
-                }
-            });
+        const resolveUrl = (file: string): string => {
+            const f = String(file || "");
+            if (/^https?:\/\//.test(f)) return f;
+            if (f.startsWith("/")) return `${ORIGIN_BASE}${f}`;
+            return `${ORIGIN_BASE}/upload/oni/v3/images/${f}`;
         };
-        traverse(data);
+
+        Object.entries(images).forEach(([key, val]) => {
+            if (!key) return;
+            if (!val?.file) return;
+            map.set(key, { icon: resolveUrl(val.file), iconFilter: val.filter });
+        });
         return map;
-    }, [data]);
+    }, [images]);
 
     return (
         <DataContext.Provider value={{ data, iconMap, loading, error, refresh: fetchData }}>

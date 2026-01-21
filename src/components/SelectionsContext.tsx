@@ -13,7 +13,7 @@ import {
 } from "./selection/modeSelection";
 import { DataContext } from "./DataContext";
 
-export type SelectionItem = Pick<Link, "name" | "icon" | "iconFilter">;
+export type SelectionItem = Pick<Link, "name" | "icon">;
 
 export type SelectionEntry = {
   key: string;
@@ -140,7 +140,6 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
       item = {
         name,
         icon: String((rawItem as any).icon || ""),
-        iconFilter: (rawItem as any).iconFilter ? String((rawItem as any).iconFilter) : undefined,
       };
     }
   }
@@ -152,7 +151,7 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
       item = {
         name,
         icon: String((rawDetail as any).icon || ""),
-        iconFilter: (rawDetail as any).iconFilter ? String((rawDetail as any).iconFilter) : undefined,
+
       };
     }
   }
@@ -437,7 +436,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         dispatch({
           type: "upsert",
           payload: {
-            item: { name: found.link.name, icon: found.link.icon, iconFilter: found.link.iconFilter },
+            item: { name: found.link.name, icon: found.link.icon },
             detail,
             count: 3,
             modeSelections,

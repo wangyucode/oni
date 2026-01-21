@@ -21,3 +21,12 @@ export function calculateGridColumns(count: number): number {
     }
     return bestCols;
 }
+
+export function getIconData(
+    iconMap: Map<string, { icon: string; iconFilter?: string }>,
+    name: string,
+    icon?: string
+): { icon: string; iconFilter?: string } | undefined {
+    if (icon && /^https?:\/\//.test(icon)) return { icon };
+    return iconMap.get(icon || name);
+}

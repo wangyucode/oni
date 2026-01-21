@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
 import "./SelectionDetailView.scss";
-import { Link } from "./data";
+import { DetailLink, Link } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useUnit } from "./UnitContext";
 import { useSelectionsActions } from "./SelectionsContext";
@@ -12,9 +12,11 @@ import SelectionDetailHeader from "./detail/SelectionDetailHeader";
 import ModeSelectionEditor from "./detail/ModeSelectionEditor";
 import { convertCalories, formatSignedFloor } from "./detail/formatters";
 import { isDupeDetail } from "./detail/typeGuards";
+import { DataContext } from "./DataContext";
+import { getIconData } from "./utils";
 
 export type DupeDetailViewProps = {
-  link: Link;
+  link: DetailLink;
   categoryPath?: string[];
   mode?: "add" | "edit";
   editKey?: string;
@@ -36,6 +38,8 @@ export default function DupeDetailView({
   const dupe = link.detail;
   const { timeUnit } = useUnit();
   const { upsert, update } = useSelectionsActions();
+  const { iconMap } = useContext(DataContext);
+  const iconData = getIconData(iconMap, link.name, link.icon);
 
   const [count, setCount] = useState<number>(
     mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1
@@ -78,7 +82,7 @@ export default function DupeDetailView({
 
   function handlePrimaryAction(): void {
     const payload = {
-      item: { name: link.name, icon: link.icon, iconFilter: link.iconFilter },
+      item: { name: link.name, icon: link.icon },
       detail: dupe,
       count,
       modeSelections,
@@ -96,8 +100,8 @@ export default function DupeDetailView({
   return (
     <View className="selection-detail-view">
       <SelectionDetailHeader
-        icon={link.icon}
-        iconFilter={link.iconFilter}
+        icon={iconData?.icon}
+        iconFilter={iconData?.iconFilter}
         name={link.name}
         count={count}
         actionLabel={mode === "edit" ? "确认" : "添加"}

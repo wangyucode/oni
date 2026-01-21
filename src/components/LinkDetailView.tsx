@@ -1,11 +1,10 @@
-import { Link } from "./data";
+import { DetailLink } from "./data";
 import { ModeSelections } from "./selection/modeSelection";
 import BuildingDetailView from "./BuildingDetailView";
 import DupeDetailView from "./DupeDetailView";
-import { isBuildingDetail, isDupeDetail } from "./detail/typeGuards";
 
 export type LinkDetailViewProps = {
-  link: Link;
+  link: DetailLink;
   categoryPath?: string[];
   mode?: "add" | "edit";
   editKey?: string;

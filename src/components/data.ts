@@ -3,13 +3,27 @@ export interface Menu {
   items: Link[];
 }
 
-export interface Link {
+export interface MenuLink {
   name: string;
-  icon: string;
-  iconFilter?: string;
-  menu?: Menu;
-  detail?: LinkDetail;
+  icon?: string;
+  menu: Menu;
 }
+
+export interface DetailLink {
+  name: string;
+  icon?: string;
+  detail: LinkDetail;
+}
+
+export type Link = MenuLink & DetailLink;
+
+export type Images = Record<
+  string,
+  {
+    file: string;
+    filter?: string;
+  }
+>;
 
 export type LinkDetail =
   | DupeDetail
@@ -66,12 +80,14 @@ export interface Option {
 
 export type ResourceMap = Record<string, string>;
 
+export const ORIGIN_BASE = "https://wycode.cn";
+
 export const API_BASE = process.env.TARO_ENV === 'h5' && process.env.NODE_ENV === 'development'
   ? ''
-  : 'https://wycode.cn';
+  : ORIGIN_BASE;
 
 export const sharedMessage = {
   title: "oni产物计算器",
   path: "/pages/index/index",
-  imageUrl: "https://wycode.cn/upload/image/oni/oni.png",
+  imageUrl: `${ORIGIN_BASE}/upload/image/oni/oni.png`,
 };

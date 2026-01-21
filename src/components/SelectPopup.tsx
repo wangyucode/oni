@@ -6,9 +6,8 @@ import { ArrowLeft } from "@nutui/icons-react-taro";
 import './SelectPopup.scss';
 import { DataContext } from "./DataContext";
 import MenuGrid from "./MenuGrid";
-import { Link, Menu } from "./data";
+import { DetailLink, Link, Menu, MenuLink } from "./data";
 import LinkDetailView from "./LinkDetailView";
-import { isBuildingDetail, isDupeDetail } from "./detail/typeGuards";
 import { calculateGridColumns } from "./utils";
 
 interface SelectPopupProps {
@@ -63,7 +62,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         setCurrentMenu(nextStack[nextStack.length - 1] || null);
     }
 
-    function handleSelectLink(link: Link) {
+    function handleSelectLink(link: MenuLink & DetailLink) {
         if (link.menu) {
             setBackStack([...backStack, link.menu]);
             setCurrentMenu(link.menu);
