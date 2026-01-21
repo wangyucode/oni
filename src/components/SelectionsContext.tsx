@@ -180,20 +180,6 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   };
 }
 
-function sortSelections(selections: SelectionEntry[]): SelectionEntry[] {
-  return selections
-    .slice()
-    .sort((a, b) => {
-      const aPath = a.categoryPath.join("/");
-      const bPath = b.categoryPath.join("/");
-      const byPath = aPath.localeCompare(bPath, "zh-CN");
-      if (byPath) return byPath;
-      const byName = a.item.name.localeCompare(b.item.name, "zh-CN");
-      if (byName) return byName;
-      return a.key.localeCompare(b.key, "zh-CN");
-    });
-}
-
 function findDupeDetail(data: Menu): { link: Link; categoryPath: string[] } | null {
   const visited = new WeakSet<Menu>();
   let fallback: { link: Link; categoryPath: string[] } | null = null;
@@ -292,7 +278,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           modeSelections: normalizedModeSelections,
         });
       }
-      return { selections: sortSelections(nextSelections) };
+      return { selections: nextSelections };
     }
     case "update": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.next.detail, action.payload.next.modeSelections);
@@ -303,7 +289,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
       const count = action.payload.next.count;
 
       if (count <= 0) {
-        return { selections: sortSelections(baseSelections) };
+        return { selections: baseSelections };
       }
 
       const existingIndex = baseSelections.findIndex((s) => s.key === nextKey);
@@ -330,7 +316,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
         });
       }
 
-      return { selections: sortSelections(nextSelections) };
+      return { selections: nextSelections };
     }
     case "remove": {
       return {
@@ -339,7 +325,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
     }
     case "replace": {
       return {
-        selections: sortSelections(mergeSelectionsByKey(action.payload.selections)),
+        selections: mergeSelectionsByKey(action.payload.selections),
       };
     }
     case "clear": {
