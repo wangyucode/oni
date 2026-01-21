@@ -1,4 +1,5 @@
 import { LinkDetail, Mode } from "../data";
+import { ModeSelections, buildDefaultModeSelection, optionFactor, normalizeModeSelections } from "./modeSelection";
 
 export type SelectionTotals = {
   resources: Record<string, number>;
@@ -16,29 +17,22 @@ export function parseNumber(raw: string | undefined): number {
   return Number.isFinite(value) ? value : 0;
 }
 
-function buildDefaultModeSelection(mode: Mode): Map<string, number> {
-  const map = new Map<string, number>();
-  mode.options.forEach((option, index) => {
-    map.set(option.name, index === 0 ? 100 : 0);
-  });
-  return map;
-}
-
 export function calculateSelectionTotals(
   detail: LinkDetail,
   count: number,
-  modeSelections: Array<Map<string, number>>
+  modeSelections: ModeSelections
 ): SelectionTotals {
   const detailAny = detail as any;
   const modes: Mode[] = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
   const resources: Record<string, number> = {};
   let totalFactor = 0;
 
+  const normalizedSelections = normalizeModeSelections(detail, modeSelections);
+
   modes.forEach((mode, modeIndex) => {
-    const selectionMap = modeSelections[modeIndex] || buildDefaultModeSelection(mode);
+    const modeSelection = normalizedSelections[modeIndex] || buildDefaultModeSelection(mode);
     mode.options.forEach((option) => {
-      const percentage = selectionMap.get(option.name) || 0;
-      const factor = percentage / 100;
+      const factor = optionFactor(option, modeSelection);
       totalFactor += factor;
 
       Object.entries(option.resources || {}).forEach(([name, rawValue]) => {

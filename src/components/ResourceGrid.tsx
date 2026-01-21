@@ -1,4 +1,4 @@
-import React, { useMemo, useContext } from 'react';
+import { useMemo, useContext } from 'react';
 import { View, Text } from '@tarojs/components';
 import { Grid } from '@nutui/nutui-react-taro';
 import Icon from './icons';

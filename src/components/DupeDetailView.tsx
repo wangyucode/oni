@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Image, Text, View } from "@tarojs/components";
-import { Button, Collapse, Grid, InputNumber, Radio, RadioGroup, Range } from "@nutui/nutui-react-taro";
+import { Text, View } from "@tarojs/components";
+import { Button, Collapse, InputNumber, Radio, RadioGroup, Range, Switch } from "@nutui/nutui-react-taro";
 
 import "./DupeDetailView.scss";
 import { DupeDetail, Link, LinkDetail } from "./data";
@@ -9,6 +9,17 @@ import { useUnit } from "./UnitContext";
 import Icon from "./icons";
 import FilteredImage from "./FilteredImage";
 import { useSelectionsActions } from "./SelectionsContext";
+import {
+  ModeSelections,
+  buildDefaultModeSelection,
+  buildDefaultModeSelections,
+  inferModeSelectionType,
+  normalizeModeSelections,
+  optionFactor,
+  setModeSelectionRadio,
+  setModeSelectionSliderValue,
+  toggleModeSelectionCheckbox,
+} from "./selection/modeSelection";
 
 export type DupeDetailViewProps = {
   link: Link;
@@ -35,16 +46,6 @@ function parseNumber(raw: string | undefined): number {
   return Number.isFinite(value) ? value : 0;
 }
 
-function buildDefaultModeSelections(dupe: DupeDetail): Array<Map<string, number>> {
-  return dupe.modes.map((mode) => {
-    const initial = new Map<string, number>();
-    mode.options.forEach((option, index) => {
-      initial.set(option.name, index === 0 ? 100 : 0);
-    });
-    return initial;
-  });
-}
-
 export default function DupeDetailView({ link, categoryPath = [], onConfirmed }: DupeDetailViewProps) {
   if (!isDupeDetail(link.detail)) return null;
   const dupe = link.detail;
@@ -52,14 +53,14 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
   const { upsert } = useSelectionsActions();
 
   const [count, setCount] = useState<number>(1);
-  const [modeSelections, setModeSelections] = useState<Array<Map<string, number>>>(() =>
-    buildDefaultModeSelections(dupe)
-  );
+  const [modeSelections, setModeSelections] = useState<ModeSelections>(() => buildDefaultModeSelections(dupe));
 
   useEffect(() => {
     setCount(1);
     setModeSelections(buildDefaultModeSelections(dupe));
   }, [link.name]);
+
+  const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
 
   const convertCalories = (calories: number): { convertedValue: number; unit: string } => {
     if (timeUnit === '秒') {
@@ -73,11 +74,10 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
     let nextTotalFactor = 0;
 
     dupe.modes.forEach((mode, modeIndex) => {
-      const optionSelectionMap = modeSelections[modeIndex] || new Map<string, number>();
+      const modeSelection = normalizedModeSelections[modeIndex] || buildDefaultModeSelection(mode);
 
       mode.options.forEach((option) => {
-        const percentage = optionSelectionMap.get(option.name) || 0;
-        const factor = percentage / 100;
+        const factor = optionFactor(option, modeSelection);
         nextTotalFactor += factor;
 
         Object.entries(option.resources || {}).forEach(([name, rawValue]) => {
@@ -105,7 +105,7 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
       totalPower: nextTotalPower,
       totalCalories: nextTotalCalories,
     };
-  }, [count, dupe.calorie, dupe.modes, dupe.power, dupe.resources, modeSelections]);
+  }, [count, dupe.calorie, dupe.modes, dupe.power, dupe.resources, normalizedModeSelections]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({
@@ -185,22 +185,19 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
             {dupe.modes.map((mode, modeIndex) => (
               <Collapse.Item title={mode.name} name={String(modeIndex)} key={`${mode.name}-${modeIndex}`}>
                 <View className="dupe-detail-view__mode">
-                  {mode.options.every((o) => o.type === "radio") ? (
+                  {inferModeSelectionType(mode) === "radio" ? (
                     <RadioGroup
                       direction="horizontal"
                       value={
-                        mode.options.find((option) => (modeSelections[modeIndex]?.get(option.name) || 0) > 0)?.name ||
-                        mode.options[0]?.name
+                        (normalizedModeSelections[modeIndex]?.type === "radio"
+                          ? normalizedModeSelections[modeIndex].selected
+                          : mode.options[0]?.name) || ""
                       }
                       onChange={(value) => {
                         const selected = String(value);
                         setModeSelections((prev) => {
                           const next = prev.slice();
-                          const nextMap = new Map<string, number>();
-                          mode.options.forEach((option) => {
-                            nextMap.set(option.name, option.name === selected ? 100 : 0);
-                          });
-                          next[modeIndex] = nextMap;
+                          next[modeIndex] = setModeSelectionRadio(mode, selected);
                           return next;
                         });
                       }}
@@ -211,6 +208,26 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
                         </Radio>
                       ))}
                     </RadioGroup>
+                  ) : inferModeSelectionType(mode) === "checkbox" ? (
+                    mode.options.map((option, optionIndex) => (
+                      <View className="dupe-detail-view__option" key={`${option.name}-${optionIndex}`}>
+                        <Text className="dupe-detail-view__optionName">{option.name}</Text>
+                        <Switch
+                          checked={
+                            normalizedModeSelections[modeIndex]?.type === "checkbox"
+                              ? Boolean(normalizedModeSelections[modeIndex].checked[option.name])
+                              : false
+                          }
+                          onChange={(checked) => {
+                            setModeSelections((prev) => {
+                              const next = prev.slice();
+                              next[modeIndex] = toggleModeSelectionCheckbox(mode, option.name, Boolean(checked), prev[modeIndex]);
+                              return next;
+                            });
+                          }}
+                        />
+                      </View>
+                    ))
                   ) : (
                     mode.options.map((option, optionIndex) => (
                       <View className="dupe-detail-view__option" key={`${option.name}-${optionIndex}`}>
@@ -218,7 +235,11 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
                         <View className="dupe-detail-view__sliderRow">
                           <Range
                             className="dupe-detail-view__slider"
-                            value={[modeSelections[modeIndex]?.get(option.name) || 0]}
+                            value={[
+                              normalizedModeSelections[modeIndex]?.type === "slider"
+                                ? normalizedModeSelections[modeIndex].values[option.name] || 0
+                                : 0,
+                            ]}
                             minDescription={null}
                             maxDescription={null}
                             max={100}
@@ -228,9 +249,7 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
                               const nextValue = Array.isArray(val) ? val[0] : val;
                               setModeSelections((prev) => {
                                 const next = prev.slice();
-                                const nextMap = new Map(next[modeIndex] || []);
-                                nextMap.set(option.name, Number(nextValue) || 0);
-                                next[modeIndex] = nextMap;
+                                next[modeIndex] = setModeSelectionSliderValue(mode, option.name, Number(nextValue) || 0, prev[modeIndex]);
                                 return next;
                               });
                             }}
@@ -238,16 +257,18 @@ export default function DupeDetailView({ link, categoryPath = [], onConfirmed }:
                           />
                           <InputNumber
                             className="dupe-detail-view__inputNumber"
-                            value={modeSelections[modeIndex]?.get(option.name) || 0}
+                            value={
+                              normalizedModeSelections[modeIndex]?.type === "slider"
+                                ? normalizedModeSelections[modeIndex].values[option.name] || 0
+                                : 0
+                            }
                             min={0}
                             max={100}
                             onChange={(value) => {
                               const nextValue = Math.max(0, Math.min(100, Number(value) || 0));
                               setModeSelections((prev) => {
                                 const next = prev.slice();
-                                const nextMap = new Map(next[modeIndex] || []);
-                                nextMap.set(option.name, nextValue);
-                                next[modeIndex] = nextMap;
+                                next[modeIndex] = setModeSelectionSliderValue(mode, option.name, nextValue, prev[modeIndex]);
                                 return next;
                               });
                             }}

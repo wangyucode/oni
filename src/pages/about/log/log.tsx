@@ -18,10 +18,12 @@ export default function Log() {
                 <Cell title="1.3" extra='2025-09-11' description='支持保留上次的选择/计算结果' />
                 <Cell title="1.4" extra='2025-09-14' description='增加清空选择按钮' />
                 <Cell title="1.5.0" extra='2025-09-14' description='新增显示单位切换功能' />
-                {/* <Cell title="1.6.0" extra='2025-09-17' description={<>
-                    <Text>新增滑动条支持数字方式输入</Text>
-                    <Text>新增显示单位切换功能</Text>
-                </>} /> */}
+                <Cell title="2.0.0" extra='2026-01-21' description={
+                    <>
+                        <Text>• 计算结果放在上面，整合添加项目的功能</Text>
+                        <Text>• 新增滑动条支持数字方式输入</Text>
+                    </>
+                } />
             </Cell.Group>
         </View>
     )

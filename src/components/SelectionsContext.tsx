@@ -5,6 +5,12 @@ import { debounce } from "@tarojs/runtime";
 import { Link, LinkDetail, Menu } from "./data";
 import { ResourceItem } from "./ResourceGrid";
 import { calculateSelectionTotals } from "./selection/calc";
+import {
+  ModeSelections,
+  buildDefaultModeSelections,
+  inferModeSelectionType,
+  normalizeModeSelections,
+} from "./selection/modeSelection";
 import { DataContext } from "./DataContext";
 
 export type SelectionItem = Pick<Link, "name" | "icon" | "iconFilter">;
@@ -15,12 +21,10 @@ export type SelectionEntry = {
   item: SelectionItem;
   detail: LinkDetail;
   count: number;
-  modeSelections: Array<Map<string, number>>;
+  modeSelections: ModeSelections;
 };
 
-type SavedSelectionEntry = Omit<SelectionEntry, "modeSelections"> & {
-  modeSelections: Array<Record<string, number>>;
-};
+type SavedSelectionEntry = SelectionEntry;
 
 export type SelectionsSummary = {
   resources: Record<string, number>;
@@ -39,7 +43,7 @@ type UpsertPayload = {
   item: SelectionItem;
   detail: LinkDetail;
   count: number;
-  modeSelections: Array<Map<string, number>>;
+  modeSelections: ModeSelections;
   categoryPath: string[];
 };
 
@@ -69,26 +73,6 @@ export const SelectionsActionsContext = createContext<SelectionsActions>({
 function createSelectionKey(categoryPath: string[], itemName: string): string {
   const prefix = categoryPath.filter(Boolean).join("/");
   return `${prefix}::${itemName}`;
-}
-
-function serializeModeSelections(modeSelections: Array<Map<string, number>>): Array<Record<string, number>> {
-  return modeSelections.map((map) => {
-    const record: Record<string, number> = {};
-    map.forEach((value, key) => {
-      record[key] = value;
-    });
-    return record;
-  });
-}
-
-function deserializeModeSelections(modeSelections: Array<Record<string, number>>): Array<Map<string, number>> {
-  return modeSelections.map((record) => {
-    const map = new Map<string, number>();
-    Object.entries(record || {}).forEach(([key, value]) => {
-      map.set(key, Number(value) || 0);
-    });
-    return map;
-  });
 }
 
 function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
@@ -143,7 +127,7 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
     item,
     detail: detail as LinkDetail,
     count,
-    modeSelections: deserializeModeSelections(raw.modeSelections || []),
+    modeSelections: normalizeModeSelections(detail as LinkDetail, raw.modeSelections),
   };
 }
 
@@ -311,7 +295,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         item: s.item,
         detail: s.detail,
         count: s.count,
-        modeSelections: serializeModeSelections(s.modeSelections),
+        modeSelections: s.modeSelections,
       }));
       Taro.setStorage({
         key: "selections",
@@ -338,28 +322,35 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     if (shouldInitDefaults && data) {
       const found = findDupeDetail(data);
       if (found) {
-        const modeSelections =
-          (found.link.detail as any).modes?.map((mode: any) => {
-            const map = new Map<string, number>();
-            const options = Array.isArray(mode?.options) ? mode.options : [];
-            options.forEach((option: any, index: number) => {
-              map.set(option?.name, index === 0 ? 100 : 0);
+        const detail = found.link.detail as LinkDetail;
+        const modeSelections = buildDefaultModeSelections(detail).map((sel, idx) => {
+          const mode = (detail as any).modes?.[idx];
+          const options = Array.isArray(mode?.options) ? mode.options : [];
+          const hasFlush = options.some((o: any) => o?.name === "抽水马桶");
+          if (!hasFlush) return sel;
+          const modeType = inferModeSelectionType(mode);
+          if (modeType === "radio") {
+            return { type: "radio", selected: "抽水马桶" } as const;
+          }
+          if (modeType === "checkbox") {
+            const checked: Record<string, boolean> = {};
+            options.forEach((o: any) => {
+              checked[String(o?.name || "")] = String(o?.name || "") === "抽水马桶";
             });
-
-            const hasFlush = options.some((o: any) => o?.name === "抽水马桶");
-            if (hasFlush) {
-              options.forEach((option: any) => {
-                map.set(option?.name, option?.name === "抽水马桶" ? 100 : 0);
-              });
-            }
-            return map;
-          }) || [];
+            return { type: "checkbox", checked } as const;
+          }
+          const values: Record<string, number> = {};
+          options.forEach((o: any) => {
+            values[String(o?.name || "")] = String(o?.name || "") === "抽水马桶" ? 100 : 0;
+          });
+          return { type: "slider", values } as const;
+        });
 
         dispatch({
           type: "upsert",
           payload: {
             item: { name: found.link.name, icon: found.link.icon, iconFilter: found.link.iconFilter },
-            detail: found.link.detail as LinkDetail,
+            detail,
             count: 3,
             modeSelections,
             categoryPath: found.categoryPath
