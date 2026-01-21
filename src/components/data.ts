@@ -28,8 +28,8 @@ export interface DupeDetail {
 
 export interface BuildingDetail {
   resources: ResourceMap;
-  power: string;
-  heat: string;
+  power?: string;
+  heat?: string;
   modes: Mode[];
 }
 

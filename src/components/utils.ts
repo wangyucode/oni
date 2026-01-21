@@ -1,5 +1,5 @@
 export function calculateGridColumns(count: number): number {
-    if (count <= 5) return count;
+    if (count <= 5) return Math.max(count, 2);
     
     const candidates = [5, 4, 3];
     let bestCols = 5;

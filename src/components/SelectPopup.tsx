@@ -6,8 +6,9 @@ import { ArrowLeft } from "@nutui/icons-react-taro";
 import './SelectPopup.scss';
 import { DataContext } from "./DataContext";
 import MenuGrid from "./MenuGrid";
-import { DupeDetail, Link, LinkDetail, Menu } from "./data";
-import DupeDetailView from "./DupeDetailView";
+import { Link, Menu } from "./data";
+import LinkDetailView from "./LinkDetailView";
+import { isBuildingDetail, isDupeDetail } from "./detail/typeGuards";
 import { calculateGridColumns } from "./utils";
 
 interface SelectPopupProps {
@@ -44,17 +45,6 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         }
     }, [visible, rootMenu, menu]);
 
-    function isDupeDetail(detail: LinkDetail | undefined): detail is DupeDetail {
-        return (
-            typeof detail === "object" &&
-            detail !== null &&
-            "resources" in detail &&
-            "modes" in detail &&
-            !("heat" in detail) &&
-            !("life" in detail)
-        );
-    }
-
     function handleClose() {
         setCurrentMenu(rootMenu);
         setBackStack(rootMenu ? [rootMenu] : []);
@@ -79,10 +69,8 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
             setCurrentMenu(link.menu);
             return;
         }
-        if (link.detail) {
-            if (isDupeDetail(link.detail)) {
-                setSelectedLink(link);
-            }
+        if (backStack.length > 1 && link.detail) {
+            setSelectedLink(link);
         }
     }
 
@@ -92,8 +80,8 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         return <MenuGrid<Link> columns={calculateGridColumns(menu.items.length)} items={menu.items} onItemClick={handleSelectLink} />;
     }
 
-    const content = selectedLink && isDupeDetail(selectedLink.detail)
-        ? <DupeDetailView link={selectedLink} categoryPath={categoryPath} onConfirmed={handleClose} />
+    const content = selectedLink
+        ? <LinkDetailView link={selectedLink} categoryPath={categoryPath} onConfirmed={handleClose} />
         : renderMenu(currentMenu);
 
     return (

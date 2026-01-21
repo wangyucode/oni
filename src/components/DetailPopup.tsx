@@ -4,7 +4,7 @@ import { Popup } from "@nutui/nutui-react-taro";
 
 import "./DetailPopup.scss";
 import { Link } from "./data";
-import DupeDetailView from "./DupeDetailView";
+import LinkDetailView from "./LinkDetailView";
 import { SelectionEntry } from "./SelectionsContext";
 
 interface DetailPopupProps {
@@ -36,7 +36,7 @@ export default function DetailPopup({ visible, entry, onClose }: DetailPopupProp
     >
       <View className="content">
         {entry && link ? (
-          <DupeDetailView
+          <LinkDetailView
             link={link}
             categoryPath={entry.categoryPath}
             mode="edit"
@@ -50,4 +50,3 @@ export default function DetailPopup({ visible, entry, onClose }: DetailPopupProp
     </Popup>
   );
 }
-
