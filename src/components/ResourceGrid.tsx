@@ -65,13 +65,15 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
         const iconData = iconMap.get(name);
         const iconSrc = iconData?.icon;
         const iconFilter = iconData?.iconFilter;
+        const type = convertedValue < 0 ? "consume" : "produce";
         return (
           <Grid.Item key={name}>
             {iconSrc ? <FilteredImage src={iconSrc} iconFilter={iconFilter} style={{ width: 48, height: 48 }} mode="aspectFit" /> : <Icon name={name} width={48} height={48} />}
             <Text className='resource-grid__name'>{name}</Text>
-            <Text className={`resource-grid__value ${convertedValue < 0 ? "consume" : "produce"}`}>
-              {`${valueStr} ${unit}`}
+            <Text className={`resource-grid__value ${type}`}>
+              {valueStr}
             </Text>
+            <Text className={`resource-grid__unit ${type}`}>{unit}</Text>
           </Grid.Item>
         );
       })}

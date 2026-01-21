@@ -1,10 +1,11 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer, useRef } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import Taro from "@tarojs/taro";
 import { debounce } from "@tarojs/runtime";
 
-import { Detail } from "./data";
+import { Detail, Link, Menu } from "./data";
 import { ResourceItem } from "./ResourceGrid";
 import { calculateSelectionTotals } from "./selection/calc";
+import { DataContext } from "./DataContext";
 
 export type SelectionEntry = {
   key: string;
@@ -98,6 +99,56 @@ function sortSelections(selections: SelectionEntry[]): SelectionEntry[] {
     });
 }
 
+function findDupeDetail(data: Menu): { detail: Detail; categoryPath: string[] } | null {
+  const visited = new WeakSet<Menu>();
+  let fallback: { detail: Detail; categoryPath: string[] } | null = null;
+
+  const isDupeDetail = (detail: Detail["detail"]): detail is any => {
+    return (
+      typeof detail === "object" &&
+      detail !== null &&
+      "resources" in detail &&
+      "modes" in detail &&
+      !("heat" in detail) &&
+      !("life" in detail)
+    );
+  };
+
+  const hasOptionName = (detail: any, optionName: string): boolean => {
+    const modes = Array.isArray(detail?.modes) ? detail.modes : [];
+    return modes.some((mode: any) => {
+      const options = Array.isArray(mode?.options) ? mode.options : [];
+      return options.some((opt: any) => opt?.name === optionName);
+    });
+  };
+
+  const buildCategoryPath = (stack: Menu[]) => stack.slice(1).map((m) => m.title).filter(Boolean);
+
+  const dfs = (menu: Menu, stack: Menu[]): { detail: Detail; categoryPath: string[] } | null => {
+    if (!menu || visited.has(menu)) return null;
+    visited.add(menu);
+    const items = Array.isArray(menu.items) ? menu.items : [];
+
+    for (const item of items) {
+      if (item?.detail && isDupeDetail(item.detail.detail)) {
+        const candidate = { detail: item.detail, categoryPath: buildCategoryPath(stack) };
+        if (!fallback) fallback = candidate;
+        if (hasOptionName(item.detail.detail, "抽水马桶")) {
+          return candidate;
+        }
+      }
+
+      if (item?.menu) {
+        const found = dfs(item.menu, [...stack, item.menu]);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  return dfs(data, [data]) || fallback;
+}
+
 type SelectionsState = {
   selections: SelectionEntry[];
 };
@@ -188,6 +239,8 @@ function buildSummary(selections: SelectionEntry[]): SelectionsSummary {
 export function SelectionsProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(selectionsReducer, { selections: [] });
   const hydratedRef = useRef(false);
+  const { data } = useContext(DataContext);
+  const [shouldInitDefaults, setShouldInitDefaults] = useState(false);
 
   const debouncedSaveRef = useRef(
     debounce((selections: SelectionEntry[]) => {
@@ -202,7 +255,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         key: "selections",
         data: saved,
       });
-    }, 800)
+    }, 1000)
   );
 
   useEffect(() => {
@@ -220,18 +273,58 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         .filter((s) => s.detail && s.detail.name && s.count > 0);
 
       dispatch({ type: "replace", payload: { selections: restored } });
+    } else {
+      setShouldInitDefaults(true);
     }
     hydratedRef.current = true;
   }, []);
 
   useEffect(() => {
+    if (shouldInitDefaults && data) {
+      const found = findDupeDetail(data);
+      if (found) {
+        const modeSelections =
+          (found.detail.detail as any).modes?.map((mode: any) => {
+            const map = new Map<string, number>();
+            const options = Array.isArray(mode?.options) ? mode.options : [];
+            options.forEach((option: any, index: number) => {
+              map.set(option?.name, index === 0 ? 100 : 0);
+            });
+
+            const hasFlush = options.some((o: any) => o?.name === "抽水马桶");
+            if (hasFlush) {
+              options.forEach((option: any) => {
+                map.set(option?.name, option?.name === "抽水马桶" ? 100 : 0);
+              });
+            }
+            return map;
+          }) || [];
+
+        dispatch({
+          type: "upsert",
+          payload: {
+            detail: found.detail,
+            count: 3,
+            modeSelections,
+            categoryPath: found.categoryPath
+          }
+        });
+      }
+      setShouldInitDefaults(false);
+    }
+  }, [data, shouldInitDefaults]);
+
+  useEffect(() => {
     if (!hydratedRef.current) return;
     if (!state.selections.length) {
-      Taro.removeStorage({ key: "selections" });
+      // Don't clear storage immediately if we are waiting for defaults
+      if (!shouldInitDefaults) {
+        Taro.removeStorage({ key: "selections" });
+      }
       return;
     }
     debouncedSaveRef.current(state.selections);
-  }, [state.selections]);
+  }, [state.selections, shouldInitDefaults]);
 
   const summary = useMemo(() => buildSummary(state.selections), [state.selections]);
 

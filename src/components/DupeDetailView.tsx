@@ -146,7 +146,7 @@ export default function DupeDetailView({ detail, categoryPath = [], onConfirmed 
               setCount(Number.isFinite(next) ? next : 0);
             }}
           />
-          <Button onClick={handleConfirm} type="primary">确认</Button>
+          <Button onClick={handleConfirm} type="primary">添加</Button>
         </View>
       </View>
 
