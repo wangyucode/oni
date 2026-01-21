@@ -3,7 +3,7 @@ import { Image, Text, View } from "@tarojs/components";
 import { Button, Collapse, Grid, InputNumber, Radio, RadioGroup, Range } from "@nutui/nutui-react-taro";
 
 import "./DupeDetailView.scss";
-import { Detail, DupeDetail } from "./data";
+import { DupeDetail, Link, LinkDetail } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useUnit } from "./UnitContext";
 import Icon from "./icons";
@@ -11,12 +11,12 @@ import FilteredImage from "./FilteredImage";
 import { useSelectionsActions } from "./SelectionsContext";
 
 export type DupeDetailViewProps = {
-  detail: Detail;
+  link: Link;
   categoryPath?: string[];
   onConfirmed?: () => void;
 };
 
-function isDupeDetail(detail: Detail["detail"]): detail is DupeDetail {
+function isDupeDetail(detail: LinkDetail | undefined): detail is DupeDetail {
   return (
     typeof detail === "object" &&
     detail !== null &&
@@ -45,9 +45,9 @@ function buildDefaultModeSelections(dupe: DupeDetail): Array<Map<string, number>
   });
 }
 
-export default function DupeDetailView({ detail, categoryPath = [], onConfirmed }: DupeDetailViewProps) {
-  if (!isDupeDetail(detail.detail)) return null;
-  const dupe = detail.detail;
+export default function DupeDetailView({ link, categoryPath = [], onConfirmed }: DupeDetailViewProps) {
+  if (!isDupeDetail(link.detail)) return null;
+  const dupe = link.detail;
   const { timeUnit } = useUnit();
   const { upsert } = useSelectionsActions();
 
@@ -59,7 +59,7 @@ export default function DupeDetailView({ detail, categoryPath = [], onConfirmed 
   useEffect(() => {
     setCount(1);
     setModeSelections(buildDefaultModeSelections(dupe));
-  }, [detail.name]);
+  }, [link.name]);
 
   const convertCalories = (calories: number): { convertedValue: number; unit: string } => {
     if (timeUnit === '秒') {
@@ -68,7 +68,7 @@ export default function DupeDetailView({ detail, categoryPath = [], onConfirmed 
     return { convertedValue: calories, unit: "千卡/周期" };
   };
 
-  const { resources, totalFactor, totalPower, totalCalories } = useMemo(() => {
+  const { resources, totalPower, totalCalories } = useMemo(() => {
     const nextResources: Record<string, number> = {};
     let nextTotalFactor = 0;
 
@@ -115,13 +115,14 @@ export default function DupeDetailView({ detail, categoryPath = [], onConfirmed 
     }));
   }, [resources]);
 
-  const isDupe = detail.name.includes("复制人");
-  const isBionic = detail.name.includes("仿生人");
+  const isDupe = link.name.includes("复制人");
+  const isBionic = link.name.includes("仿生人");
   const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);
 
-  function handleConfirm(): void {
+  function handleAdd(): void {
     upsert({
-      detail,
+      item: { name: link.name, icon: link.icon, iconFilter: link.iconFilter },
+      detail: dupe,
       count,
       modeSelections,
       categoryPath,
@@ -132,10 +133,10 @@ export default function DupeDetailView({ detail, categoryPath = [], onConfirmed 
   return (
     <View className="dupe-detail-view">
       <View className="dupe-detail-view__header">
-        {detail.icon ? (
-          <FilteredImage src={detail.icon} iconFilter={detail.iconFilter} className="dupe-detail-view__icon" mode="aspectFit" />
+        {link.icon ? (
+          <FilteredImage src={link.icon} iconFilter={link.iconFilter} className="dupe-detail-view__icon" mode="aspectFit" />
         ) : null}
-        <Text className="dupe-detail-view__name">{detail.name}</Text>
+        <Text className="dupe-detail-view__name">{link.name}</Text>
         <View style={{ flex: 1 }} />
         <View className="dupe-detail-view__count">
           <InputNumber
@@ -146,7 +147,7 @@ export default function DupeDetailView({ detail, categoryPath = [], onConfirmed 
               setCount(Number.isFinite(next) ? next : 0);
             }}
           />
-          <Button onClick={handleConfirm} type="primary">添加</Button>
+          <Button onClick={handleAdd} type="primary">添加</Button>
         </View>
       </View>
 
@@ -184,7 +185,7 @@ export default function DupeDetailView({ detail, categoryPath = [], onConfirmed 
             {dupe.modes.map((mode, modeIndex) => (
               <Collapse.Item title={mode.name} name={String(modeIndex)} key={`${mode.name}-${modeIndex}`}>
                 <View className="dupe-detail-view__mode">
-                  {mode.options.every((o) => o.type === "switch") ? (
+                  {mode.options.every((o) => o.type === "radio") ? (
                     <RadioGroup
                       direction="horizontal"
                       value={

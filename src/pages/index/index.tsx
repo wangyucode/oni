@@ -94,17 +94,17 @@ function Index() {
           rotate={90}>
           <Collapse.Item title="选择" name="选择" extra={<Button className='reset' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
             <View className='avatar-container'>
-              {selections.map(({ key, count, detail }) =>
+              {selections.map(({ key, count, item }) =>
                 <Badge value={count} key={key} max={999}>
-                  {detail.icon ? (
+                  {item.icon ? (
                     <FilteredImage
-                      src={detail.icon}
-                      iconFilter={detail.iconFilter}
+                      src={item.icon}
+                      iconFilter={item.iconFilter}
                       style={{ width: 48, height: 48 }}
                       mode="aspectFit"
                     />
                   ) : (
-                    <Icon name={detail.name} width={48} height={48} />
+                    <Icon name={item.name} width={48} height={48} />
                   )}
                 </Badge>)}
               <Button className='add' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>

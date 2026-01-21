@@ -8,15 +8,16 @@ export interface Link {
   icon: string;
   iconFilter?: string;
   menu?: Menu;
-  detail?: Detail;
+  detail?: LinkDetail;
 }
 
-export interface Detail {
-  name: string;
-  icon: string;
-  iconFilter?: string;
-  detail: DupeDetail | BuildingDetail | CreatureDetail | PlantDetail | TransDetail | GeyserDetail;
-}
+export type LinkDetail =
+  | DupeDetail
+  | BuildingDetail
+  | CreatureDetail
+  | PlantDetail
+  | TransDetail
+  | GeyserDetail;
 
 export interface DupeDetail {
   resources: ResourceMap;
@@ -59,7 +60,7 @@ export interface Mode {
 
 export interface Option {
   name: string;
-  type: "switch" | "slider";
+  type: "radio" | "slider" | "checkbox";
   resources: ResourceMap;
 }
 

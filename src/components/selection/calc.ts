@@ -1,4 +1,4 @@
-import { Detail, Mode } from "../data";
+import { LinkDetail, Mode } from "../data";
 
 export type SelectionTotals = {
   resources: Record<string, number>;
@@ -25,11 +25,11 @@ function buildDefaultModeSelection(mode: Mode): Map<string, number> {
 }
 
 export function calculateSelectionTotals(
-  detail: Detail,
+  detail: LinkDetail,
   count: number,
   modeSelections: Array<Map<string, number>>
 ): SelectionTotals {
-  const detailAny = detail.detail as any;
+  const detailAny = detail as any;
   const modes: Mode[] = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
   const resources: Record<string, number> = {};
   let totalFactor = 0;
@@ -69,4 +69,3 @@ export function calculateSelectionTotals(
     totalCalories,
   };
 }
-

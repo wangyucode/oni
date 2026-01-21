@@ -6,7 +6,7 @@ import { ArrowLeft } from "@nutui/icons-react-taro";
 import './SelectPopup.scss';
 import { DataContext } from "./DataContext";
 import MenuGrid from "./MenuGrid";
-import { Detail, DupeDetail, Link, Menu } from "./data";
+import { DupeDetail, Link, LinkDetail, Menu } from "./data";
 import DupeDetailView from "./DupeDetailView";
 import { calculateGridColumns } from "./utils";
 
@@ -20,11 +20,11 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
     const [rootMenu, setRootMenu] = useState<Menu | null>(menu);
     const [currentMenu, setCurrentMenu] = useState<Menu | null>(null);
     const [backStack, setBackStack] = useState<Menu[]>([]);
-    const [selectedDetail, setSelectedDetail] = useState<Detail | null>(null);
+    const [selectedLink, setSelectedLink] = useState<Link | null>(null);
 
     const title = useMemo(() => {
-        return selectedDetail?.name || currentMenu?.title || "类别";
-    }, [currentMenu?.title, selectedDetail?.name]);
+        return selectedLink?.name || currentMenu?.title || "类别";
+    }, [currentMenu?.title, selectedLink?.name]);
 
     const categoryPath = useMemo(() => {
         return backStack.slice(1).map((m) => m.title).filter(Boolean);
@@ -44,7 +44,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         }
     }, [visible, rootMenu, menu]);
 
-    function isDupeDetail(detail: Detail["detail"]): detail is DupeDetail {
+    function isDupeDetail(detail: LinkDetail | undefined): detail is DupeDetail {
         return (
             typeof detail === "object" &&
             detail !== null &&
@@ -58,13 +58,13 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
     function handleClose() {
         setCurrentMenu(rootMenu);
         setBackStack(rootMenu ? [rootMenu] : []);
-        setSelectedDetail(null);
+        setSelectedLink(null);
         onClose();
     }
 
     function handleGoBack() {
-        if (selectedDetail) {
-            setSelectedDetail(null);
+        if (selectedLink) {
+            setSelectedLink(null);
             return;
         }
         if (backStack.length <= 1) return;
@@ -80,8 +80,8 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
             return;
         }
         if (link.detail) {
-            if (isDupeDetail(link.detail.detail)) {
-                setSelectedDetail(link.detail);
+            if (isDupeDetail(link.detail)) {
+                setSelectedLink(link);
             }
         }
     }
@@ -92,8 +92,8 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         return <MenuGrid<Link> columns={calculateGridColumns(menu.items.length)} items={menu.items} onItemClick={handleSelectLink} />;
     }
 
-    const content = selectedDetail && isDupeDetail(selectedDetail.detail)
-        ? <DupeDetailView detail={selectedDetail} categoryPath={categoryPath} onConfirmed={handleClose} />
+    const content = selectedLink && isDupeDetail(selectedLink.detail)
+        ? <DupeDetailView link={selectedLink} categoryPath={categoryPath} onConfirmed={handleClose} />
         : renderMenu(currentMenu);
 
     return (
@@ -102,7 +102,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
             visible={visible}
             position="bottom"
             title={title}
-            left={selectedDetail || backStack.length > 1 ? <Button className="back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
+            left={selectedLink || backStack.length > 1 ? <Button className="back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
             onClose={handleClose}
             closeable
             style={{ height: '50%', paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}

@@ -2,15 +2,18 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer, u
 import Taro from "@tarojs/taro";
 import { debounce } from "@tarojs/runtime";
 
-import { Detail, Link, Menu } from "./data";
+import { Link, LinkDetail, Menu } from "./data";
 import { ResourceItem } from "./ResourceGrid";
 import { calculateSelectionTotals } from "./selection/calc";
 import { DataContext } from "./DataContext";
 
+export type SelectionItem = Pick<Link, "name" | "icon" | "iconFilter">;
+
 export type SelectionEntry = {
   key: string;
   categoryPath: string[];
-  detail: Detail;
+  item: SelectionItem;
+  detail: LinkDetail;
   count: number;
   modeSelections: Array<Map<string, number>>;
 };
@@ -33,7 +36,8 @@ export type SelectionsContextValue = {
 };
 
 type UpsertPayload = {
-  detail: Detail;
+  item: SelectionItem;
+  detail: LinkDetail;
   count: number;
   modeSelections: Array<Map<string, number>>;
   categoryPath: string[];
@@ -62,9 +66,9 @@ export const SelectionsActionsContext = createContext<SelectionsActions>({
   clear: () => {},
 });
 
-function createSelectionKey(categoryPath: string[], detailName: string): string {
+function createSelectionKey(categoryPath: string[], itemName: string): string {
   const prefix = categoryPath.filter(Boolean).join("/");
-  return `${prefix}::${detailName}`;
+  return `${prefix}::${itemName}`;
 }
 
 function serializeModeSelections(modeSelections: Array<Map<string, number>>): Array<Record<string, number>> {
@@ -87,6 +91,62 @@ function deserializeModeSelections(modeSelections: Array<Record<string, number>>
   });
 }
 
+function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
+  if (!raw || typeof raw !== "object") return null;
+  const categoryPath = Array.isArray(raw.categoryPath) ? raw.categoryPath.map(String) : [];
+  const count = Number(raw.count) || 0;
+  if (count <= 0) return null;
+
+  let item: SelectionItem | null = null;
+  const rawItem = raw.item;
+  if (rawItem && typeof rawItem === "object") {
+    const name = String((rawItem as any).name || "");
+    if (name) {
+      item = {
+        name,
+        icon: String((rawItem as any).icon || ""),
+        iconFilter: (rawItem as any).iconFilter ? String((rawItem as any).iconFilter) : undefined,
+      };
+    }
+  }
+
+  const rawDetail = raw.detail;
+  if (!item && rawDetail && typeof rawDetail === "object") {
+    const name = String((rawDetail as any).name || "");
+    if (name) {
+      item = {
+        name,
+        icon: String((rawDetail as any).icon || ""),
+        iconFilter: (rawDetail as any).iconFilter ? String((rawDetail as any).iconFilter) : undefined,
+      };
+    }
+  }
+
+  let detail: any = null;
+  if (rawDetail && typeof rawDetail === "object" && Array.isArray((rawDetail as any).modes)) {
+    detail = rawDetail;
+  } else if (rawDetail && typeof rawDetail === "object" && (rawDetail as any).detail) {
+    detail = (rawDetail as any).detail;
+  }
+
+  if (!item?.name) return null;
+  if (!detail || !Array.isArray(detail.modes)) return null;
+
+  const key =
+    typeof raw.key === "string" && raw.key
+      ? raw.key
+      : createSelectionKey(categoryPath, item.name);
+
+  return {
+    key,
+    categoryPath,
+    item,
+    detail: detail as LinkDetail,
+    count,
+    modeSelections: deserializeModeSelections(raw.modeSelections || []),
+  };
+}
+
 function sortSelections(selections: SelectionEntry[]): SelectionEntry[] {
   return selections
     .slice()
@@ -95,15 +155,15 @@ function sortSelections(selections: SelectionEntry[]): SelectionEntry[] {
       const bPath = b.categoryPath.join("/");
       const byPath = aPath.localeCompare(bPath, "zh-CN");
       if (byPath) return byPath;
-      return a.detail.name.localeCompare(b.detail.name, "zh-CN");
+      return a.item.name.localeCompare(b.item.name, "zh-CN");
     });
 }
 
-function findDupeDetail(data: Menu): { detail: Detail; categoryPath: string[] } | null {
+function findDupeDetail(data: Menu): { link: Link; categoryPath: string[] } | null {
   const visited = new WeakSet<Menu>();
-  let fallback: { detail: Detail; categoryPath: string[] } | null = null;
+  let fallback: { link: Link; categoryPath: string[] } | null = null;
 
-  const isDupeDetail = (detail: Detail["detail"]): detail is any => {
+  const isDupeDetail = (detail: LinkDetail | undefined): detail is any => {
     return (
       typeof detail === "object" &&
       detail !== null &&
@@ -124,16 +184,16 @@ function findDupeDetail(data: Menu): { detail: Detail; categoryPath: string[] } 
 
   const buildCategoryPath = (stack: Menu[]) => stack.slice(1).map((m) => m.title).filter(Boolean);
 
-  const dfs = (menu: Menu, stack: Menu[]): { detail: Detail; categoryPath: string[] } | null => {
+  const dfs = (menu: Menu, stack: Menu[]): { link: Link; categoryPath: string[] } | null => {
     if (!menu || visited.has(menu)) return null;
     visited.add(menu);
     const items = Array.isArray(menu.items) ? menu.items : [];
 
     for (const item of items) {
-      if (item?.detail && isDupeDetail(item.detail.detail)) {
-        const candidate = { detail: item.detail, categoryPath: buildCategoryPath(stack) };
+      if (item?.detail && isDupeDetail(item.detail)) {
+        const candidate = { link: item, categoryPath: buildCategoryPath(stack) };
         if (!fallback) fallback = candidate;
-        if (hasOptionName(item.detail.detail, "抽水马桶")) {
+        if (hasOptionName(item.detail, "抽水马桶")) {
           return candidate;
         }
       }
@@ -162,7 +222,7 @@ type SelectionsAction =
 function selectionsReducer(state: SelectionsState, action: SelectionsAction): SelectionsState {
   switch (action.type) {
     case "upsert": {
-      const key = createSelectionKey(action.payload.categoryPath, action.payload.detail.name);
+      const key = createSelectionKey(action.payload.categoryPath, action.payload.item.name);
       if (action.payload.count <= 0) {
         return {
           selections: state.selections.filter((s) => s.key !== key),
@@ -171,6 +231,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
       const nextEntry: SelectionEntry = {
         key,
         categoryPath: action.payload.categoryPath,
+        item: action.payload.item,
         detail: action.payload.detail,
         count: action.payload.count,
         modeSelections: action.payload.modeSelections,
@@ -247,6 +308,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       const saved: SavedSelectionEntry[] = selections.map((s) => ({
         key: s.key,
         categoryPath: s.categoryPath,
+        item: s.item,
         detail: s.detail,
         count: s.count,
         modeSelections: serializeModeSelections(s.modeSelections),
@@ -262,15 +324,8 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     const saved = Taro.getStorageSync("selections") as SavedSelectionEntry[] | undefined;
     if (Array.isArray(saved) && saved.length) {
       const restored: SelectionEntry[] = saved
-        .filter((s) => s && typeof s === "object")
-        .map((s) => ({
-          key: String((s as any).key || createSelectionKey((s as any).categoryPath || [], (s as any).detail?.name || "")),
-          categoryPath: Array.isArray((s as any).categoryPath) ? (s as any).categoryPath.map(String) : [],
-          detail: (s as any).detail as Detail,
-          count: Number((s as any).count) || 0,
-          modeSelections: deserializeModeSelections((s as any).modeSelections || []),
-        }))
-        .filter((s) => s.detail && s.detail.name && s.count > 0);
+        .map((s) => normalizeRestoredSelectionEntry(s))
+        .filter(Boolean) as SelectionEntry[];
 
       dispatch({ type: "replace", payload: { selections: restored } });
     } else {
@@ -284,7 +339,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       const found = findDupeDetail(data);
       if (found) {
         const modeSelections =
-          (found.detail.detail as any).modes?.map((mode: any) => {
+          (found.link.detail as any).modes?.map((mode: any) => {
             const map = new Map<string, number>();
             const options = Array.isArray(mode?.options) ? mode.options : [];
             options.forEach((option: any, index: number) => {
@@ -303,7 +358,8 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         dispatch({
           type: "upsert",
           payload: {
-            detail: found.detail,
+            item: { name: found.link.name, icon: found.link.icon, iconFilter: found.link.iconFilter },
+            detail: found.link.detail as LinkDetail,
             count: 3,
             modeSelections,
             categoryPath: found.categoryPath
