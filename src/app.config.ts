@@ -27,7 +27,7 @@ export default defineAppConfig({
         pagePath: "pages/about/about",
         iconPath: "components/icons/idea-1.png",
         selectedIconPath: "components/icons/idea.png",
-        text: "关于",
+        text: "设置",
       },
     ],
   },
