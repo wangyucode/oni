@@ -2,20 +2,17 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
 import "./SelectionDetailView.scss";
-import { DetailLink } from "./data";
+import { CreatureDetail, DetailLink, LinkDetail, PlantDetail } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
-import { useUnit } from "./UnitContext";
 import { useSelectionsActions } from "./SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
 import { calculateSelectionTotals } from "./selection/calc";
 import SelectionDetailHeader from "./detail/SelectionDetailHeader";
 import ModeSelectionEditor from "./detail/ModeSelectionEditor";
-import { convertCalories, formatSignedFloor } from "./detail/formatters";
-import { isDupeDetail } from "./detail/typeGuards";
 import { DataContext } from "./DataContext";
 import { getIconData } from "./utils";
 
-export type DupeDetailViewProps = {
+export type LifeDetailViewProps = {
   link: DetailLink;
   categoryPath?: string[];
   mode?: "add" | "edit";
@@ -25,7 +22,17 @@ export type DupeDetailViewProps = {
   onConfirmed?: () => void;
 };
 
-export default function DupeDetailView({
+function isLifeDetail(detail: LinkDetail | undefined): detail is CreatureDetail | PlantDetail {
+  return (
+    typeof detail === "object" &&
+    detail !== null &&
+    "life" in detail &&
+    "resources" in detail &&
+    "modes" in detail
+  );
+}
+
+export default function LifeDetailView({
   link,
   categoryPath = [],
   mode = "add",
@@ -33,37 +40,34 @@ export default function DupeDetailView({
   initialCount,
   initialModeSelections,
   onConfirmed,
-}: DupeDetailViewProps) {
-  if (!isDupeDetail(link.detail)) return null;
-  const dupe = link.detail;
-  const { timeUnit } = useUnit();
+}: LifeDetailViewProps) {
+  if (!isLifeDetail(link.detail)) return null;
+  const detail = link.detail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
-  const [count, setCount] = useState<number>(
-    mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1
-  );
+  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
-    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(dupe, initialModeSelections);
-    return buildDefaultModeSelections(dupe);
+    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(detail, initialModeSelections);
+    return buildDefaultModeSelections(detail);
   });
 
   useEffect(() => {
     if (mode === "edit") {
       setCount(Math.max(0, Number(initialCount ?? 1) || 0));
-      setModeSelections(initialModeSelections ? normalizeModeSelections(dupe, initialModeSelections) : buildDefaultModeSelections(dupe));
+      setModeSelections(initialModeSelections ? normalizeModeSelections(detail, initialModeSelections) : buildDefaultModeSelections(detail));
       return;
     }
     setCount(1);
-    setModeSelections(buildDefaultModeSelections(dupe));
-  }, [link.name, dupe, mode, initialCount, initialModeSelections]);
+    setModeSelections(buildDefaultModeSelections(detail));
+  }, [detail, initialCount, initialModeSelections, link.name, mode]);
 
-  const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
+  const normalizedModeSelections = useMemo(() => normalizeModeSelections(detail, modeSelections), [detail, modeSelections]);
 
-  const { resources, resourceKinds, totalPower, totalCalories } = useMemo(() => {
-    return calculateSelectionTotals(dupe, count, normalizedModeSelections);
-  }, [count, dupe, normalizedModeSelections]);
+  const { resources, resourceKinds } = useMemo(() => {
+    return calculateSelectionTotals(detail, count, normalizedModeSelections);
+  }, [count, detail, normalizedModeSelections]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({
@@ -74,17 +78,10 @@ export default function DupeDetailView({
     }));
   }, [resources, resourceKinds]);
 
-  const isDupe = link.name.includes("复制人");
-  const isBionic = link.name.includes("仿生人");
-  const { convertedValue: convertedCalories, unit: caloriesUnit } = useMemo(
-    () => convertCalories(totalCalories, timeUnit),
-    [timeUnit, totalCalories]
-  );
-
   function handlePrimaryAction(): void {
     const payload = {
       item: { name: link.name, icon: link.icon },
-      detail: dupe,
+      detail,
       count,
       modeSelections,
       categoryPath,
@@ -110,34 +107,22 @@ export default function DupeDetailView({
         onAction={handlePrimaryAction}
       />
 
-      {isBionic && dupe.power ? (
+      {detail.life ? (
         <View className="selection-detail-view__section">
-          <Text className="selection-detail-view__sectionTitle">电力</Text>
+          <Text className="selection-detail-view__sectionTitle">寿命</Text>
           <View className="selection-detail-view__kvList">
             <View className="selection-detail-view__kv">
-              <Text className="selection-detail-view__k">功率</Text>
-              <Text className="selection-detail-view__v">{`${formatSignedFloor(totalPower)} W`}</Text>
+              <Text className="selection-detail-view__k">寿命</Text>
+              <Text className="selection-detail-view__v">{detail.life}</Text>
             </View>
           </View>
         </View>
       ) : null}
 
-      {isDupe && dupe.calorie ? (
-        <View className="selection-detail-view__section">
-          <Text className="selection-detail-view__sectionTitle">卡路里</Text>
-          <View className="selection-detail-view__kvList">
-            <View className="selection-detail-view__kv">
-              <Text className="selection-detail-view__k">合计</Text>
-              <Text className="selection-detail-view__v">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
-            </View>
-          </View>
-        </View>
-      ) : null}
-
-      {dupe.modes?.length > 0 && (
+      {detail.modes?.length > 0 && (
         <View className="selection-detail-view__section">
           <Text className="selection-detail-view__sectionTitle">模式</Text>
-          <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
+          <ModeSelectionEditor detail={detail} modes={detail.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 

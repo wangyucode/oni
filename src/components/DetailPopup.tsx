@@ -3,7 +3,7 @@ import { View } from "@tarojs/components";
 import { Popup } from "@nutui/nutui-react-taro";
 
 import "./DetailPopup.scss";
-import { DetailLink, Link } from "./data";
+import { DetailLink } from "./data";
 import LinkDetailView from "./LinkDetailView";
 import { SelectionEntry } from "./SelectionsContext";
 

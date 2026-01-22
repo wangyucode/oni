@@ -4,18 +4,15 @@ import { Text, View } from "@tarojs/components";
 import "./SelectionDetailView.scss";
 import { DetailLink } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
-import { useUnit } from "./UnitContext";
 import { useSelectionsActions } from "./SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
 import { calculateSelectionTotals } from "./selection/calc";
 import SelectionDetailHeader from "./detail/SelectionDetailHeader";
 import ModeSelectionEditor from "./detail/ModeSelectionEditor";
-import { convertHeat, formatSignedFloor } from "./detail/formatters";
-import { isBuildingDetail } from "./detail/typeGuards";
 import { DataContext } from "./DataContext";
 import { getIconData } from "./utils";
 
-export type BuildingDetailViewProps = {
+export type ElementDetailViewProps = {
   link: DetailLink;
   categoryPath?: string[];
   mode?: "add" | "edit";
@@ -25,7 +22,7 @@ export type BuildingDetailViewProps = {
   onConfirmed?: () => void;
 };
 
-export default function BuildingDetailView({
+export default function ElementDetailView({
   link,
   categoryPath = [],
   mode = "add",
@@ -33,46 +30,47 @@ export default function BuildingDetailView({
   initialCount,
   initialModeSelections,
   onConfirmed,
-}: BuildingDetailViewProps) {
-  if (!isBuildingDetail(link.detail)) return null;
-  const building = link.detail;
-  const { timeUnit } = useUnit();
+}: ElementDetailViewProps) {
+  const detail = link.detail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
   const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
-    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(building, initialModeSelections);
-    return buildDefaultModeSelections(building);
+    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(detail, initialModeSelections);
+    return buildDefaultModeSelections(detail);
   });
 
   useEffect(() => {
     if (mode === "edit") {
       setCount(Math.max(0, Number(initialCount ?? 1) || 0));
-      setModeSelections(initialModeSelections ? normalizeModeSelections(building, initialModeSelections) : buildDefaultModeSelections(building));
+      setModeSelections(initialModeSelections ? normalizeModeSelections(detail, initialModeSelections) : buildDefaultModeSelections(detail));
       return;
     }
     setCount(1);
-    setModeSelections(buildDefaultModeSelections(building));
-  }, [building, initialCount, initialModeSelections, link.name, mode]);
+    setModeSelections(buildDefaultModeSelections(detail));
+  }, [detail, initialCount, initialModeSelections, link.name, mode]);
 
-  const normalizedModeSelections = useMemo(() => normalizeModeSelections(building, modeSelections), [building, modeSelections]);
+  const normalizedModeSelections = useMemo(() => normalizeModeSelections(detail, modeSelections), [detail, modeSelections]);
 
-  const { resources, resourceKinds, totalPower, totalHeat } = useMemo(() => {
-    return calculateSelectionTotals(building, count, normalizedModeSelections);
-  }, [building, count, normalizedModeSelections]);
+  const { resources, resourceKinds } = useMemo(() => {
+    return calculateSelectionTotals(detail, count, normalizedModeSelections);
+  }, [count, detail, normalizedModeSelections]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
-    return Object.entries(resources).map(([name, value]) => ({ name, value, count: 1, kind: resourceKinds[name] || "mass" }));
+    return Object.entries(resources).map(([name, value]) => ({
+      name,
+      value,
+      count: 1,
+      kind: resourceKinds[name] || "mass",
+    }));
   }, [resources, resourceKinds]);
-
-  const { convertedValue: convertedHeat, unit: heatUnit } = useMemo(() => convertHeat(totalHeat, timeUnit), [timeUnit, totalHeat]);
 
   function handlePrimaryAction(): void {
     const payload = {
       item: { name: link.name, icon: link.icon },
-      detail: building,
+      detail,
       count,
       modeSelections,
       categoryPath,
@@ -98,30 +96,10 @@ export default function BuildingDetailView({
         onAction={handlePrimaryAction}
       />
 
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">电力</Text>
-        <View className="selection-detail-view__kvList">
-          <View className="selection-detail-view__kv">
-            <Text className="selection-detail-view__k">功率</Text>
-            <Text className="selection-detail-view__v">{`${formatSignedFloor(totalPower)} W`}</Text>
-          </View>
-        </View>
-      </View>
-
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">热量</Text>
-        <View className="selection-detail-view__kvList">
-          <View className="selection-detail-view__kv">
-            <Text className="selection-detail-view__k">合计</Text>
-            <Text className="selection-detail-view__v">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
-          </View>
-        </View>
-      </View>
-
-      {building.modes?.length > 0 && (
+      {detail.modes?.length > 0 && (
         <View className="selection-detail-view__section">
           <Text className="selection-detail-view__sectionTitle">模式</Text>
-          <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
+          <ModeSelectionEditor detail={detail} modes={detail.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 
