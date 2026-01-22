@@ -59,13 +59,13 @@ export default function BuildingDetailView({
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(building, modeSelections), [building, modeSelections]);
 
-  const { resources, totalPower, totalHeat } = useMemo(() => {
+  const { resources, resourceKinds, totalPower, totalHeat } = useMemo(() => {
     return calculateSelectionTotals(building, count, normalizedModeSelections);
   }, [building, count, normalizedModeSelections]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
-    return Object.entries(resources).map(([name, value]) => ({ name, value, count: 1 }));
-  }, [resources]);
+    return Object.entries(resources).map(([name, value]) => ({ name, value, count: 1, kind: resourceKinds[name] || "mass" }));
+  }, [resources, resourceKinds]);
 
   const { convertedValue: convertedHeat, unit: heatUnit } = useMemo(() => convertHeat(totalHeat, timeUnit), [timeUnit, totalHeat]);
 
@@ -118,10 +118,12 @@ export default function BuildingDetailView({
         </View>
       </View>
 
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">模式</Text>
-        <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
-      </View>
+      {building.modes?.length > 0 && (
+        <View className="selection-detail-view__section">
+          <Text className="selection-detail-view__sectionTitle">模式</Text>
+          <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
+        </View>
+      )}
 
       <View className="selection-detail-view__section">
         <Text className="selection-detail-view__sectionTitle">资源</Text>

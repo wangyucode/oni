@@ -4,7 +4,7 @@ import { debounce } from "@tarojs/runtime";
 
 import { Link, LinkDetail, Menu } from "./data";
 import { ResourceItem } from "./ResourceGrid";
-import { calculateSelectionTotals } from "./selection/calc";
+import { calculateSelectionTotals, ResourceUnitKind } from "./selection/calc";
 import {
   ModeSelections,
   buildDefaultModeSelections,
@@ -28,6 +28,7 @@ type SavedSelectionEntry = SelectionEntry;
 
 export type SelectionsSummary = {
   resources: Record<string, number>;
+  resourceKinds: Record<string, ResourceUnitKind>;
   resourceItems: ResourceItem[];
   totalPower: number;
   totalHeat: number;
@@ -58,6 +59,7 @@ export const SelectionsContext = createContext<SelectionsContextValue>({
   selections: [],
   summary: {
     resources: {},
+    resourceKinds: {},
     resourceItems: [],
     totalPower: 0,
     totalHeat: 0,
@@ -338,9 +340,18 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
 
 function buildSummary(selections: SelectionEntry[]): SelectionsSummary {
   const resources: Record<string, number> = {};
+  const resourceKinds: Record<string, ResourceUnitKind> = {};
   let totalPower = 0;
   let totalHeat = 0;
   let totalCalories = 0;
+
+  const mergeKind = (a: ResourceUnitKind | undefined, b: ResourceUnitKind | undefined): ResourceUnitKind | undefined => {
+    if (!b) return a;
+    if (!a) return b;
+    if (a === b) return a;
+    if (a === "mass" || b === "mass") return "mass";
+    return "count";
+  };
 
   selections.forEach((selection) => {
     const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections);
@@ -350,6 +361,7 @@ function buildSummary(selections: SelectionEntry[]): SelectionsSummary {
 
     Object.entries(totals.resources).forEach(([name, value]) => {
       resources[name] = (resources[name] || 0) + value;
+      resourceKinds[name] = mergeKind(resourceKinds[name], totals.resourceKinds[name]) as ResourceUnitKind;
     });
   });
 
@@ -357,10 +369,12 @@ function buildSummary(selections: SelectionEntry[]): SelectionsSummary {
     name,
     value,
     count: 1,
+    kind: resourceKinds[name] || "mass",
   }));
 
   return {
     resources,
+    resourceKinds,
     resourceItems,
     totalPower,
     totalHeat,

@@ -61,7 +61,7 @@ export default function DupeDetailView({
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
 
-  const { resources, totalPower, totalCalories } = useMemo(() => {
+  const { resources, resourceKinds, totalPower, totalCalories } = useMemo(() => {
     return calculateSelectionTotals(dupe, count, normalizedModeSelections);
   }, [count, dupe, normalizedModeSelections]);
 
@@ -69,9 +69,10 @@ export default function DupeDetailView({
     return Object.entries(resources).map(([name, value]) => ({
       name,
       value,
-      count: 1
+      count: 1,
+      kind: resourceKinds[name] || "mass",
     }));
-  }, [resources]);
+  }, [resources, resourceKinds]);
 
   const isDupe = link.name.includes("复制人");
   const isBionic = link.name.includes("仿生人");
@@ -133,10 +134,12 @@ export default function DupeDetailView({
         </View>
       ) : null}
 
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">模式</Text>
-        <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
-      </View>
+      {dupe.modes?.length > 0 && (
+        <View className="selection-detail-view__section">
+          <Text className="selection-detail-view__sectionTitle">模式</Text>
+          <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
+        </View>
+      )}
 
       <View className="selection-detail-view__section">
         <Text className="selection-detail-view__sectionTitle">资源</Text>

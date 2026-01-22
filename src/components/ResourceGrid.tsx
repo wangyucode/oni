@@ -12,6 +12,7 @@ export interface ResourceItem {
   name: string;
   value: number;
   count: number;
+  kind?: "mass" | "count";
 }
 
 export interface ResourceGridProps {
@@ -23,11 +24,20 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
   const { iconMap } = useContext(DataContext);
 
   const aggregatedResources = useMemo(() => {
-    const map = new Map<string, number>();
+    const map = new Map<string, { value: number; kind: "mass" | "count" }>();
     items.forEach(item => {
       const total = item.value * item.count;
       if (total !== 0) {
-        map.set(item.name, (map.get(item.name) || 0) + total);
+        const kind = item.kind || "mass";
+        const existing = map.get(item.name);
+        if (!existing) {
+          map.set(item.name, { value: total, kind });
+          return;
+        }
+        map.set(item.name, {
+          value: existing.value + total,
+          kind: existing.kind === "mass" || kind === "mass" ? "mass" : "count"
+        });
       }
     });
     return map;
@@ -38,7 +48,14 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
       .sort(([a], [b]) => a.localeCompare(b, "zh-CN"));
   }, [aggregatedResources]);
 
-  const convertResourceValue = (value: number) => {
+  const convertResourceValue = (value: number, kind: "mass" | "count") => {
+    if (kind === "count") {
+      const convertedValue = timeUnit === "周期" ? value * 600 : value;
+      return {
+        convertedValue,
+        unit: `单位/${timeUnit}`,
+      };
+    }
     return {
       convertedValue: transValue(value, weightUnit, timeUnit),
       unit: `${weightUnit}/${timeUnit}`
@@ -59,8 +76,8 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
       gap={0}
       columns={calculateGridColumns(sortedResources.length)}
     >
-      {sortedResources.map(([name, value]) => {
-        const { convertedValue, unit } = convertResourceValue(value);
+      {sortedResources.map(([name, entry]) => {
+        const { convertedValue, unit } = convertResourceValue(entry.value, entry.kind);
         const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue);
         const iconData = iconMap.get(name);
         const iconSrc = iconData?.icon;

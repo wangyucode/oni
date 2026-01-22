@@ -27,14 +27,6 @@ export default function ModeSelectionEditor({
 }: ModeSelectionEditorProps) {
   const normalized = normalizeModeSelections(detail, modeSelections);
 
-  if (!modes?.length) {
-    return (
-      <View className="selection-detail-view__empty">
-        <Text>无</Text>
-      </View>
-    );
-  }
-
   return (
     <Collapse defaultActiveName={modes.map((_, i) => String(i))} expandIcon={<Icon width={12} height={16} name="rightArrow" />} rotate={90}>
       {modes.map((mode, modeIndex) => (
