@@ -27,7 +27,7 @@ function Index() {
   const { timeUnit } = useUnit();
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   const [isShowEditPopup, setIsShowEditPopup] = useState(false);
-  const { selections, summary } = useSelections();
+  const { selections, groupedSelections, summary } = useSelections();
   const { clear } = useSelectionsActions();
   const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
   const { iconMap } = useContext(DataContext);
@@ -103,7 +103,7 @@ function Index() {
           rotate={90}>
           <Collapse.Item title="选择" name="选择" extra={<Button className='reset' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
             <View className='avatar-container'>
-              {selections.map((selection) =>
+              {groupedSelections.map((selection) =>
                 <View
                   key={selection.key}
                   onClick={() => {

@@ -30,8 +30,16 @@ export type SelectionsSummary = {
   totalCalories: number;
 };
 
+export type GroupedSelectionEntry = {
+  key: string;
+  categoryPath: string[];
+  item: SelectionItem;
+  count: number;
+};
+
 export type SelectionsContextValue = {
   selections: SelectionEntry[];
+  groupedSelections: GroupedSelectionEntry[];
   summary: SelectionsSummary;
 };
 
@@ -52,6 +60,7 @@ export type SelectionsActions = {
 
 export const SelectionsContext = createContext<SelectionsContextValue>({
   selections: [],
+  groupedSelections: [],
   summary: {
     resources: {},
     resourceKinds: {},
@@ -102,6 +111,26 @@ function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
     byKey.set(s.key, { ...existing, count: existing.count + s.count });
   });
   return Array.from(byKey.values()).filter((s) => s.count > 0);
+}
+
+function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionEntry[] {
+  const grouped = new Map<string, GroupedSelectionEntry>();
+  selections.forEach((selection) => {
+    const categoryKey = selection.categoryPath.join(">");
+    const groupKey = `${categoryKey}::${selection.item.name}`;
+    const existing = grouped.get(groupKey);
+    if (existing) {
+      grouped.set(groupKey, { ...existing, count: existing.count + selection.count });
+    } else {
+      grouped.set(groupKey, {
+        key: groupKey,
+        categoryPath: selection.categoryPath,
+        item: selection.item,
+        count: selection.count,
+      });
+    }
+  });
+  return Array.from(grouped.values()).filter((s) => s.count > 0);
 }
 
 function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
@@ -436,6 +465,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
   }, [state.selections, shouldInitDefaults]);
 
   const summary = useMemo(() => buildSummary(state.selections), [state.selections]);
+  const groupedSelections = useMemo(() => buildGroupedSelections(state.selections), [state.selections]);
 
   const actions = useMemo<SelectionsActions>(
     () => ({
@@ -453,9 +483,10 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
   const value = useMemo<SelectionsContextValue>(
     () => ({
       selections: state.selections,
+      groupedSelections,
       summary,
     }),
-    [state.selections, summary]
+    [state.selections, groupedSelections, summary]
   );
 
   return (
