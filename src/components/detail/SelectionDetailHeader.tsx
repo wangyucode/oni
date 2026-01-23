@@ -23,13 +23,13 @@ export default function SelectionDetailHeader({
   onAction,
 }: SelectionDetailHeaderProps) {
   return (
-    <View className="selection-detail-view__header">
+    <View className="flex items-center gap-8">
       {icon ? (
-        <FilteredImage src={icon} iconFilter={iconFilter} className="selection-detail-view__icon" mode="aspectFit" />
+        <FilteredImage src={icon} iconFilter={iconFilter} className="w-48 h-48" mode="aspectFit" />
       ) : null}
-      <Text className="selection-detail-view__name">{name}</Text>
+      <Text className="text-base font-semibold">{name}</Text>
       <View style={{ flex: 1 }} />
-      <View className="selection-detail-view__count">
+      <View className="flex justify-end gap-16 w-120">
         <InputNumber
           value={count}
           min={0}

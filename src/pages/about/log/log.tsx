@@ -4,14 +4,16 @@ import { useShareAppMessage } from "@tarojs/taro";
 import { sharedMessage } from "src/components/data";
 import BackButton from "src/components/back/BackButton";
 
-import './log.scss'
+
+
 
 export default function Log() {
 
     useShareAppMessage(() => sharedMessage);
 
     return (
-        <View className='root log'>
+        <View className='root page-log flex flex-col gap-4'>
+
             {process.env.TARO_ENV === 'h5' && <BackButton />}
             <Cell.Group className="cells">
                 <Cell title="1.0" extra='2025-09-07' description='提供《缺氧》产物平衡计算功能' />

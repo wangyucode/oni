@@ -7,25 +7,18 @@ import icon from 'src/icon.png'
 import { sharedMessage } from "src/components/data";
 import { useUnit } from "src/components/UnitContext";
 
-import './about.scss'
 
 
 export default function About() {
 
-    const { weightUnit, timeUnit, toggleWeightUnit, toggleTimeUnit } = useUnit();
+    const { timeUnit, toggleTimeUnit } = useUnit();
 
     useShareAppMessage(() => sharedMessage);
 
-    const isKgCycle = weightUnit === '千克' && timeUnit === '周期';
+    const isCycle = timeUnit === '周期';
 
-    const toggleMode = (val: boolean) => {
-        if (val) {
-            toggleWeightUnit();
-            toggleTimeUnit();
-        } else {
-            toggleWeightUnit();
-            toggleTimeUnit();
-        }
+    const toggleMode = () => {
+        toggleTimeUnit();
     }
 
     function handleLogClick() {
@@ -42,10 +35,10 @@ export default function About() {
 
     return (
         <View className='root'>
-            <View className="about-header">
+            <View className="flex flex-col items-center bg-white border border-black gap-8 p-16 rounded-6">
                 <Avatar src={icon} size="large" />
-                <Text className="title">ONI产物计算器{process.env.TARO_APP_VERSION}</Text>
-                <Text className="desc">本小程序提供《缺氧》产物平衡计算功能，仅作交流学习使用。所使用的物品名称，图标等版权归科雷娱乐所有。</Text>
+                <Text className="text-base font-bold text-black">ONI产物计算器{process.env.TARO_APP_VERSION}</Text>
+                <Text className="text-13 text-gray">本小程序提供《缺氧》产物平衡计算功能，仅作交流学习使用。所使用的物品名称，图标等版权归科雷娱乐所有。</Text>
             </View>
             <Cell.Group className="about-cells">
                 <Cell title="更新日志" extra={<ArrowRight size={16} />} onClick={handleLogClick} align="center" clickable />
@@ -53,13 +46,14 @@ export default function About() {
             </Cell.Group>
 
             <Cell.Group className="about-cells">
-                <Cell className='unit-cell' align="center" title="切换显示单位" extra={
+                <Cell className='border border-black shadow-none' align="center" title="切换时间单位" extra={
                       <>
-                        <Text className='unit-text'>{isKgCycle ? '千克/周期' : '克/秒'}</Text>
-                        <Switch checked={isKgCycle} onChange={toggleMode} />
+                        <Text className='text-primary font-bold mr-4'>{isCycle ? '周期' : '秒'}</Text>
+                        <Switch checked={isCycle} onChange={toggleMode} />
                       </>
                     } />
             </Cell.Group>          
+
         </View>
     )
 }

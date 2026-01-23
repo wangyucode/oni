@@ -1,7 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
-import "./SelectionDetailView.scss";
 import { DetailLink } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useUnit } from "./UnitContext";
@@ -111,38 +110,38 @@ export default function DupeDetailView({
       />
 
       {isBionic && dupe.power ? (
-        <View className="selection-detail-view__section">
-          <Text className="selection-detail-view__sectionTitle">电力</Text>
-          <View className="selection-detail-view__kvList">
-            <View className="selection-detail-view__kv">
-              <Text className="selection-detail-view__k">功率</Text>
-              <Text className="selection-detail-view__v">{`${formatSignedFloor(totalPower)} W`}</Text>
+        <View className="flex flex-col gap-6">
+          <Text className="text-sm font-semibold">电力</Text>
+          <View className="flex flex-col gap-6">
+            <View className="flex items-start justify-between gap-12">
+              <Text className="text-gray max-w-55 break-all flex-none">功率</Text>
+              <Text className="text-gray-600 flex-1 text-right break-all">{`${formatSignedFloor(totalPower)} W`}</Text>
             </View>
           </View>
         </View>
       ) : null}
 
       {isDupe && dupe.calorie ? (
-        <View className="selection-detail-view__section">
-          <Text className="selection-detail-view__sectionTitle">卡路里</Text>
-          <View className="selection-detail-view__kvList">
-            <View className="selection-detail-view__kv">
-              <Text className="selection-detail-view__k">合计</Text>
-              <Text className="selection-detail-view__v">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
+        <View className="flex flex-col gap-6">
+          <Text className="text-sm font-semibold">卡路里</Text>
+          <View className="flex flex-col gap-6">
+            <View className="flex items-start justify-between gap-12">
+              <Text className="text-gray max-w-55 break-all flex-none">合计</Text>
+              <Text className="text-gray-600 flex-1 text-right break-all">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
             </View>
           </View>
         </View>
       ) : null}
 
       {dupe.modes?.length > 0 && (
-        <View className="selection-detail-view__section">
-          <Text className="selection-detail-view__sectionTitle">模式</Text>
+        <View className="flex flex-col gap-6">
+          <Text className="text-sm font-semibold">模式</Text>
           <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">资源</Text>
+      <View className="flex flex-col gap-6">
+        <Text className="text-sm font-semibold">资源</Text>
         <ResourceGrid items={resourceItems} />
       </View>
     </View>

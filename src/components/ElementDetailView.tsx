@@ -1,7 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
-import "./SelectionDetailView.scss";
 import { DetailLink } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useSelectionsActions } from "./SelectionsContext";
@@ -97,14 +96,14 @@ export default function ElementDetailView({
       />
 
       {detail.modes?.length > 0 && (
-        <View className="selection-detail-view__section">
-          <Text className="selection-detail-view__sectionTitle">模式</Text>
+        <View className="flex flex-col gap-6">
+          <Text className="text-sm font-semibold">模式</Text>
           <ModeSelectionEditor detail={detail} modes={detail.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">资源</Text>
+      <View className="flex flex-col gap-6">
+        <Text className="text-sm font-semibold">资源</Text>
         <ResourceGrid items={resourceItems} />
       </View>
     </View>

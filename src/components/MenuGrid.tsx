@@ -1,6 +1,5 @@
 import { Grid } from "@nutui/nutui-react-taro";
 
-import './MenuGrid.scss';
 import FilteredImage from "./FilteredImage";
 import { useContext } from "react";
 import { DataContext } from "./DataContext";

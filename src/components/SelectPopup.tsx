@@ -3,7 +3,6 @@ import { Text, View } from "@tarojs/components";
 import { Button, Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
-import './SelectPopup.scss';
 import { DataContext } from "./DataContext";
 import MenuGrid from "./MenuGrid";
 import { DetailLink, Link, Menu, MenuLink } from "./data";
@@ -85,18 +84,18 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
 
     return (
         <Popup
-            className="select-popup"
+            className="popup-root select-popup"
             visible={visible}
             position="bottom"
             title={title}
-            left={selectedLink || backStack.length > 1 ? <Button className="back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
+            left={selectedLink || backStack.length > 1 ? <Button className="btn-back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
             onClose={handleClose}
             closeable
             style={{ height: '50%', paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}
         >
-            <View className="content">
+            <View className="flex-1 p-8 overflow-y-auto">
                 {content ?? (
-                    <View style={{ padding: 16 }}>
+                    <View className="p-16">
                         <Text>加载中...</Text>
                     </View>
                 )}

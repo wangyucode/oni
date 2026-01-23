@@ -1,7 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
-import "./SelectionDetailView.scss";
 import { DetailLink } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useUnit } from "./UnitContext";
@@ -97,36 +96,26 @@ export default function BuildingDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
-
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">电力</Text>
-        <View className="selection-detail-view__kvList">
-          <View className="selection-detail-view__kv">
-            <Text className="selection-detail-view__k">功率</Text>
-            <Text className="selection-detail-view__v">{`${formatSignedFloor(totalPower)} W`}</Text>
-          </View>
+      <View className="flex gap-12">
+        <View className="flex flex-col gap-6">
+          <Text className="text-sm font-semibold">电力</Text>
+          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
-      </View>
-
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">热量</Text>
-        <View className="selection-detail-view__kvList">
-          <View className="selection-detail-view__kv">
-            <Text className="selection-detail-view__k">合计</Text>
-            <Text className="selection-detail-view__v">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
-          </View>
+        <View className="flex flex-col gap-6">
+          <Text className="text-sm font-semibold">热量</Text>
+          <Text className="text-gray-600">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
         </View>
       </View>
 
       {building.modes?.length > 0 && (
-        <View className="selection-detail-view__section">
-          <Text className="selection-detail-view__sectionTitle">模式</Text>
+        <View className="flex flex-col gap-6">
+          <Text className="text-sm font-semibold">模式</Text>
           <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 
-      <View className="selection-detail-view__section">
-        <Text className="selection-detail-view__sectionTitle">资源</Text>
+      <View className="flex flex-col gap-6">
+        <Text className="text-sm font-semibold">资源</Text>
         <ResourceGrid items={resourceItems} />
       </View>
     </View>

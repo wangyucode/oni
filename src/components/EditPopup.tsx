@@ -3,7 +3,8 @@ import { Text, View } from "@tarojs/components";
 import { Badge, Button, Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
-import "./EditPopup.scss";
+
+
 import Icon from "./icons";
 import FilteredImage from "./FilteredImage";
 import { SelectionEntry } from "./SelectionsContext";
@@ -59,16 +60,19 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
 
   return (
     <Popup
-      className="edit-popup"
+      className="popup-root"
+
       visible={visible}
       position="bottom"
       title={title}
       onClose={handleClose}
-      left={selectedEntry ? <Button className="back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
+      left={selectedEntry ? <Button className="btn-back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
+
       closeable
       style={{ height: "50%", paddingBottom: process.env.TARO_ENV === "h5" ? 50 : 0 }}
     >
-      <View className="content">
+      <View className="flex-1 p-8 overflow-y-auto">
+
         {selectedEntry ? (
           <LinkDetailView
             link={{
@@ -81,43 +85,48 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
             editKey={selectedEntry.key}
             initialCount={selectedEntry.count}
             initialModeSelections={selectedEntry.modeSelections}
-            onConfirmed={handleGoBack}
+            onConfirmed={handleClose}
           />
         ) : selections.length ? (
-          <View className="edit-popup__list">
+          <View className="flex flex-col gap-8">
+
             {selections.map((entry) => {
               const iconData = getIconData(iconMap, entry.item.name, entry.item.icon);
               const modeSummary = buildModeSummary(entry);
               return (
                 <View
-                  className="edit-popup__item"
+                  className="flex items-center gap-12 p-8 px-10 rounded-10 bg-gray-100 active-bg-gray-200"
                   key={entry.key}
                   onClick={() => setSelectedEntry(entry)}
                 >
+
                   <Badge value={entry.count} max={999}>
                     {iconData?.icon ? (
                       <FilteredImage
                         src={iconData.icon}
                         iconFilter={iconData.iconFilter}
-                        className="edit-popup__icon"
+                        className="w-40 h-40"
+
                         mode="aspectFit"
                       />
                     ) : (
                       <Icon name={entry.item.name} width={40} height={40} />
                     )}
                   </Badge>
-                  <View className="edit-popup__meta">
-                    <Text className="edit-popup__name">{entry.item.name}</Text>
-                    <Text className="edit-popup__modes">{modeSummary}</Text>
+                  <View className="flex flex-col gap-4 flex-1">
+                    <Text className="text-sm font-semibold text-ink">{entry.item.name}</Text>
+                    <Text className="text-xs text-muted">{modeSummary}</Text>
                   </View>
+
                 </View>
               );
             })}
           </View>
         ) : (
-          <View className="edit-popup__empty">
+          <View className="p-16 text-center text-muted">
             <Text>暂无选择，先添加再编辑。</Text>
           </View>
+
         )}
       </View>
     </Popup>

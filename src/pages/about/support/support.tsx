@@ -7,7 +7,6 @@ import BackButton from "src/components/back/BackButton";
 import { sharedMessage, API_BASE } from "src/components/data";
 import icon from 'src/icon.png';
 
-import './support.scss'
 
 export default function Support() {
 
@@ -36,27 +35,27 @@ export default function Support() {
     }, []);
 
     return (
-        <View className='root support'>
+        <View className='root page-support flex flex-col gap-4'>
             {process.env.TARO_ENV === 'h5' && <BackButton />}
-            <View className="header">
-                <Image className="icon" src={icon} />
-                <Text className="desc">《oni产物计算器》的更新维护离不开您的支持！您可以通过以下方式支持我。</Text>
+            <View className="flex flex-col items-center bg-white gap-8 p-16 rounded-6">
+                <Image className="w-64 h-64" src={icon} />
+                <Text className="text-sm text-gray">《oni产物计算器》的更新维护离不开您的支持！您可以通过以下方式支持我。</Text>
             </View>
             <Cell.Group className="cells">
-                <Cell className="share-cell" clickable>
-                    <Button openType="share" className="share">
-                        <Text className="share-title">分享给好友❤️</Text>
+                <Cell className="px-13 py-0" clickable>
+                    <Button openType="share" className="support-share-btn flex items-center justify-between w-full h-42 p-0 bg-transparent">
+                        <Text className="text-sm text-gray">分享给好友❤️</Text>
                         <ArrowRight size={16} />
                     </Button>
                 </Cell>
                 {
                     apps.map((item: any) => (
-                        <Cell key={item._id} className="app-cell">
-                            <Navigator className="app-navigator" openType="navigate" target="miniProgram" appId={item.appid} version="release">
-                                <Image className="app-img" src={item.img} />
-                                <View className="app-info">
-                                    <Text className="app-name">{item.name}</Text>
-                                    <Text className="app-desc">{item.note}</Text>
+                        <Cell key={item._id} className="p-0">
+                            <Navigator className="flex items-center justify-between w-full gap-8 px-16 py-13" openType="navigate" target="miniProgram" appId={item.appid} version="release">
+                                <Image className="w-64 h-64" src={item.img} />
+                                <View className="flex flex-col items-start justify-center flex-1 gap-8">
+                                    <Text className="text-base text-ink font-bold">{item.name}</Text>
+                                    <Text className="text-xs text-gray-500">{item.note}</Text>
                                 </View>
                                 <ArrowRight size={16} />
                             </Navigator>

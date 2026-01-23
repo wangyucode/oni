@@ -15,7 +15,6 @@ import EditPopup from 'src/components/EditPopup';
 import { DataContext } from 'src/components/DataContext';
 import { getIconData } from 'src/components/utils';
 
-import './index.scss'
 import { Add } from '@nutui/icons-react-taro';
 import GlobalSvgFilters from 'src/components/GlobalSvgFilters';
 
@@ -44,8 +43,9 @@ function Index() {
     setIsShowEditPopup(false);
   }
 
-  function reset() {
+  function reset(e: Event) {
     clear();
+    e.stopPropagation();
   }
 
   const convertCalories = (calories: number): { convertedValue: number, unit: string } => {
@@ -67,29 +67,29 @@ function Index() {
   const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
 
   return (
-    <View className='root index'>
-      <View className='result'>
+    <View className='root'>
+      <View className='flex flex-col flex-1 gap-8'>
         <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
           <Collapse.Item title="资源" name='资源'>
             <ResourceGrid items={resourceItems} />
           </Collapse.Item>
           <Collapse.Item title="食物" name="食物">
-            <View className="power-heat-container">
-              <Text className={`value ${convertedCalories < 0 ? "consume" : "produce"}`}>
+            <View className="text-center">
+              <Text className={`text-sm font-bold ${convertedCalories < 0 ? "consume" : "produce"}`}>
                 {`${convertedCalories < 0 ? Math.floor(convertedCalories) : '+' + Math.floor(convertedCalories)} ${caloriesUnit}`}
               </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="电力" name="电力">
-            <View className="power-heat-container">
-              <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>
-                {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.floor(totalPower)} W`}
+            <View className="text-center">
+              <Text className={`text-sm font-bold ${totalPower < 0 ? "consume" : "produce"}`}>
+                {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.floor(totalPower)} 瓦`}
               </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="热量" name="热量">
-            <View className="power-heat-container">
-              <Text className={`value ${convertedHeat < 0 ? "consume" : "produce"}`}>
+            <View className="text-center">
+              <Text className={`text-sm font-bold ${convertedHeat < 0 ? "consume" : "produce"}`}>
                 {`${convertedHeat < 0 ? Math.floor(convertedHeat) : '+' + Math.floor(convertedHeat)} ${heatUnit}`}
               </Text>
             </View>
@@ -97,12 +97,12 @@ function Index() {
         </Collapse>
 
         <Collapse
-          className='selection'
+          className='flex flex-col'
           defaultActiveName={['选择']}
           expandIcon={<Icon width={12} height={16} name='rightArrow' />}
           rotate={90}>
-          <Collapse.Item title="选择" name="选择" extra={<Button className='reset' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
-            <View className='avatar-container'>
+          <Collapse.Item title="选择" name="选择" extra={<Button className='rounded-4 text-white' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
+            <View className='flex flex-wrap gap-8 mt-8'>
               {groupedSelections.map((selection) =>
                 <View
                   key={selection.key}
@@ -125,7 +125,7 @@ function Index() {
                     })()}
                   </Badge>
                 </View>)}
-              <Button className='add' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>
+              <Button className='w-48 h-48 rounded-4 border border-primary ml-4 p-0' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>
             </View>
           </Collapse.Item>
         </Collapse>

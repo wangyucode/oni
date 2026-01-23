@@ -4,7 +4,6 @@ import { Grid } from '@nutui/nutui-react-taro';
 import Icon from './icons';
 import { useUnit, transValue } from './UnitContext';
 import { DataContext } from './DataContext';
-import './ResourceGrid.scss';
 import { calculateGridColumns } from './utils';
 import FilteredImage from './FilteredImage';
 
@@ -20,7 +19,7 @@ export interface ResourceGridProps {
 }
 
 export default function ResourceGrid({ items }: ResourceGridProps) {
-  const { weightUnit, timeUnit } = useUnit();
+  const { timeUnit } = useUnit();
   const { iconMap } = useContext(DataContext);
 
   const aggregatedResources = useMemo(() => {
@@ -56,15 +55,17 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
         unit: `单位/${timeUnit}`,
       };
     }
+    const valueByTime = transValue(value, timeUnit);
+    const useKg = Math.abs(valueByTime) >= 10000 || valueByTime % 1000 === 0;
     return {
-      convertedValue: transValue(value, weightUnit, timeUnit),
-      unit: `${weightUnit}/${timeUnit}`
+      convertedValue: useKg ? valueByTime / 1000 : valueByTime,
+      unit: `${useKg ? "千克" : "克"}/${timeUnit}`
     };
   };
 
   if (sortedResources.length === 0) {
     return (
-      <View className="resource-grid__empty">
+      <View className="py-8 text-center text-muted">
         <Text>无</Text>
       </View>
     );
@@ -86,11 +87,11 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
         return (
           <Grid.Item key={name}>
             {iconSrc ? <FilteredImage src={iconSrc} iconFilter={iconFilter} style={{ width: 48, height: 48 }} mode="aspectFit" /> : <Icon name={name} width={48} height={48} />}
-            <Text className='resource-grid__name'>{name}</Text>
-            <Text className={`resource-grid__value ${type}`}>
+            <Text className='text-xs'>{name}</Text>
+            <Text className={`text-sm font-bold ${type}`}>
               {valueStr}
             </Text>
-            <Text className={`resource-grid__unit ${type}`}>{unit}</Text>
+            <Text className={`text-10 ${type}`}>{unit}</Text>
           </Grid.Item>
         );
       })}

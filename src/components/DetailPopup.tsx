@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { View } from "@tarojs/components";
 import { Popup } from "@nutui/nutui-react-taro";
 
-import "./DetailPopup.scss";
 import { DetailLink } from "./data";
 import LinkDetailView from "./LinkDetailView";
 import { SelectionEntry } from "./SelectionsContext";
@@ -25,7 +24,7 @@ export default function DetailPopup({ visible, entry, onClose }: DetailPopupProp
 
   return (
     <Popup
-      className="detail-popup"
+      className="popup-root"
       visible={visible && Boolean(entry)}
       position="bottom"
       title={entry?.item.name || "详情"}
@@ -33,7 +32,7 @@ export default function DetailPopup({ visible, entry, onClose }: DetailPopupProp
       closeable
       style={{ height: "50%", paddingBottom: process.env.TARO_ENV === "h5" ? 50 : 0 }}
     >
-      <View className="content">
+      <View className="flex-1 p-8 overflow-y-auto">
         {entry && link ? (
           <LinkDetailView
             link={link}
