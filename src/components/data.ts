@@ -74,7 +74,6 @@ export interface Mode {
 
 export interface Option {
   name: string;
-  type: "radio" | "slider" | "checkbox";
   resources: ResourceMap;
 }
 

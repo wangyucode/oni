@@ -5,12 +5,7 @@ import { debounce } from "@tarojs/runtime";
 import { Link, LinkDetail, Menu } from "./data";
 import { ResourceItem } from "./ResourceGrid";
 import { calculateSelectionTotals, ResourceUnitKind } from "./selection/calc";
-import {
-  ModeSelections,
-  buildDefaultModeSelections,
-  inferModeSelectionType,
-  normalizeModeSelections,
-} from "./selection/modeSelection";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
 import { DataContext } from "./DataContext";
 
 export type SelectionItem = Pick<Link, "name" | "icon">;
@@ -85,28 +80,9 @@ function inferDetailKind(detail: LinkDetail): string {
   return "unknown";
 }
 
-function serializeBooleanRecord(record: Record<string, boolean> | undefined): string {
-  const entries = Object.entries(record || {}).sort(([a], [b]) => a.localeCompare(b, "zh-CN"));
-  return entries.map(([k, v]) => `${encodeURIComponent(k)}=${v ? 1 : 0}`).join(",");
-}
-
-function serializeNumberRecord(record: Record<string, number> | undefined): string {
-  const entries = Object.entries(record || {}).sort(([a], [b]) => a.localeCompare(b, "zh-CN"));
-  return entries
-    .map(([k, v]) => `${encodeURIComponent(k)}=${Number.isFinite(Number(v)) ? Number(v) : 0}`)
-    .join(",");
-}
-
 function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
   const normalized = normalizeModeSelections(detail, raw);
-  return normalized
-    .map((sel) => {
-      if (sel.type === "radio") return `r:${encodeURIComponent(sel.selected || "")}`;
-      if (sel.type === "checkbox") return `c:${serializeBooleanRecord(sel.checked)}`;
-      if (sel.type === "slider") return `s:${serializeNumberRecord(sel.values)}`;
-      return "u:";
-    })
-    .join("|");
+  return normalized.map((sel) => encodeURIComponent(sel || "")).join("|");
 }
 
 function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {
@@ -429,22 +405,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
           const options = Array.isArray(mode?.options) ? mode.options : [];
           const hasFlush = options.some((o: any) => o?.name === "抽水马桶");
           if (!hasFlush) return sel;
-          const modeType = inferModeSelectionType(mode);
-          if (modeType === "radio") {
-            return { type: "radio", selected: "抽水马桶" } as const;
-          }
-          if (modeType === "checkbox") {
-            const checked: Record<string, boolean> = {};
-            options.forEach((o: any) => {
-              checked[String(o?.name || "")] = String(o?.name || "") === "抽水马桶";
-            });
-            return { type: "checkbox", checked } as const;
-          }
-          const values: Record<string, number> = {};
-          options.forEach((o: any) => {
-            values[String(o?.name || "")] = String(o?.name || "") === "抽水马桶" ? 100 : 0;
-          });
-          return { type: "slider", values } as const;
+          return "抽水马桶" as const;
         });
 
         dispatch({
