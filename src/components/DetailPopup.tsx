@@ -41,6 +41,7 @@ export default function DetailPopup({ visible, entry, onClose }: DetailPopupProp
             editKey={entry.key}
             initialCount={entry.count}
             initialModeSelections={entry.modeSelections}
+            initialEfficiency={entry.efficiency}
             onConfirmed={onClose}
           />
         ) : null}

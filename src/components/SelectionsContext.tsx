@@ -17,6 +17,7 @@ export type SelectionEntry = {
   detail: LinkDetail;
   count: number;
   modeSelections: ModeSelections;
+  efficiency?: number;
 };
 
 type SavedSelectionEntry = SelectionEntry;
@@ -49,6 +50,7 @@ type UpsertPayload = {
   count: number;
   modeSelections: ModeSelections;
   categoryPath: string[];
+  efficiency?: number;
 };
 
 export type SelectionsActions = {
@@ -94,10 +96,11 @@ function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): strin
   return normalized.map((sel) => encodeURIComponent(sel || "")).join("|");
 }
 
-function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {
+function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections, efficiency?: number): string {
   const kind = inferDetailKind(detail);
   const modeKey = serializeModeSelections(detail, modeSelections);
-  return `${kind}::${itemName}::${modeKey}`;
+  const efficiencyKey = efficiency !== undefined && efficiency !== 100 ? `::eff${efficiency}` : "";
+  return `${kind}::${itemName}::${modeKey}${efficiencyKey}`;
 }
 
 function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
@@ -174,7 +177,8 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   if (!detail || !Array.isArray(detail.modes)) return null;
 
   const modeSelections = normalizeModeSelections(detail as LinkDetail, raw.modeSelections);
-  const key = createSelectionKey(item.name, detail as LinkDetail, modeSelections);
+  const efficiency = raw.efficiency !== undefined ? Number(raw.efficiency) : undefined;
+  const key = createSelectionKey(item.name, detail as LinkDetail, modeSelections, efficiency);
 
   return {
     key,
@@ -183,6 +187,7 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
     detail: detail as LinkDetail,
     count,
     modeSelections,
+    efficiency,
   };
 }
 
@@ -251,7 +256,8 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
   switch (action.type) {
     case "upsert": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.detail, action.payload.modeSelections);
-      const key = createSelectionKey(action.payload.item.name, action.payload.detail, normalizedModeSelections);
+      const efficiency = action.payload.efficiency;
+      const key = createSelectionKey(action.payload.item.name, action.payload.detail, normalizedModeSelections, efficiency);
       if (action.payload.count <= 0) {
         return {
           selections: state.selections.filter((s) => s.key !== key),
@@ -272,6 +278,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
             detail: action.payload.detail,
             modeSelections: normalizedModeSelections,
             count: nextCount,
+            efficiency,
           };
         }
       } else {
@@ -282,13 +289,15 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           detail: action.payload.detail,
           count: action.payload.count,
           modeSelections: normalizedModeSelections,
+          efficiency,
         });
       }
       return { selections: nextSelections };
     }
     case "update": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.next.detail, action.payload.next.modeSelections);
-      const nextKey = createSelectionKey(action.payload.next.item.name, action.payload.next.detail, normalizedModeSelections);
+      const efficiency = action.payload.next.efficiency;
+      const nextKey = createSelectionKey(action.payload.next.item.name, action.payload.next.detail, normalizedModeSelections, efficiency);
       const fromKey = action.payload.fromKey;
 
       const baseSelections = state.selections.filter((s) => s.key !== fromKey);
@@ -310,6 +319,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           modeSelections: normalizedModeSelections,
           categoryPath: action.payload.next.categoryPath,
           count: existing.count + count,
+          efficiency,
         };
       } else {
         nextSelections.push({
@@ -319,6 +329,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           modeSelections: normalizedModeSelections,
           categoryPath: action.payload.next.categoryPath,
           count,
+          efficiency,
         });
       }
 
@@ -359,7 +370,7 @@ function buildSummary(selections: SelectionEntry[]): SelectionsSummary {
   };
 
   selections.forEach((selection) => {
-    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections);
+    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections, selection.efficiency);
     totalPower += totals.totalPower;
     totalHeat += totals.totalHeat;
     totalCalories += totals.totalCalories;
@@ -402,6 +413,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         detail: s.detail,
         count: s.count,
         modeSelections: s.modeSelections,
+        efficiency: s.efficiency,
       }));
       Taro.setStorage({
         key: "selections",

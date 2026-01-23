@@ -12,6 +12,7 @@ export type LinkDetailViewProps = {
   editKey?: string;
   initialCount?: number;
   initialModeSelections?: ModeSelections;
+  initialEfficiency?: number;
   onConfirmed?: () => void;
 };
 

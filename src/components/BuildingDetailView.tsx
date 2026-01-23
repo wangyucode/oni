@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
+import {InputNumber, Range} from "@nutui/nutui-react-taro";
 
 import { DetailLink } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
@@ -21,6 +22,7 @@ export type BuildingDetailViewProps = {
   editKey?: string;
   initialCount?: number;
   initialModeSelections?: ModeSelections;
+  initialEfficiency?: number;
   onConfirmed?: () => void;
 };
 
@@ -31,6 +33,7 @@ export default function BuildingDetailView({
   editKey,
   initialCount,
   initialModeSelections,
+  initialEfficiency,
   onConfirmed,
 }: BuildingDetailViewProps) {
   if (!isBuildingDetail(link.detail)) return null;
@@ -41,6 +44,7 @@ export default function BuildingDetailView({
   const iconData = getIconData(iconMap, link.name, link.icon);
 
   const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
+  const [efficiency, setEfficiency] = useState<number>(mode === "edit" ? (initialEfficiency ?? 100) : 100);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(building, initialModeSelections);
     return buildDefaultModeSelections(building);
@@ -49,18 +53,20 @@ export default function BuildingDetailView({
   useEffect(() => {
     if (mode === "edit") {
       setCount(Math.max(0, Number(initialCount ?? 1) || 0));
+      setEfficiency(initialEfficiency ?? 100);
       setModeSelections(initialModeSelections ? normalizeModeSelections(building, initialModeSelections) : buildDefaultModeSelections(building));
       return;
     }
     setCount(1);
+    setEfficiency(100);
     setModeSelections(buildDefaultModeSelections(building));
-  }, [building, initialCount, initialModeSelections, link.name, mode]);
+  }, [building, initialCount, initialEfficiency, initialModeSelections, link.name, mode]);
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(building, modeSelections), [building, modeSelections]);
 
   const { resources, resourceKinds, totalPower, totalHeat } = useMemo(() => {
-    return calculateSelectionTotals(building, count, normalizedModeSelections);
-  }, [building, count, normalizedModeSelections]);
+    return calculateSelectionTotals(building, count, normalizedModeSelections, efficiency);
+  }, [building, count, normalizedModeSelections, efficiency]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({ name, value, count: 1, kind: resourceKinds[name] || "mass" }));
@@ -75,6 +81,7 @@ export default function BuildingDetailView({
       count,
       modeSelections,
       categoryPath,
+      efficiency,
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);
@@ -96,13 +103,30 @@ export default function BuildingDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
+      <View className="flex flex-col gap-6">
+        <Text className="text-sm font-semibold">效率</Text>
+        <View className="flex gap-6 items-center">
+          <Range
+            min={0}
+            max={100}
+            step={1}
+            value={efficiency}
+            onChange={(val) => setEfficiency(Array.isArray(val) ? val[0] : val)}
+            maxDescription={null}
+            minDescription={null}
+            currentDescription={null}
+          />
+          <InputNumber min={0} max={100} step={1} value={efficiency} onChange={(val) => setEfficiency(Number(val))} />
+          <Text className="text-gray-600">%</Text>
+        </View>
+      </View>
       <View className="flex justify-between">
         <View className="flex gap-12">
-          <Text className="text-sm font-semibold">电力:</Text>
+          <Text className="text-sm font-semibold">电力</Text>
           <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
         <View className="flex gap-12">
-          <Text className="text-sm font-semibold">热量:</Text>
+          <Text className="text-sm font-semibold">热量</Text>
           <Text className="text-gray-600">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
         </View>
       </View>

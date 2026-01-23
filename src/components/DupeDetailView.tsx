@@ -110,26 +110,16 @@ export default function DupeDetailView({
       />
 
       {isBionic && dupe.power ? (
-        <View className="flex flex-col gap-6">
+        <View className="flex gap-12">
           <Text className="text-sm font-semibold">电力</Text>
-          <View className="flex flex-col gap-6">
-            <View className="flex items-start justify-between gap-12">
-              <Text className="text-gray max-w-55 break-all flex-none">功率</Text>
-              <Text className="text-gray-600 flex-1 text-right break-all">{`${formatSignedFloor(totalPower)} W`}</Text>
-            </View>
-          </View>
+          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
       ) : null}
 
       {isDupe && dupe.calorie ? (
-        <View className="flex flex-col gap-6">
+        <View className="flex gap-12">
           <Text className="text-sm font-semibold">卡路里</Text>
-          <View className="flex flex-col gap-6">
-            <View className="flex items-start justify-between gap-12">
-              <Text className="text-gray max-w-55 break-all flex-none">合计</Text>
-              <Text className="text-gray-600 flex-1 text-right break-all">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
-            </View>
-          </View>
+          <Text className="text-gray-600">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
         </View>
       ) : null}
 
