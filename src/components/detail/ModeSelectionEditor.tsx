@@ -1,4 +1,3 @@
-import { View } from "@tarojs/components";
 import { Collapse, Radio, RadioGroup } from "@nutui/nutui-react-taro";
 
 import Icon from "../icons";
