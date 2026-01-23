@@ -8,10 +8,10 @@ import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
 import ResourceGrid from 'src/components/ResourceGrid';
 import { useUnit } from 'src/components/UnitContext';
-import { SelectionEntry, useSelections, useSelectionsActions } from 'src/components/SelectionsContext';
+import { useSelections, useSelectionsActions } from 'src/components/SelectionsContext';
 import { sharedMessage } from 'src/components/data';
 import FilteredImage from 'src/components/FilteredImage';
-import DetailPopup from 'src/components/DetailPopup';
+import EditPopup from 'src/components/EditPopup';
 import { DataContext } from 'src/components/DataContext';
 import { getIconData } from 'src/components/utils';
 
@@ -26,8 +26,7 @@ function Index() {
   useShareAppMessage(() => sharedMessage);
   const { timeUnit } = useUnit();
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
-  const [isShowDetailPopup, setIsShowDetailPopup] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<SelectionEntry | null>(null);
+  const [isShowEditPopup, setIsShowEditPopup] = useState(false);
   const { selections, summary } = useSelections();
   const { clear } = useSelectionsActions();
   const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
@@ -41,9 +40,8 @@ function Index() {
     setIsShowSelectPopup(false);
   }
 
-  function onDetailPopupClose() {
-    setIsShowDetailPopup(false);
-    setEditingEntry(null);
+  function onEditPopupClose() {
+    setIsShowEditPopup(false);
   }
 
   function reset() {
@@ -109,8 +107,7 @@ function Index() {
                 <View
                   key={selection.key}
                   onClick={() => {
-                    setEditingEntry(selection);
-                    setIsShowDetailPopup(true);
+                    setIsShowEditPopup(true);
                   }}
                 >
                   <Badge value={selection.count} max={999}>
@@ -134,7 +131,11 @@ function Index() {
         </Collapse>
       </View>
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
-      <DetailPopup visible={isShowDetailPopup} entry={editingEntry} onClose={onDetailPopupClose} />
+      <EditPopup
+        visible={isShowEditPopup}
+        selections={selections}
+        onClose={onEditPopupClose}
+      />
       <GlobalSvgFilters />
     </View>
   )
