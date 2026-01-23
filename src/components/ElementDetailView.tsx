@@ -95,7 +95,7 @@ export default function ElementDetailView({
         onAction={handlePrimaryAction}
       />
 
-      {detail.modes?.length > 0 && (
+      {detail.modes && detail.modes.length > 0 && (
         <View className="flex flex-col gap-6">
           <Text className="text-sm font-semibold">模式</Text>
           <ModeSelectionEditor detail={detail} modes={detail.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />

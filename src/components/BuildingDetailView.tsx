@@ -131,7 +131,7 @@ export default function BuildingDetailView({
         </View>
       </View>
 
-      {building.modes?.length > 0 && (
+      {building.modes && building.modes.length > 0 && (
         <View className="flex flex-col gap-6">
           <Text className="text-sm font-semibold">模式</Text>
           <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />

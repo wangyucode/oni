@@ -117,23 +117,39 @@ function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
 }
 
 function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionEntry[] {
-  const grouped = new Map<string, GroupedSelectionEntry>();
+  const grouped = new Map<string, { entry: GroupedSelectionEntry; rawCount: number }>();
   selections.forEach((selection) => {
     const categoryKey = selection.categoryPath.join(">");
     const groupKey = `${categoryKey}::${selection.item.name}`;
+    const kind = inferDetailKind(selection.detail);
+
+    let contribution = selection.count;
+    if (kind === "building") {
+      contribution = (selection.count * (selection.efficiency ?? 100)) / 100;
+    }
+
     const existing = grouped.get(groupKey);
     if (existing) {
-      grouped.set(groupKey, { ...existing, count: existing.count + selection.count });
+      existing.rawCount += contribution;
     } else {
       grouped.set(groupKey, {
-        key: groupKey,
-        categoryPath: selection.categoryPath,
-        item: selection.item,
-        count: selection.count,
+        entry: {
+          key: groupKey,
+          categoryPath: selection.categoryPath,
+          item: selection.item,
+          count: 0,
+        },
+        rawCount: contribution,
       });
     }
   });
-  return Array.from(grouped.values()).filter((s) => s.count > 0);
+
+  return Array.from(grouped.values())
+    .map(({ entry, rawCount }) => ({
+      ...entry,
+      count: Math.ceil(rawCount),
+    }))
+    .filter((s) => s.count > 0);
 }
 
 function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {

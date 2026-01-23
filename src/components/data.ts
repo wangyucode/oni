@@ -41,10 +41,10 @@ export interface DupeDetail {
 }
 
 export interface BuildingDetail {
-  resources: ResourceMap;
+  resources?: ResourceMap;
   power?: string;
   heat?: string;
-  modes: Mode[];
+  modes?: Mode[];
 }
 
 export interface CreatureDetail {
