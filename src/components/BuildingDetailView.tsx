@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 import {InputNumber, Range} from "@nutui/nutui-react-taro";
 
-import { DetailLink } from "./data";
+import { BuildingDetail, DetailLink } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useUnit } from "./UnitContext";
 import { useSelectionsActions } from "./SelectionsContext";
@@ -11,7 +11,6 @@ import { calculateSelectionTotals } from "./selection/calc";
 import SelectionDetailHeader from "./detail/SelectionDetailHeader";
 import ModeSelectionEditor from "./detail/ModeSelectionEditor";
 import { convertHeat, formatSignedFloor } from "./detail/formatters";
-import { isBuildingDetail } from "./detail/typeGuards";
 import { DataContext } from "./DataContext";
 import { getIconData } from "./utils";
 
@@ -36,8 +35,7 @@ export default function BuildingDetailView({
   initialEfficiency,
   onConfirmed,
 }: BuildingDetailViewProps) {
-  if (!isBuildingDetail(link.detail)) return null;
-  const building = link.detail;
+  const building = link.detail as BuildingDetail;
   const { timeUnit } = useUnit();
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);

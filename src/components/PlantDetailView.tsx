@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
-import { CreatureDetail, DetailLink, LinkDetail, PlantDetail } from "./data";
+import { DetailLink, PlantDetail } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useSelectionsActions } from "./SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
@@ -11,7 +11,7 @@ import ModeSelectionEditor from "./detail/ModeSelectionEditor";
 import { DataContext } from "./DataContext";
 import { getIconData } from "./utils";
 
-export type LifeDetailViewProps = {
+export type PlantDetailViewProps = {
   link: DetailLink;
   categoryPath?: string[];
   mode?: "add" | "edit";
@@ -21,17 +21,7 @@ export type LifeDetailViewProps = {
   onConfirmed?: () => void;
 };
 
-function isLifeDetail(detail: LinkDetail | undefined): detail is CreatureDetail | PlantDetail {
-  return (
-    typeof detail === "object" &&
-    detail !== null &&
-    "life" in detail &&
-    "resources" in detail &&
-    "modes" in detail
-  );
-}
-
-export default function LifeDetailView({
+export default function PlantDetailView({
   link,
   categoryPath = [],
   mode = "add",
@@ -39,34 +29,33 @@ export default function LifeDetailView({
   initialCount,
   initialModeSelections,
   onConfirmed,
-}: LifeDetailViewProps) {
-  if (!isLifeDetail(link.detail)) return null;
-  const detail = link.detail;
+}: PlantDetailViewProps) {
+  const plant = link.detail as PlantDetail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
   const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
-    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(detail, initialModeSelections);
-    return buildDefaultModeSelections(detail);
+    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(plant, initialModeSelections);
+    return buildDefaultModeSelections(plant);
   });
 
   useEffect(() => {
     if (mode === "edit") {
       setCount(Math.max(0, Number(initialCount ?? 1) || 0));
-      setModeSelections(initialModeSelections ? normalizeModeSelections(detail, initialModeSelections) : buildDefaultModeSelections(detail));
+      setModeSelections(initialModeSelections ? normalizeModeSelections(plant, initialModeSelections) : buildDefaultModeSelections(plant));
       return;
     }
     setCount(1);
-    setModeSelections(buildDefaultModeSelections(detail));
-  }, [detail, initialCount, initialModeSelections, link.name, mode]);
+    setModeSelections(buildDefaultModeSelections(plant));
+  }, [plant, initialCount, initialModeSelections, link.name, mode]);
 
-  const normalizedModeSelections = useMemo(() => normalizeModeSelections(detail, modeSelections), [detail, modeSelections]);
+  const normalizedModeSelections = useMemo(() => normalizeModeSelections(plant, modeSelections), [plant, modeSelections]);
 
   const { resources, resourceKinds } = useMemo(() => {
-    return calculateSelectionTotals(detail, count, normalizedModeSelections);
-  }, [count, detail, normalizedModeSelections]);
+    return calculateSelectionTotals(plant, count, normalizedModeSelections);
+  }, [count, plant, normalizedModeSelections]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({
@@ -80,7 +69,7 @@ export default function LifeDetailView({
   function handlePrimaryAction(): void {
     const payload = {
       item: { name: link.name, icon: link.icon },
-      detail,
+      detail: plant,
       count,
       modeSelections,
       categoryPath,
@@ -106,22 +95,17 @@ export default function LifeDetailView({
         onAction={handlePrimaryAction}
       />
 
-      {detail.life ? (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">寿命</Text>
-          <View className="flex flex-col gap-6">
-            <View className="flex items-start justify-between gap-12">
-              <Text className="text-gray max-w-55 break-all flex-none">寿命</Text>
-              <Text className="text-gray-600 flex-1 text-right break-all">{detail.life}</Text>
-            </View>
-          </View>
+      {plant.life ? (
+        <View className="flex gap-12">
+          <Text className="text-sm font-semibold">生长</Text>
+          <Text className="text-gray-600">{plant.life}</Text>
         </View>
       ) : null}
 
-      {detail.modes?.length > 0 && (
+      {plant.modes?.length > 0 && (
         <View className="flex flex-col gap-6">
           <Text className="text-sm font-semibold">模式</Text>
-          <ModeSelectionEditor detail={detail} modes={detail.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
+          <ModeSelectionEditor detail={plant} modes={plant.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 

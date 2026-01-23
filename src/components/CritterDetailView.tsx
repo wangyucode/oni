@@ -1,19 +1,17 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
-import { DetailLink, DupeDetail } from "./data";
+import { CreatureDetail, DetailLink } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
-import { useUnit } from "./UnitContext";
 import { useSelectionsActions } from "./SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
 import { calculateSelectionTotals } from "./selection/calc";
 import SelectionDetailHeader from "./detail/SelectionDetailHeader";
 import ModeSelectionEditor from "./detail/ModeSelectionEditor";
-import { convertCalories, formatSignedFloor } from "./detail/formatters";
 import { DataContext } from "./DataContext";
 import { getIconData } from "./utils";
 
-export type DupeDetailViewProps = {
+export type CritterDetailViewProps = {
   link: DetailLink;
   categoryPath?: string[];
   mode?: "add" | "edit";
@@ -23,7 +21,7 @@ export type DupeDetailViewProps = {
   onConfirmed?: () => void;
 };
 
-export default function DupeDetailView({
+export default function CritterDetailView({
   link,
   categoryPath = [],
   mode = "add",
@@ -31,36 +29,33 @@ export default function DupeDetailView({
   initialCount,
   initialModeSelections,
   onConfirmed,
-}: DupeDetailViewProps) {
-  const dupe = link.detail as DupeDetail;
-  const { timeUnit } = useUnit();
+}: CritterDetailViewProps) {
+  const critter = link.detail as CreatureDetail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
-  const [count, setCount] = useState<number>(
-    mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1
-  );
+  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
-    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(dupe, initialModeSelections);
-    return buildDefaultModeSelections(dupe);
+    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(critter, initialModeSelections);
+    return buildDefaultModeSelections(critter);
   });
 
   useEffect(() => {
     if (mode === "edit") {
       setCount(Math.max(0, Number(initialCount ?? 1) || 0));
-      setModeSelections(initialModeSelections ? normalizeModeSelections(dupe, initialModeSelections) : buildDefaultModeSelections(dupe));
+      setModeSelections(initialModeSelections ? normalizeModeSelections(critter, initialModeSelections) : buildDefaultModeSelections(critter));
       return;
     }
     setCount(1);
-    setModeSelections(buildDefaultModeSelections(dupe));
-  }, [link.name, dupe, mode, initialCount, initialModeSelections]);
+    setModeSelections(buildDefaultModeSelections(critter));
+  }, [critter, initialCount, initialModeSelections, link.name, mode]);
 
-  const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
+  const normalizedModeSelections = useMemo(() => normalizeModeSelections(critter, modeSelections), [critter, modeSelections]);
 
-  const { resources, resourceKinds, totalPower, totalCalories } = useMemo(() => {
-    return calculateSelectionTotals(dupe, count, normalizedModeSelections);
-  }, [count, dupe, normalizedModeSelections]);
+  const { resources, resourceKinds } = useMemo(() => {
+    return calculateSelectionTotals(critter, count, normalizedModeSelections);
+  }, [count, critter, normalizedModeSelections]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({
@@ -71,17 +66,10 @@ export default function DupeDetailView({
     }));
   }, [resources, resourceKinds]);
 
-  const isDupe = link.name.includes("复制人");
-  const isBionic = link.name.includes("仿生人");
-  const { convertedValue: convertedCalories, unit: caloriesUnit } = useMemo(
-    () => convertCalories(totalCalories, timeUnit),
-    [timeUnit, totalCalories]
-  );
-
   function handlePrimaryAction(): void {
     const payload = {
       item: { name: link.name, icon: link.icon },
-      detail: dupe,
+      detail: critter,
       count,
       modeSelections,
       categoryPath,
@@ -107,24 +95,17 @@ export default function DupeDetailView({
         onAction={handlePrimaryAction}
       />
 
-      {isBionic && dupe.power ? (
+      {critter.life ? (
         <View className="flex gap-12">
-          <Text className="text-sm font-semibold">电力</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
+          <Text className="text-sm font-semibold">寿命</Text>
+          <Text className="text-gray-600">{critter.life}</Text>
         </View>
       ) : null}
 
-      {isDupe && dupe.calorie ? (
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">卡路里</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
-        </View>
-      ) : null}
-
-      {dupe.modes?.length > 0 && (
+      {critter.modes?.length > 0 && (
         <View className="flex flex-col gap-6">
           <Text className="text-sm font-semibold">模式</Text>
-          <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
+          <ModeSelectionEditor detail={critter} modes={critter.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 

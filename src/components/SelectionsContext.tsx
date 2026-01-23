@@ -211,17 +211,6 @@ function findDupeDetail(data: Menu): { link: Link; categoryPath: string[] } | nu
   const visited = new WeakSet<Menu>();
   let fallback: { link: Link; categoryPath: string[] } | null = null;
 
-  const isDupeDetail = (detail: LinkDetail | undefined): detail is any => {
-    return (
-      typeof detail === "object" &&
-      detail !== null &&
-      "resources" in detail &&
-      "modes" in detail &&
-      !("heat" in detail) &&
-      !("life" in detail)
-    );
-  };
-
   const hasOptionName = (detail: any, optionName: string): boolean => {
     const modes = Array.isArray(detail?.modes) ? detail.modes : [];
     return modes.some((mode: any) => {
@@ -238,7 +227,7 @@ function findDupeDetail(data: Menu): { link: Link; categoryPath: string[] } | nu
     const items = Array.isArray(menu.items) ? menu.items : [];
 
     for (const item of items) {
-      if (item?.detail && isDupeDetail(item.detail)) {
+      if (item?.detail && "resources" in item.detail && "modes" in item.detail && !("heat" in item.detail) && !("life" in item.detail)) {
         const candidate = { link: item, categoryPath: buildCategoryPath(stack) };
         if (!fallback) fallback = candidate;
         if (hasOptionName(item.detail, "抽水马桶")) {
