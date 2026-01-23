@@ -19,10 +19,9 @@ interface EditPopupProps {
   onClose: () => void;
 }
 
-function buildModeSummary(entry: SelectionEntry): string {
+function buildSummary(entry: SelectionEntry): string {
   const detailAny = entry.detail as any;
   const modes = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
-  if (!modes.length) return "无模式";
   const normalized = normalizeModeSelections(entry.detail, entry.modeSelections);
   const parts = modes
     .map((mode: any, idx: number) => {
@@ -34,7 +33,12 @@ function buildModeSummary(entry: SelectionEntry): string {
       return `${name}：${selected}`;
     })
     .filter(Boolean);
-  return parts.length ? parts.join(" · ") : "无模式";
+
+  if (entry.efficiency !== undefined && entry.efficiency !== 100) {
+    parts.unshift(`效率：${entry.efficiency}%`);
+  }
+
+  return parts.length ? parts.join(" ｜ ") : "无模式";
 }
 
 export default function EditPopup({ visible, selections, onClose }: EditPopupProps) {
@@ -83,6 +87,7 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
             editKey={selectedEntry.key}
             initialCount={selectedEntry.count}
             initialModeSelections={selectedEntry.modeSelections}
+            initialEfficiency={selectedEntry.efficiency}
             onConfirmed={handleClose}
           />
         ) : selections.length ? (
@@ -90,7 +95,7 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
 
             {selections.map((entry) => {
               const iconData = getIconData(iconMap, entry.item.name, entry.item.icon);
-              const modeSummary = buildModeSummary(entry);
+              const summary = buildSummary(entry);
               return (
                 <View
                   className="flex items-center gap-12 p-8 px-10 rounded-10 bg-gray-100 active-bg-gray-200"
@@ -113,7 +118,7 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
                   </Badge>
                   <View className="flex flex-col gap-4 flex-1">
                     <Text className="text-sm font-semibold text-ink">{entry.item.name}</Text>
-                    <Text className="text-xs text-muted">{modeSummary}</Text>
+                    <Text className="text-xs text-muted">{summary}</Text>
                   </View>
 
                 </View>
