@@ -1,5 +1,5 @@
 
-import { useContext, useState } from 'react';
+import { MouseEvent, useContext, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { Badge, Button, Collapse } from '@nutui/nutui-react-taro'
@@ -43,7 +43,7 @@ function Index() {
     setIsShowEditPopup(false);
   }
 
-  function reset(e: Event) {
+  function reset(e: MouseEvent) {
     clear();
     e.stopPropagation();
   }

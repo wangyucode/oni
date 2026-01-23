@@ -24,8 +24,8 @@ export default function ModeSelectionEditor({
     <Collapse defaultActiveName={modes.map((_, i) => String(i))} expandIcon={<Icon width={12} height={16} name="rightArrow" />} rotate={90}>
       {modes.map((mode, modeIndex) => (
         <Collapse.Item title={mode.name} name={String(modeIndex)} key={`${mode.name}-${modeIndex}`}>
-          <View className="flex flex-col gap-10 py-8">
             <RadioGroup
+              className="flex-wrap"
               direction="horizontal"
               value={normalized[modeIndex] || mode.options[0]?.name || ""}
               onChange={(value) => {
@@ -41,7 +41,6 @@ export default function ModeSelectionEditor({
                 </Radio>
               ))}
             </RadioGroup>
-          </View>
         </Collapse.Item>
       ))}
     </Collapse>

@@ -91,7 +91,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
             left={selectedLink || backStack.length > 1 ? <Button className="btn-back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
             onClose={handleClose}
             closeable
-            style={{ height: '50%', paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}
+            style={{ maxHeight: '50%', paddingBottom: process.env.TARO_ENV === 'h5' ? 50 : 0 }}
         >
             <View className="flex-1 p-8 overflow-y-auto">
                 {content ?? (

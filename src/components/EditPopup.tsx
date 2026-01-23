@@ -61,15 +61,13 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
   return (
     <Popup
       className="popup-root"
-
       visible={visible}
       position="bottom"
       title={title}
       onClose={handleClose}
       left={selectedEntry ? <Button className="btn-back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
-
       closeable
-      style={{ height: "50%", paddingBottom: process.env.TARO_ENV === "h5" ? 50 : 0 }}
+      style={{ maxHeight: "50%", paddingBottom: process.env.TARO_ENV === "h5" ? 50 : 0 }}
     >
       <View className="flex-1 p-8 overflow-y-auto">
 

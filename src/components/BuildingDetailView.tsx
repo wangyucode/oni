@@ -96,13 +96,13 @@ export default function BuildingDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
-      <View className="flex gap-12">
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">电力</Text>
+      <View className="flex justify-between">
+        <View className="flex gap-12">
+          <Text className="text-sm font-semibold">电力:</Text>
           <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">热量</Text>
+        <View className="flex gap-12">
+          <Text className="text-sm font-semibold">热量:</Text>
           <Text className="text-gray-600">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
         </View>
       </View>

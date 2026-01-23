@@ -114,6 +114,10 @@ page,
             display: flex;
             flex-direction: column;
             overflow: hidden;
+
+            &.nut-popup-slide-bottom-exit-done{
+                display: none;
+            }
         }
 
         .select-popup {
