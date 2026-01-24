@@ -7,6 +7,7 @@ import BackButton from "src/components/back/BackButton";
 import { sharedMessage, API_BASE } from "src/components/data";
 import icon from 'src/icon.png';
 
+import './support.scss';
 
 export default function Support() {
 
@@ -35,7 +36,7 @@ export default function Support() {
     }, []);
 
     return (
-        <View className='page page-support flex flex-col gap-4'>
+        <View className='page support flex flex-col gap-4'>
             {process.env.TARO_ENV === 'h5' && <BackButton />}
             <View className="flex flex-col items-center bg-white gap-8 p-16 rounded-6">
                 <Image className="w-64 h-64" src={icon} />
@@ -43,7 +44,7 @@ export default function Support() {
             </View>
             <Cell.Group className="cells">
                 <Cell className="px-13 py-0" clickable>
-                    <Button openType="share" className="support-share-btn flex items-center justify-between w-full h-42 p-0 bg-transparent">
+                    <Button openType="share" className="btn-share flex items-center justify-between w-full h-42 p-0 bg-transparent">
                         <Text className="text-sm text-gray">分享给好友❤️</Text>
                         <ArrowRight size={16} />
                     </Button>

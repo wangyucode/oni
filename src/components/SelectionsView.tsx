@@ -1,5 +1,6 @@
 import { Text, View } from "@tarojs/components";
 import { Badge } from "@nutui/nutui-react-taro";
+import { Del } from "@nutui/icons-react-taro";
 
 import Icon from "./icons";
 import FilteredImage from "./FilteredImage";
@@ -12,6 +13,7 @@ interface SelectionsViewProps {
   selections: SelectionEntry[];
   iconMap: Map<string, IconData>;
   onSelect: (entry: SelectionEntry) => void;
+  onRemove?: (key: string) => void;
 }
 
 function buildSummary(entry: SelectionEntry): string {
@@ -36,7 +38,7 @@ function buildSummary(entry: SelectionEntry): string {
   return parts.length ? parts.join(" ｜ ") : "无模式";
 }
 
-export default function SelectionsView({ selections, iconMap, onSelect }: SelectionsViewProps) {
+export default function SelectionsView({ selections, iconMap, onSelect, onRemove }: SelectionsViewProps) {
   if (!selections.length) {
     return (
       <View className="p-16 text-center text-muted">
@@ -68,10 +70,21 @@ export default function SelectionsView({ selections, iconMap, onSelect }: Select
                 <Icon name={entry.item.name} width={40} height={40} />
               )}
             </Badge>
-            <View className="flex flex-col gap-4 flex-1">
-              <Text className="text-sm font-semibold text-ink">{entry.item.name}</Text>
-              <Text className="text-xs text-muted">{summary}</Text>
+            <View className="flex flex-col gap-4 flex-1 overflow-hidden">
+              <Text className="text-sm font-semibold text-ink truncate">{entry.item.name}</Text>
+              <Text className="text-xs text-muted truncate">{summary}</Text>
             </View>
+            {onRemove && (
+              <View
+                className="p-8 -mr-8 active-opacity-60"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove(entry.key);
+                }}
+              >
+                <Del size={16} color="#999" />
+              </View>
+            )}
           </View>
         );
       })}

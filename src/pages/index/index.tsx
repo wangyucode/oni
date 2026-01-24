@@ -3,6 +3,7 @@ import { MouseEvent, useContext, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { Badge, Button, Collapse } from '@nutui/nutui-react-taro'
+import { Add } from '@nutui/icons-react-taro';
 
 import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
@@ -14,9 +15,9 @@ import FilteredImage from 'src/components/FilteredImage';
 import EditPopup from 'src/components/EditPopup';
 import { DataContext } from 'src/components/DataContext';
 import { getIconData } from 'src/components/utils';
-
-import { Add } from '@nutui/icons-react-taro';
 import GlobalSvgFilters from 'src/components/GlobalSvgFilters';
+
+import './index.scss'
 
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
@@ -67,7 +68,7 @@ function Index() {
   const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
 
   return (
-    <View className='page'>
+    <View className='page index'>
       <View className='flex flex-col flex-1 gap-8'>
         <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
           <Collapse.Item title="资源" name='资源'>
