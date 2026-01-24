@@ -1,5 +1,5 @@
 import { Text, View } from "@tarojs/components";
-import { Badge, Button } from "@nutui/nutui-react-taro";
+import { Button } from "@nutui/nutui-react-taro";
 import { Del, Edit } from "@nutui/icons-react-taro";
 
 import Icon from "./icons";

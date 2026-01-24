@@ -95,12 +95,28 @@ export default function CritterDetailView({
         onAction={handlePrimaryAction}
       />
 
-      {critter.life ? (
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">寿命</Text>
-          <Text className="text-gray-600">{critter.life}</Text>
-        </View>
-      ) : null}
+      <View className="flex justify-between flex-wrap gap-8">
+        {critter.life ? (
+          <View className="flex gap-4">
+            <Text className="text-sm font-semibold">寿命:</Text>
+            <Text className="text-gray-600">{critter.life}</Text>
+          </View>
+        ) : null}
+        {critter.spawn ? (
+          <View className="flex gap-4">
+            <Text className="text-sm font-semibold">野生产卵周期:</Text>
+            <Text className="text-gray-600">{critter.spawn}周期</Text>
+          </View>
+        ) : null}
+        {critter.drop && Object.keys(critter.drop).length > 0 ? (
+          <View className="flex gap-4">
+            <Text className="text-sm font-semibold">死亡掉落:</Text>
+            <Text className="text-gray-600">
+              {Object.entries(critter.drop).map(([name, value]) => `${name}-${value}`).join(', ')}
+            </Text>
+          </View>
+        ) : null}
+      </View>
 
       {critter.modes?.length > 0 && (
         <View className="flex flex-col gap-6">
