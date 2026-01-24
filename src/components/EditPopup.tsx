@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { Text, View } from "@tarojs/components";
-import { Badge, Button, Popup } from "@nutui/nutui-react-taro";
+import { ScrollView, Text, View } from "@tarojs/components";
+import { Badge, Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
 
@@ -69,69 +69,65 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
       position="bottom"
       title={title}
       onClose={handleClose}
-      left={selectedEntry ? <Button className="btn-back" onClick={handleGoBack}><ArrowLeft size={16} />返回</Button> : null}
+      left={selectedEntry ? <ArrowLeft onClick={handleGoBack} /> : null}
       closeable
-      style={{ maxHeight: "50%", paddingBottom: process.env.TARO_ENV === "h5" ? 50 : 0 }}
+      style={{ marginBottom: process.env.TARO_ENV === "h5" ? "50px" : "0" }}
     >
-      <View className="flex-1 p-8 overflow-y-auto">
-
-        {selectedEntry ? (
-          <LinkDetailView
-            link={{
-              name: selectedEntry.item.name,
-              icon: selectedEntry.item.icon || "",
-              detail: selectedEntry.detail,
-            }}
-            categoryPath={selectedEntry.categoryPath}
-            mode="edit"
-            editKey={selectedEntry.key}
-            initialCount={selectedEntry.count}
-            initialModeSelections={selectedEntry.modeSelections}
-            initialEfficiency={selectedEntry.efficiency}
-            onConfirmed={handleClose}
-          />
-        ) : selections.length ? (
-          <View className="flex flex-col gap-8">
-
-            {selections.map((entry) => {
-              const iconData = getIconData(iconMap, entry.item.name, entry.item.icon);
-              const summary = buildSummary(entry);
-              return (
-                <View
-                  className="flex items-center gap-12 p-8 px-10 rounded-10 bg-gray-100 active-bg-gray-200"
-                  key={entry.key}
-                  onClick={() => setSelectedEntry(entry)}
-                >
-
-                  <Badge value={entry.count} max={999}>
-                    {iconData?.icon ? (
-                      <FilteredImage
-                        src={iconData.icon}
-                        iconFilter={iconData.iconFilter}
-                        className="w-40 h-40"
-
-                        mode="aspectFit"
-                      />
-                    ) : (
-                      <Icon name={entry.item.name} width={40} height={40} />
-                    )}
-                  </Badge>
-                  <View className="flex flex-col gap-4 flex-1">
-                    <Text className="text-sm font-semibold text-ink">{entry.item.name}</Text>
-                    <Text className="text-xs text-muted">{summary}</Text>
+      <ScrollView style={{ height: "calc(100% - 48px)" }} scrollY={true}>
+        <View className="p-8">
+          {selectedEntry ? (
+            <LinkDetailView
+              link={{
+                name: selectedEntry.item.name,
+                icon: selectedEntry.item.icon || "",
+                detail: selectedEntry.detail,
+              }}
+              categoryPath={selectedEntry.categoryPath}
+              mode="edit"
+              editKey={selectedEntry.key}
+              initialCount={selectedEntry.count}
+              initialModeSelections={selectedEntry.modeSelections}
+              initialEfficiency={selectedEntry.efficiency}
+              onConfirmed={handleClose}
+            />
+          ) : selections.length ? (
+            <View className="flex flex-col gap-8">
+              {selections.map((entry) => {
+                const iconData = getIconData(iconMap, entry.item.name, entry.item.icon);
+                const summary = buildSummary(entry);
+                return (
+                  <View
+                    className="flex items-center gap-12 p-8 px-10 rounded-10 bg-gray-100 active-bg-gray-200"
+                    key={entry.key}
+                    onClick={() => setSelectedEntry(entry)}
+                  >
+                    <Badge value={entry.count} max={999}>
+                      {iconData?.icon ? (
+                        <FilteredImage
+                          src={iconData.icon}
+                          iconFilter={iconData.iconFilter}
+                          className="w-40 h-40"
+                          mode="aspectFit"
+                        />
+                      ) : (
+                        <Icon name={entry.item.name} width={40} height={40} />
+                      )}
+                    </Badge>
+                    <View className="flex flex-col gap-4 flex-1">
+                      <Text className="text-sm font-semibold text-ink">{entry.item.name}</Text>
+                      <Text className="text-xs text-muted">{summary}</Text>
+                    </View>
                   </View>
-
-                </View>
-              );
-            })}
-          </View>
-        ) : (
-          <View className="p-16 text-center text-muted">
-            <Text>暂无选择，先添加再编辑。</Text>
-          </View>
-
-        )}
-      </View>
+                );
+              })}
+            </View>
+          ) : (
+            <View className="p-16 text-center text-muted">
+              <Text>暂无选择，先添加再编辑。</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
     </Popup>
   );
 }

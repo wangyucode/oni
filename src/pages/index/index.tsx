@@ -67,7 +67,7 @@ function Index() {
   const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
 
   return (
-    <View className='root'>
+    <View className='page'>
       <View className='flex flex-col flex-1 gap-8'>
         <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
           <Collapse.Item title="资源" name='资源'>

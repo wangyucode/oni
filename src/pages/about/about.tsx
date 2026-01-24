@@ -34,7 +34,7 @@ export default function About() {
     }
 
     return (
-        <View className='root'>
+        <View className='page'>
             <View className="flex flex-col items-center bg-white border border-black gap-8 p-16 rounded-6">
                 <Avatar src={icon} size="large" />
                 <Text className="text-base font-bold text-black">ONI产物计算器{process.env.TARO_APP_VERSION}</Text>

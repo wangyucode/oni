@@ -35,7 +35,7 @@ export default function Support() {
     }, []);
 
     return (
-        <View className='root page-support flex flex-col gap-4'>
+        <View className='page page-support flex flex-col gap-4'>
             {process.env.TARO_ENV === 'h5' && <BackButton />}
             <View className="flex flex-col items-center bg-white gap-8 p-16 rounded-6">
                 <Image className="w-64 h-64" src={icon} />

@@ -12,7 +12,7 @@ export default function Log() {
     useShareAppMessage(() => sharedMessage);
 
     return (
-        <View className='root page-log flex flex-col gap-4'>
+        <View className='page page-log flex flex-col gap-4'>
 
             {process.env.TARO_ENV === 'h5' && <BackButton />}
             <Cell.Group className="cells">
