@@ -110,39 +110,20 @@ page,
         }
 
         .popup-root {
-            min-height: unset;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            min-height: 0;
+            height: 50%;
 
-            &.nut-popup-slide-bottom-exit-done{
-                display: none;
+            .nut-grid-item:active {
+                background-color: #BF7FA8;
             }
-        }
 
-        .select-popup {
-            --nutui-grid-border-color: #000;
-        }
+            .nut-popup-title-left:active {
+                background-color: #BF7FA8;
+            }
 
-        .select-popup .nut-popup-title-right {
-            padding: 4PX;
-        }
-
-        .select-popup .nut-popup-title-right:active {
-            background-color: #BF7FA8;
-        }
-
-        .select-popup .nut-grid .nut-grid-item:active .nut-grid-item-content-center {
-            background-color: #BF7FA8;
-        }
-
-        .select-popup .nut-grid .nut-grid-item:active .nut-grid-item-content-center .nut-grid-item-text {
-            color: #fff;
-        }
-
-        .select-popup .nut-grid .nut-grid-item .nut-grid-item-content {
-            padding: 8PX 0;
-            row-gap: 2PX;
+            .nut-popup-title-right:active {
+                background-color: #BF7FA8;
+            }
         }
 
         .menu-grid-icon {
@@ -150,15 +131,6 @@ page,
             height: 50%;
             display: flex;
             justify-content: center;
-            align-items: center;
-        }
-
-        .btn-back {
-            background-color: #f5f5f5;
-            align-self: flex-start;
-        }
-
-        .btn-back .nut-button-children {
             align-items: center;
         }
 
@@ -333,6 +305,10 @@ page,
 
         .w-full {
             width: 100%;
+        }
+
+        .w-auto {
+            width: auto;
         }
 
 
