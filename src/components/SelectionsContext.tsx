@@ -8,12 +8,10 @@ import { calculateSelectionTotals, ResourceUnitKind } from "./selection/calc";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
 import { DataContext } from "./DataContext";
 
-export type SelectionItem = Pick<Link, "name" | "icon">;
-
 export type SelectionEntry = {
   key: string;
   categoryPath: string[];
-  item: SelectionItem;
+  name: string;
   detail: LinkDetail;
   count: number;
   modeSelections: ModeSelections;
@@ -34,7 +32,7 @@ export type SelectionsSummary = {
 export type GroupedSelectionEntry = {
   key: string;
   categoryPath: string[];
-  item: SelectionItem;
+  name: string;
   count: number;
 };
 
@@ -45,7 +43,7 @@ export type SelectionsContextValue = {
 };
 
 type UpsertPayload = {
-  item: SelectionItem;
+  name: string;
   detail: LinkDetail;
   count: number;
   modeSelections: ModeSelections;
@@ -121,7 +119,7 @@ function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionE
   const grouped = new Map<string, { entry: GroupedSelectionEntry; rawCount: number }>();
   selections.forEach((selection) => {
     const categoryKey = selection.categoryPath.join(">");
-    const groupKey = `${categoryKey}::${selection.item.name}`;
+    const groupKey = `${categoryKey}::${selection.name}`;
     const kind = inferDetailKind(selection.detail);
 
     let contribution = selection.count;
@@ -137,7 +135,7 @@ function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionE
         entry: {
           key: groupKey,
           categoryPath: selection.categoryPath,
-          item: selection.item,
+          name: selection.name,
           count: 0,
         },
         rawCount: contribution,
@@ -159,28 +157,17 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   const count = Number(raw.count) || 0;
   if (count <= 0) return null;
 
-  let item: SelectionItem | null = null;
+  let name = "";
   const rawItem = raw.item;
   if (rawItem && typeof rawItem === "object") {
-    const name = String((rawItem as any).name || "");
-    if (name) {
-      item = {
-        name,
-        icon: String((rawItem as any).icon || ""),
-      };
-    }
+    name = String((rawItem as any).name || "");
+  } else if (typeof raw.name === "string") {
+    name = raw.name;
   }
 
   const rawDetail = raw.detail;
-  if (!item && rawDetail && typeof rawDetail === "object") {
-    const name = String((rawDetail as any).name || "");
-    if (name) {
-      item = {
-        name,
-        icon: String((rawDetail as any).icon || ""),
-
-      };
-    }
+  if (!name && rawDetail && typeof rawDetail === "object") {
+    name = String((rawDetail as any).name || "");
   }
 
   let detail: any = null;
@@ -190,17 +177,17 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
     detail = (rawDetail as any).detail;
   }
 
-  if (!item?.name) return null;
+  if (!name) return null;
   if (!detail || !Array.isArray(detail.modes)) return null;
 
   const modeSelections = normalizeModeSelections(detail as LinkDetail, raw.modeSelections);
   const efficiency = raw.efficiency !== undefined ? Number(raw.efficiency) : undefined;
-  const key = createSelectionKey(item.name, detail as LinkDetail, modeSelections, efficiency);
+  const key = createSelectionKey(name, detail as LinkDetail, modeSelections, efficiency);
 
   return {
     key,
     categoryPath,
-    item,
+    name,
     detail: detail as LinkDetail,
     count,
     modeSelections,
@@ -263,7 +250,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
     case "upsert": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.detail, action.payload.modeSelections);
       const efficiency = action.payload.efficiency;
-      const key = createSelectionKey(action.payload.item.name, action.payload.detail, normalizedModeSelections, efficiency);
+      const key = createSelectionKey(action.payload.name, action.payload.detail, normalizedModeSelections, efficiency);
       if (action.payload.count <= 0) {
         return {
           selections: state.selections.filter((s) => s.key !== key),
@@ -280,7 +267,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
         } else {
           nextSelections[existingIndex] = {
             ...existing,
-            item: action.payload.item,
+            name: action.payload.name,
             detail: action.payload.detail,
             modeSelections: normalizedModeSelections,
             count: nextCount,
@@ -291,7 +278,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
         nextSelections.push({
           key,
           categoryPath: action.payload.categoryPath,
-          item: action.payload.item,
+          name: action.payload.name,
           detail: action.payload.detail,
           count: action.payload.count,
           modeSelections: normalizedModeSelections,
@@ -303,7 +290,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
     case "update": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.next.detail, action.payload.next.modeSelections);
       const efficiency = action.payload.next.efficiency;
-      const nextKey = createSelectionKey(action.payload.next.item.name, action.payload.next.detail, normalizedModeSelections, efficiency);
+      const nextKey = createSelectionKey(action.payload.next.name, action.payload.next.detail, normalizedModeSelections, efficiency);
       const fromKey = action.payload.fromKey;
 
       const baseSelections = state.selections.filter((s) => s.key !== fromKey);
@@ -320,7 +307,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
         const existing = nextSelections[existingIndex];
         nextSelections[existingIndex] = {
           ...existing,
-          item: action.payload.next.item,
+          name: action.payload.next.name,
           detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
           categoryPath: action.payload.next.categoryPath,
@@ -330,7 +317,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
       } else {
         nextSelections.push({
           key: nextKey,
-          item: action.payload.next.item,
+          name: action.payload.next.name,
           detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
           categoryPath: action.payload.next.categoryPath,
@@ -415,7 +402,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       const saved: SavedSelectionEntry[] = selections.map((s) => ({
         key: s.key,
         categoryPath: s.categoryPath,
-        item: s.item,
+        name: s.name,
         detail: s.detail,
         count: s.count,
         modeSelections: s.modeSelections,
@@ -461,7 +448,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         dispatch({
           type: "upsert",
           payload: {
-            item: { name: found.link.name, icon: found.link.icon },
+            name: found.link.name,
             detail,
             count: 3,
             modeSelections,

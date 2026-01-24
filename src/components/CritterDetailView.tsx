@@ -68,7 +68,7 @@ export default function CritterDetailView({
 
   function handlePrimaryAction(): void {
     const payload = {
-      item: { name: link.name, icon: link.icon },
+      name: link.name,
       detail: critter,
       count,
       modeSelections,

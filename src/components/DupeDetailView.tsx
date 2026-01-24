@@ -80,7 +80,7 @@ export default function DupeDetailView({
 
   function handlePrimaryAction(): void {
     const payload = {
-      item: { name: link.name, icon: link.icon },
+      name: link.name,
       detail: dupe,
       count,
       modeSelections,

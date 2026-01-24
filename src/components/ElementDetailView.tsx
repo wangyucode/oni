@@ -68,7 +68,7 @@ export default function ElementDetailView({
 
   function handlePrimaryAction(): void {
     const payload = {
-      item: { name: link.name, icon: link.icon },
+      name: link.name,
       detail,
       count,
       modeSelections,

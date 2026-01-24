@@ -113,8 +113,8 @@ function Index() {
                 >
                   <Badge value={selection.count} max={999}>
                     {(() => {
-                      const iconData = getIconData(iconMap, selection.item.name, selection.item.icon);
-                      if (!iconData?.icon) return <Icon name={selection.item.name} width={48} height={48} />;
+                      const iconData = getIconData(iconMap, selection.name);
+                      if (!iconData?.icon) return <Icon name={selection.name} width={48} height={48} />;
                       return (
                       <FilteredImage
                         src={iconData.icon}

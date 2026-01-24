@@ -74,7 +74,7 @@ export default function BuildingDetailView({
 
   function handlePrimaryAction(): void {
     const payload = {
-      item: { name: link.name, icon: link.icon },
+      name: link.name,
       detail: building,
       count,
       modeSelections,

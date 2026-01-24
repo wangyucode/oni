@@ -48,7 +48,7 @@ export default function SelectionsView({ selections, iconMap, onSelect, onRemove
   return (
     <View className="flex flex-col gap-8">
       {selections.map((entry) => {
-        const iconData = getIconData(iconMap, entry.item.name, entry.item.icon);
+        const iconData = getIconData(iconMap, entry.name);
         const summary = buildSummary(entry);
         return (
           <View
@@ -64,11 +64,11 @@ export default function SelectionsView({ selections, iconMap, onSelect, onRemove
                   mode="aspectFit"
                 />
               ) : (
-                <Icon name={entry.item.name} width={40} height={40} />
+                <Icon name={entry.name} width={40} height={40} />
               )}
             <View className="flex flex-col gap-4 flex-1">
               <View className="flex items-center gap-8">
-                <Text className="text-sm font-semibold text-ink">{entry.item.name}</Text>
+                <Text className="text-sm font-semibold text-ink">{entry.name}</Text>
                 <Text className="text-md font-semibold text-primary">x{entry.count}</Text>
                 <View className="flex-1" />
                 <Button

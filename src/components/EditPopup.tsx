@@ -24,7 +24,7 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
   }, [visible]);
 
   const title = useMemo(() => {
-    return selectedEntry?.item.name || "已选条目";
+    return selectedEntry?.name || "已选条目";
   }, [selectedEntry]);
 
   function handleClose() {
@@ -52,8 +52,7 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
           {selectedEntry ? (
             <LinkDetailView
               link={{
-                name: selectedEntry.item.name,
-                icon: selectedEntry.item.icon || "",
+                name: selectedEntry.name,
                 detail: selectedEntry.detail,
               }}
               categoryPath={selectedEntry.categoryPath}
