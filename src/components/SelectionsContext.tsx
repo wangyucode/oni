@@ -78,17 +78,6 @@ export const SelectionsActionsContext = createContext<SelectionsActions>({
   clear: () => {},
 });
 
-function inferDetailKind(detail: LinkDetail): string {
-  const anyDetail = detail as any;
-  if (anyDetail && typeof anyDetail === "object") {
-    if ("heat" in anyDetail) return "building";
-    if ("life" in anyDetail) return "life";
-    if ("resources" in anyDetail) return "dupe";
-    if ("modes" in anyDetail) return "modes";
-  }
-  return "unknown";
-}
-
 function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
   const normalized = normalizeModeSelections(detail, raw);
   const modes = (detail as any).modes || [];
@@ -96,9 +85,8 @@ function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): strin
 }
 
 function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {
-  const kind = inferDetailKind(detail);
   const modeKey = serializeModeSelections(detail, modeSelections);
-  return `${kind}::${itemName}::${modeKey}`;
+  return `${itemName}::${modeKey}`;
 }
 
 function normalizeCountAndEfficiency(totalEffective: number): { count: number; efficiency: number } {
@@ -129,12 +117,8 @@ function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionE
   selections.forEach((selection) => {
     const categoryKey = selection.categoryPath.join(">");
     const groupKey = `${categoryKey}::${selection.name}`;
-    const kind = inferDetailKind(selection.detail);
 
-    let contribution = selection.count;
-    if (kind === "building") {
-      contribution = (selection.count * (selection.efficiency ?? 100)) / 100;
-    }
+    const contribution = (selection.count * (selection.efficiency ?? 100)) / 100;
 
     const existing = grouped.get(groupKey);
     if (existing) {
