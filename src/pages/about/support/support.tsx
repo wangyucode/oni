@@ -55,7 +55,7 @@ export default function Support() {
                             <Navigator className="flex items-center justify-between w-full gap-8 px-16 py-13" openType="navigate" target="miniProgram" appId={item.appid} version="release">
                                 <Image className="w-64 h-64" src={item.img} />
                                 <View className="flex flex-col items-start justify-center flex-1 gap-8">
-                                    <Text className="text-base text-ink font-bold">{item.name}</Text>
+                                    <Text className="text-md text-ink font-bold">{item.name}</Text>
                                     <Text className="text-xs text-gray-500">{item.note}</Text>
                                 </View>
                                 <ArrowRight size={16} />

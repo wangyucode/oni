@@ -2,6 +2,8 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 export type TimeUnit = '秒' | '周期';
 
+export const CYCLE_SECONDS = 600;
+
 interface UnitContextType {
   timeUnit: TimeUnit;
   toggleTimeUnit: () => void;
@@ -41,7 +43,7 @@ export function transValue(value: number, timeUnit: TimeUnit) {
 
   // 时间转换：1周期 = 600s
   if (timeUnit === '周期') {
-    result *= 600;
+    result *= CYCLE_SECONDS;
   }
 
   return result;

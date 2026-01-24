@@ -1,6 +1,6 @@
 import { Text, View } from "@tarojs/components";
-import { Badge } from "@nutui/nutui-react-taro";
-import { Del } from "@nutui/icons-react-taro";
+import { Badge, Button } from "@nutui/nutui-react-taro";
+import { Del, Edit } from "@nutui/icons-react-taro";
 
 import Icon from "./icons";
 import FilteredImage from "./FilteredImage";
@@ -13,7 +13,7 @@ interface SelectionsViewProps {
   selections: SelectionEntry[];
   iconMap: Map<string, IconData>;
   onSelect: (entry: SelectionEntry) => void;
-  onRemove?: (key: string) => void;
+  onRemove: (key: string) => void;
 }
 
 function buildSummary(entry: SelectionEntry): string {
@@ -58,7 +58,6 @@ export default function SelectionsView({ selections, iconMap, onSelect, onRemove
             key={entry.key}
             onClick={() => onSelect(entry)}
           >
-            <Badge value={entry.count} max={999}>
               {iconData?.icon ? (
                 <FilteredImage
                   src={iconData.icon}
@@ -69,22 +68,35 @@ export default function SelectionsView({ selections, iconMap, onSelect, onRemove
               ) : (
                 <Icon name={entry.item.name} width={40} height={40} />
               )}
-            </Badge>
-            <View className="flex flex-col gap-4 flex-1 overflow-hidden">
-              <Text className="text-sm font-semibold text-ink truncate">{entry.item.name}</Text>
+            <View className="flex flex-col gap-4 flex-1">
+              <View className="flex items-center gap-8">
+                <Text className="text-sm font-semibold text-ink">{entry.item.name}</Text>
+                <Text className="text-md font-semibold text-primary">x{entry.count}</Text>
+                <View className="flex-1" />
+                <Button
+                  type="info"
+                  size="small"
+                  onClick={() => {
+                    onSelect(entry);
+                  }}
+                >
+                  <Edit size={16} color="#fff" />
+                </Button>
+                <Button
+                  type="danger"
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemove(entry.key);
+                  }}
+                >
+                  <Del size={16} color="#fff" />
+                </Button>
+
+              </View>
               <Text className="text-xs text-muted truncate">{summary}</Text>
             </View>
-            {onRemove && (
-              <View
-                className="p-8 -mr-8 active-opacity-60"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemove(entry.key);
-                }}
-              >
-                <Del size={16} color="#999" />
-              </View>
-            )}
+
           </View>
         );
       })}

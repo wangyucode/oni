@@ -27,7 +27,7 @@ export default function SelectionDetailHeader({
       {icon ? (
         <FilteredImage src={icon} iconFilter={iconFilter} className="w-48 h-48" mode="aspectFit" />
       ) : null}
-      <Text className="text-base font-semibold">{name}</Text>
+      <Text className="text-md font-semibold">{name}</Text>
       <View style={{ flex: 1 }} />
       <View className="flex justify-end gap-16 w-120">
         <InputNumber

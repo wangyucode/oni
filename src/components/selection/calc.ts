@@ -1,4 +1,5 @@
 import { LinkDetail, Mode } from "../data";
+import { CYCLE_SECONDS } from "../UnitContext";
 import { ModeSelections, buildDefaultModeSelection, optionFactor, normalizeModeSelections } from "./modeSelection";
 
 export type SelectionTotals = {
@@ -10,7 +11,7 @@ export type SelectionTotals = {
   totalCalories: number;
 };
 
-export type ResourceUnitKind = "mass" | "count";
+export type ResourceUnitKind = "mass" | "count" | "kcal" | "growth";
 
 export function parseNumber(raw: string | undefined): number {
   if (!raw) return 0;
@@ -19,8 +20,6 @@ export function parseNumber(raw: string | undefined): number {
   const value = Number(match[0]);
   return Number.isFinite(value) ? value : 0;
 }
-
-const CYCLE_SECONDS = 600;
 
 export function parseResourceRate(raw: string | undefined): { valuePerSecond: number; kind: ResourceUnitKind } {
   if (!raw) return { valuePerSecond: 0, kind: "mass" };
@@ -38,6 +37,12 @@ export function parseResourceRate(raw: string | undefined): { valuePerSecond: nu
   } else if (/毫克/i.test(s) || /\bmg\b/i.test(s)) {
     kind = "mass";
     numeratorMultiplier = 0.001;
+  } else if (/千卡/i.test(s) || /\bkcal\b/i.test(s)) {
+    kind = "kcal";
+    numeratorMultiplier = 1;
+  } else if (/生长进度/i.test(s)) {
+    kind = "growth";
+    numeratorMultiplier = 1;
   } else if (/克/i.test(s) || /\bg\b/i.test(s)) {
     kind = "mass";
     numeratorMultiplier = 1;
@@ -74,8 +79,8 @@ export function parseResourceRate(raw: string | undefined): { valuePerSecond: nu
 function mergeResourceKind(a: ResourceUnitKind | undefined, b: ResourceUnitKind): ResourceUnitKind {
   if (!a) return b;
   if (a === b) return a;
-  if (a === "mass" || b === "mass") return "mass";
-  return "count";
+  const order: ResourceUnitKind[] = ["mass", "kcal", "count", "growth"];
+  return order.find(k => k === a || k === b) || a;
 }
 
 export function calculateSelectionTotals(

@@ -8,7 +8,7 @@ export function formatSignedFloor(value: number): string {
 
 export function convertCalories(calories: number, timeUnit: TimeUnit): { convertedValue: number; unit: string } {
   if (timeUnit === "秒") {
-    return { convertedValue: (calories / 600) * 1000, unit: "卡路里/秒" };
+    return { convertedValue: calories / 600, unit: "千卡/秒" };
   }
   return { convertedValue: calories, unit: "千卡/周期" };
 }

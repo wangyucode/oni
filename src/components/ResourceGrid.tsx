@@ -6,12 +6,13 @@ import { useUnit, transValue } from './UnitContext';
 import { DataContext } from './DataContext';
 import { calculateGridColumns } from './utils';
 import FilteredImage from './FilteredImage';
+import { ResourceUnitKind } from './selection/calc';
 
 export interface ResourceItem {
   name: string;
   value: number;
   count: number;
-  kind?: "mass" | "count";
+  kind?: ResourceUnitKind;
 }
 
 export interface ResourceGridProps {
@@ -23,7 +24,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
   const { iconMap } = useContext(DataContext);
 
   const aggregatedResources = useMemo(() => {
-    const map = new Map<string, { value: number; kind: "mass" | "count" }>();
+    const map = new Map<string, { value: number; kind: ResourceUnitKind }>();
     items.forEach(item => {
       const total = item.value * item.count;
       if (total !== 0) {
@@ -33,9 +34,16 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
           map.set(item.name, { value: total, kind });
           return;
         }
+
+        const mergeKind = (a: ResourceUnitKind, b: ResourceUnitKind): ResourceUnitKind => {
+          if (a === b) return a;
+          const order: ResourceUnitKind[] = ["mass", "kcal", "count", "growth"];
+          return order.find(k => k === a || k === b) || a;
+        };
+
         map.set(item.name, {
           value: existing.value + total,
-          kind: existing.kind === "mass" || kind === "mass" ? "mass" : "count"
+          kind: mergeKind(existing.kind, kind)
         });
       }
     });
@@ -47,20 +55,48 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
       .sort(([a], [b]) => a.localeCompare(b, "zh-CN"));
   }, [aggregatedResources]);
 
-  const convertResourceValue = (value: number, kind: "mass" | "count") => {
+  const convertResourceValue = (value: number, kind: ResourceUnitKind) => {
+    const valueByTime = transValue(value, timeUnit);
+    const absValue = Math.abs(valueByTime);
+
     if (kind === "count") {
-      const convertedValue = timeUnit === "周期" ? value * 600 : value;
       return {
-        convertedValue,
+        convertedValue: valueByTime,
         unit: `单位/${timeUnit}`,
       };
     }
-    const valueByTime = transValue(value, timeUnit);
-    const useKg = Math.abs(valueByTime) >= 10000 || valueByTime % 1000 === 0;
-    return {
-      convertedValue: useKg ? valueByTime / 1000 : valueByTime,
-      unit: `${useKg ? "千克" : "克"}/${timeUnit}`
-    };
+
+    if (kind === "kcal") {
+      return {
+        convertedValue: valueByTime,
+        unit: `千卡/${timeUnit}`,
+      };
+    }
+
+    if (kind === "growth") {
+      return {
+        convertedValue: valueByTime,
+        unit: `生长进度/${timeUnit}`,
+      };
+    }
+
+    // Mass handling
+    if (absValue >= 1000) {
+      return {
+        convertedValue: valueByTime / 1000,
+        unit: `千克/${timeUnit}`
+      };
+    } else if (absValue >= 1 || absValue === 0) {
+      return {
+        convertedValue: valueByTime,
+        unit: `克/${timeUnit}`
+      };
+    } else {
+      return {
+        convertedValue: valueByTime * 1000,
+        unit: `毫克/${timeUnit}`
+      };
+    }
   };
 
   if (sortedResources.length === 0) {
@@ -79,7 +115,8 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
     >
       {sortedResources.map(([name, entry]) => {
         const { convertedValue, unit } = convertResourceValue(entry.value, entry.kind);
-        const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue);
+        const formattedValue = Number(convertedValue.toFixed(2));
+        const valueStr = formattedValue > 0 ? '+' + formattedValue : formattedValue.toString();
         const iconData = iconMap.get(name);
         const iconSrc = iconData?.icon;
         const iconFilter = iconData?.iconFilter;
@@ -91,7 +128,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
             <Text className={`text-sm font-bold ${type}`}>
               {valueStr}
             </Text>
-            <Text className={`text-10 ${type}`}>{unit}</Text>
+            <Text className={`text-xs ${type}`}>{unit}</Text>
           </Grid.Item>
         );
       })}
