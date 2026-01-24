@@ -1,6 +1,6 @@
 import { LinkDetail, Mode } from "../data";
 import { CYCLE_SECONDS } from "../UnitContext";
-import { ModeSelections, buildDefaultModeSelection, optionFactor, normalizeModeSelections } from "./modeSelection";
+import { ModeSelections, optionFactor, normalizeModeSelections } from "./modeSelection";
 
 export type SelectionTotals = {
   resources: Record<string, number>;

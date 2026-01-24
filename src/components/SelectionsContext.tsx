@@ -95,11 +95,17 @@ function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): strin
   return modes.map((m: any) => normalized[m.name] || "").join("|");
 }
 
-function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections, efficiency?: number): string {
+function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {
   const kind = inferDetailKind(detail);
   const modeKey = serializeModeSelections(detail, modeSelections);
-  const efficiencyKey = efficiency !== undefined && efficiency !== 100 ? `::eff${efficiency}` : "";
-  return `${kind}::${itemName}::${modeKey}${efficiencyKey}`;
+  return `${kind}::${itemName}::${modeKey}`;
+}
+
+function normalizeCountAndEfficiency(totalEffective: number): { count: number; efficiency: number } {
+  if (totalEffective <= 0) return { count: 0, efficiency: 100 };
+  const count = Math.ceil(totalEffective);
+  const efficiency = Math.round((totalEffective / count) * 10000) / 100;
+  return { count, efficiency };
 }
 
 function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
@@ -110,7 +116,10 @@ function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
       byKey.set(s.key, s);
       return;
     }
-    byKey.set(s.key, { ...existing, count: existing.count + s.count });
+    const existingEffective = (existing.count * (existing.efficiency ?? 100)) / 100;
+    const incomingEffective = (s.count * (s.efficiency ?? 100)) / 100;
+    const normalized = normalizeCountAndEfficiency(existingEffective + incomingEffective);
+    byKey.set(s.key, { ...existing, count: normalized.count, efficiency: normalized.efficiency });
   });
   return Array.from(byKey.values()).filter((s) => s.count > 0);
 }
@@ -181,17 +190,19 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   if (!detail || !Array.isArray(detail.modes)) return null;
 
   const modeSelections = normalizeModeSelections(detail as LinkDetail, raw.modeSelections);
-  const efficiency = raw.efficiency !== undefined ? Number(raw.efficiency) : undefined;
-  const key = createSelectionKey(name, detail as LinkDetail, modeSelections, efficiency);
+  const efficiency = raw.efficiency !== undefined ? Number(raw.efficiency) : 100;
+  const key = createSelectionKey(name, detail as LinkDetail, modeSelections);
+
+  const normalized = normalizeCountAndEfficiency((count * efficiency) / 100);
 
   return {
     key,
     categoryPath,
     name,
     detail: detail as LinkDetail,
-    count,
+    count: normalized.count,
     modeSelections,
-    efficiency,
+    efficiency: normalized.efficiency,
   };
 }
 
@@ -249,8 +260,10 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
   switch (action.type) {
     case "upsert": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.detail, action.payload.modeSelections);
-      const efficiency = action.payload.efficiency;
-      const key = createSelectionKey(action.payload.name, action.payload.detail, normalizedModeSelections, efficiency);
+      const incomingEff = action.payload.efficiency ?? 100;
+      const incomingEffectiveCount = (action.payload.count * incomingEff) / 100;
+      const key = createSelectionKey(action.payload.name, action.payload.detail, normalizedModeSelections);
+
       if (action.payload.count <= 0) {
         return {
           selections: state.selections.filter((s) => s.key !== key),
@@ -261,8 +274,10 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
       const nextSelections = state.selections.slice();
       if (existingIndex >= 0) {
         const existing = nextSelections[existingIndex];
-        const nextCount = existing.count + action.payload.count;
-        if (nextCount <= 0) {
+        const nextTotalEffective = (existing.count * (existing.efficiency ?? 100)) / 100 + incomingEffectiveCount;
+        const normalized = normalizeCountAndEfficiency(nextTotalEffective);
+
+        if (normalized.count <= 0) {
           nextSelections.splice(existingIndex, 1);
         } else {
           nextSelections[existingIndex] = {
@@ -270,33 +285,37 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
             name: action.payload.name,
             detail: action.payload.detail,
             modeSelections: normalizedModeSelections,
-            count: nextCount,
-            efficiency,
+            count: normalized.count,
+            efficiency: normalized.efficiency,
           };
         }
       } else {
+        if (incomingEffectiveCount <= 0) {
+          return state;
+        }
+        const normalized = normalizeCountAndEfficiency(incomingEffectiveCount);
         nextSelections.push({
           key,
           categoryPath: action.payload.categoryPath,
           name: action.payload.name,
           detail: action.payload.detail,
-          count: action.payload.count,
+          count: normalized.count,
           modeSelections: normalizedModeSelections,
-          efficiency,
+          efficiency: normalized.efficiency,
         });
       }
       return { selections: nextSelections };
     }
     case "update": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.next.detail, action.payload.next.modeSelections);
-      const efficiency = action.payload.next.efficiency;
-      const nextKey = createSelectionKey(action.payload.next.name, action.payload.next.detail, normalizedModeSelections, efficiency);
+      const incomingEff = action.payload.next.efficiency ?? 100;
+      const incomingEffectiveCount = (action.payload.next.count * incomingEff) / 100;
+      const nextKey = createSelectionKey(action.payload.next.name, action.payload.next.detail, normalizedModeSelections);
       const fromKey = action.payload.fromKey;
 
       const baseSelections = state.selections.filter((s) => s.key !== fromKey);
-      const count = action.payload.next.count;
 
-      if (count <= 0) {
+      if (incomingEffectiveCount <= 0) {
         return { selections: baseSelections };
       }
 
@@ -305,24 +324,28 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
 
       if (existingIndex >= 0) {
         const existing = nextSelections[existingIndex];
+        const nextTotalEffective = (existing.count * (existing.efficiency ?? 100)) / 100 + incomingEffectiveCount;
+        const normalized = normalizeCountAndEfficiency(nextTotalEffective);
+
         nextSelections[existingIndex] = {
           ...existing,
           name: action.payload.next.name,
           detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
           categoryPath: action.payload.next.categoryPath,
-          count: existing.count + count,
-          efficiency,
+          count: normalized.count,
+          efficiency: normalized.efficiency,
         };
       } else {
+        const normalized = normalizeCountAndEfficiency(incomingEffectiveCount);
         nextSelections.push({
           key: nextKey,
           name: action.payload.next.name,
           detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
           categoryPath: action.payload.next.categoryPath,
-          count,
-          efficiency,
+          count: normalized.count,
+          efficiency: normalized.efficiency,
         });
       }
 
