@@ -98,8 +98,8 @@ export function calculateSelectionTotals(
   const efficiencyFactor = efficiency / 100;
   const normalizedSelections = normalizeModeSelections(detail, modeSelections);
 
-  modes.forEach((mode, modeIndex) => {
-    const modeSelection = normalizedSelections[modeIndex] || buildDefaultModeSelection(mode);
+  modes.forEach((mode) => {
+    const modeSelection = normalizedSelections[mode.name];
     mode.options.forEach((option) => {
       const factor = optionFactor(option, modeSelection);
       totalFactor += factor;

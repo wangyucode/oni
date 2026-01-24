@@ -21,11 +21,9 @@ function buildSummary(entry: SelectionEntry): string {
   const modes = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
   const normalized = normalizeModeSelections(entry.detail, entry.modeSelections);
   const parts = modes
-    .map((mode: any, idx: number) => {
+    .map((mode: any) => {
       const name = String(mode?.name || "");
-      const options = Array.isArray(mode?.options) ? mode.options : [];
-      const fallback = options[0]?.name || "";
-      const selected = normalized[idx] || fallback;
+      const selected = normalized[name];
       if (!name || !selected) return "";
       return `${name}：${selected}`;
     })

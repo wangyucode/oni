@@ -1,45 +1,46 @@
 import { LinkDetail, Mode, Option } from "../data";
 
-export type ModeSelection = string;
+export type ModeSelections = Record<string, string>;
 
-export type ModeSelections = ModeSelection[];
-
-export function buildDefaultModeSelection(mode: Mode): ModeSelection {
+export function buildDefaultModeSelection(mode: Mode): string {
   return mode.options[0]?.name || "";
 }
 
 export function buildDefaultModeSelections(detail: LinkDetail): ModeSelections {
-  const detailAny = detail as any;
-  const modes: Mode[] = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
-  return modes.map(buildDefaultModeSelection);
-}
+  const modes = (detail as any)?.modes as Mode[] | undefined;
+  if (!Array.isArray(modes)) return {};
 
-function normalizeSelection(mode: Mode, raw: any): ModeSelection {
-  const options = mode.options.map((o) => o.name);
-  const selected = typeof raw === "string" ? raw : "";
-  if (selected && options.includes(selected)) return selected;
-  return options[0] || "";
+  return modes.reduce((acc, mode) => {
+    acc[mode.name] = buildDefaultModeSelection(mode);
+    return acc;
+  }, {} as ModeSelections);
 }
 
 export function normalizeModeSelections(detail: LinkDetail, raw: any): ModeSelections {
-  const detailAny = detail as any;
-  const modes: Mode[] = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
-  if (!modes.length) return [];
+  const modes = (detail as any)?.modes as Mode[] | undefined;
+  if (!Array.isArray(modes)) return {};
 
-  if (Array.isArray(raw) && raw.every((v) => typeof v === "string")) {
-    return modes.map((mode, idx) => normalizeSelection(mode, raw[idx]));
+  const rawObj = (typeof raw === "object" && raw !== null) ? raw : {};
+  const result: ModeSelections = {};
+
+  for (const mode of modes) {
+    const selected = rawObj[mode.name];
+    const options = mode.options.map((o) => o.name);
+    if (typeof selected === "string" && options.includes(selected)) {
+      result[mode.name] = selected;
+    } else {
+      result[mode.name] = buildDefaultModeSelection(mode);
+    }
   }
-
-  return modes.map(buildDefaultModeSelection);
+  return result;
 }
 
-export function setModeSelection(mode: Mode, selected: string): ModeSelection {
+export function setModeSelection(mode: Mode, selected: string): string {
   const options = mode.options.map((o) => o.name);
-  return options.includes(selected) ? selected : options[0] || "";
+  return options.includes(selected) ? selected : buildDefaultModeSelection(mode);
 }
 
-export function optionFactor(option: Option, modeSelection: ModeSelection | undefined): number {
-  if (!modeSelection) return 0;
-  return modeSelection === option.name ? 1 : 0;
+export function optionFactor(option: Option, selected: string | undefined): number {
+  return selected === option.name ? 1 : 0;
 }
 

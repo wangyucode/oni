@@ -93,7 +93,8 @@ function inferDetailKind(detail: LinkDetail): string {
 
 function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
   const normalized = normalizeModeSelections(detail, raw);
-  return normalized.map((sel) => encodeURIComponent(sel || "")).join("|");
+  const modes = (detail as any).modes || [];
+  return modes.map((m: any) => encodeURIComponent(normalized[m.name] || "")).join("|");
 }
 
 function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections, efficiency?: number): string {
@@ -446,12 +447,15 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       const found = findDupeDetail(data);
       if (found) {
         const detail = found.link.detail as LinkDetail;
-        const modeSelections = buildDefaultModeSelections(detail).map((sel, idx) => {
-          const mode = (detail as any).modes?.[idx];
+        const defaultSelections = buildDefaultModeSelections(detail);
+        const modes = (detail as any).modes || [];
+
+        const modeSelections: ModeSelections = { ...defaultSelections };
+        modes.forEach((mode: any) => {
           const options = Array.isArray(mode?.options) ? mode.options : [];
-          const hasFlush = options.some((o: any) => o?.name === "抽水马桶");
-          if (!hasFlush) return sel;
-          return "抽水马桶" as const;
+          if (options.some((o: any) => o?.name === "抽水马桶")) {
+            modeSelections[mode.name] = "抽水马桶";
+          }
         });
 
         dispatch({

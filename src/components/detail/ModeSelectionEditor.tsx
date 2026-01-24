@@ -26,11 +26,11 @@ export default function ModeSelectionEditor({
             <RadioGroup
               className="flex-wrap"
               direction="horizontal"
-              value={normalized[modeIndex] || mode.options[0]?.name || ""}
+              value={normalized[mode.name] || mode.options[0]?.name || ""}
               onChange={(value) => {
                 const selected = String(value);
-                const next = modeSelections.slice();
-                next[modeIndex] = setModeSelection(mode, selected);
+                const next = { ...modeSelections };
+                next[mode.name] = setModeSelection(mode, selected);
                 onModeSelectionsChange(next);
               }}
             >
