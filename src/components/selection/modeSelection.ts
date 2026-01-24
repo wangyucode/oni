@@ -7,37 +7,21 @@ export function buildDefaultModeSelection(mode: Mode): string {
 }
 
 export function buildDefaultModeSelections(detail: LinkDetail): ModeSelections {
-  const modes = (detail as any)?.modes as Mode[] | undefined;
-  if (!Array.isArray(modes)) return {};
-
-  return modes.reduce((acc, mode) => {
-    acc[mode.name] = buildDefaultModeSelection(mode);
-    return acc;
-  }, {} as ModeSelections);
+  return normalizeModeSelections(detail, {});
 }
 
-export function normalizeModeSelections(detail: LinkDetail, raw: any): ModeSelections {
-  const modes = (detail as any)?.modes as Mode[] | undefined;
-  if (!Array.isArray(modes)) return {};
+export function normalizeModeSelections(detail: LinkDetail, raw: ModeSelections): ModeSelections {
+  const modes = (detail as any).modes as Mode[] | undefined;
+  if (!modes) return {};
 
-  const rawObj = (typeof raw === "object" && raw !== null) ? raw : {};
-  const result: ModeSelections = {};
-
-  for (const mode of modes) {
-    const selected = rawObj[mode.name];
-    const options = mode.options.map((o) => o.name);
-    if (typeof selected === "string" && options.includes(selected)) {
-      result[mode.name] = selected;
-    } else {
-      result[mode.name] = buildDefaultModeSelection(mode);
-    }
-  }
-  return result;
+  return Object.fromEntries(
+    modes.map((mode) => [mode.name, setModeSelection(mode, raw[mode.name])])
+  );
 }
 
-export function setModeSelection(mode: Mode, selected: string): string {
-  const options = mode.options.map((o) => o.name);
-  return options.includes(selected) ? selected : buildDefaultModeSelection(mode);
+export function setModeSelection(mode: Mode, selected: string | undefined): string {
+  const isValid = mode.options.some((o) => o.name === selected);
+  return isValid ? (selected as string) : buildDefaultModeSelection(mode);
 }
 
 export function optionFactor(option: Option, selected: string | undefined): number {

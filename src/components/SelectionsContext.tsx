@@ -92,7 +92,7 @@ function inferDetailKind(detail: LinkDetail): string {
 function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
   const normalized = normalizeModeSelections(detail, raw);
   const modes = (detail as any).modes || [];
-  return modes.map((m: any) => encodeURIComponent(normalized[m.name] || "")).join("|");
+  return modes.map((m: any) => normalized[m.name] || "").join("|");
 }
 
 function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections, efficiency?: number): string {
