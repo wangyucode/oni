@@ -13,7 +13,7 @@ import { getIconData } from "./utils";
 
 export type ElementDetailViewProps = {
   link: DetailLink;
-  categoryPath?: string[];
+  category?: string;
   mode?: "add" | "edit";
   editKey?: string;
   initialCount?: number;
@@ -23,7 +23,7 @@ export type ElementDetailViewProps = {
 
 export default function ElementDetailView({
   link,
-  categoryPath = [],
+  category = "",
   mode = "add",
   editKey,
   initialCount,
@@ -72,7 +72,7 @@ export default function ElementDetailView({
       detail,
       count,
       modeSelections,
-      categoryPath,
+      category,
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);

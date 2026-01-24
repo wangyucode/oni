@@ -8,7 +8,7 @@ import ElementDetailView from "./ElementDetailView";
 
 export type LinkDetailViewProps = {
   link: DetailLink;
-  categoryPath?: string[];
+  category?: string;
   mode?: "add" | "edit";
   editKey?: string;
   initialCount?: number;
@@ -18,7 +18,7 @@ export type LinkDetailViewProps = {
 };
 
 export default function LinkDetailView(props: LinkDetailViewProps) {
-  const category = props.categoryPath?.[0];
+  const category = props.category;
   if (category === "复制人") return <DupeDetailView {...props} />;
   if (category === "建筑") return <BuildingDetailView {...props} />;
   if (category === "小动物") return <CritterDetailView {...props} />;

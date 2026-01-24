@@ -16,7 +16,7 @@ import { getIconData } from "./utils";
 
 export type BuildingDetailViewProps = {
   link: DetailLink;
-  categoryPath?: string[];
+  category?: string;
   mode?: "add" | "edit";
   editKey?: string;
   initialCount?: number;
@@ -27,7 +27,7 @@ export type BuildingDetailViewProps = {
 
 export default function BuildingDetailView({
   link,
-  categoryPath = [],
+  category = "",
   mode = "add",
   editKey,
   initialCount,
@@ -78,7 +78,7 @@ export default function BuildingDetailView({
       detail: building,
       count,
       modeSelections,
-      categoryPath,
+      category,
       efficiency,
     };
     if (mode === "edit" && editKey) {

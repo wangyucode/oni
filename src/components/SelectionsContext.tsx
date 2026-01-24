@@ -10,7 +10,7 @@ import { DataContext } from "./DataContext";
 
 export type SelectionEntry = {
   key: string;
-  categoryPath: string[];
+  category: string;
   name: string;
   detail: LinkDetail;
   count: number;
@@ -31,7 +31,7 @@ export type SelectionsSummary = {
 
 export type GroupedSelectionEntry = {
   key: string;
-  categoryPath: string[];
+  category: string;
   name: string;
   count: number;
 };
@@ -47,7 +47,7 @@ type UpsertPayload = {
   detail: LinkDetail;
   count: number;
   modeSelections: ModeSelections;
-  categoryPath: string[];
+  category: string;
   efficiency?: number;
 };
 
@@ -115,7 +115,7 @@ function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
 function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionEntry[] {
   const grouped = new Map<string, { entry: GroupedSelectionEntry; rawCount: number }>();
   selections.forEach((selection) => {
-    const categoryKey = selection.categoryPath.join(">");
+    const categoryKey = selection.category;
     const groupKey = `${categoryKey}::${selection.name}`;
 
     const contribution = (selection.count * (selection.efficiency ?? 100)) / 100;
@@ -127,7 +127,7 @@ function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionE
       grouped.set(groupKey, {
         entry: {
           key: groupKey,
-          categoryPath: selection.categoryPath,
+          category: selection.category,
           name: selection.name,
           count: 0,
         },
@@ -146,7 +146,12 @@ function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionE
 
 function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   if (!raw || typeof raw !== "object") return null;
-  const categoryPath = Array.isArray(raw.categoryPath) ? raw.categoryPath.map(String) : [];
+  let category = "";
+  if (typeof raw.category === "string") {
+    category = raw.category;
+  } else if (Array.isArray(raw.categoryPath) && raw.categoryPath.length > 0) {
+    category = String(raw.categoryPath[0]);
+  }
   const count = Number(raw.count) || 0;
   if (count <= 0) return null;
 
@@ -181,7 +186,7 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
 
   return {
     key,
-    categoryPath,
+    category,
     name,
     detail: detail as LinkDetail,
     count: normalized.count,
@@ -190,9 +195,9 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   };
 }
 
-function findDupeDetail(data: Menu): { link: Link; categoryPath: string[] } | null {
+function findDupeDetail(data: Menu): { link: Link; category: string } | null {
   const visited = new WeakSet<Menu>();
-  let fallback: { link: Link; categoryPath: string[] } | null = null;
+  let fallback: { link: Link; category: string } | null = null;
 
   const hasOptionName = (detail: any, optionName: string): boolean => {
     const modes = Array.isArray(detail?.modes) ? detail.modes : [];
@@ -202,16 +207,19 @@ function findDupeDetail(data: Menu): { link: Link; categoryPath: string[] } | nu
     });
   };
 
-  const buildCategoryPath = (stack: Menu[]) => stack.slice(1).map((m) => m.title).filter(Boolean);
+  const getCategory = (stack: Menu[]) => {
+    const path = stack.slice(1).map((m) => m.title).filter(Boolean);
+    return path.length > 0 ? path[0] : "";
+  };
 
-  const dfs = (menu: Menu, stack: Menu[]): { link: Link; categoryPath: string[] } | null => {
+  const dfs = (menu: Menu, stack: Menu[]): { link: Link; category: string } | null => {
     if (!menu || visited.has(menu)) return null;
     visited.add(menu);
     const items = Array.isArray(menu.items) ? menu.items : [];
 
     for (const item of items) {
       if (item?.detail && "resources" in item.detail && "modes" in item.detail && !("heat" in item.detail) && !("life" in item.detail)) {
-        const candidate = { link: item, categoryPath: buildCategoryPath(stack) };
+        const candidate = { link: item, category: getCategory(stack) };
         if (!fallback) fallback = candidate;
         if (hasOptionName(item.detail, "抽水马桶")) {
           return candidate;
@@ -280,7 +288,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
         const normalized = normalizeCountAndEfficiency(incomingEffectiveCount);
         nextSelections.push({
           key,
-          categoryPath: action.payload.categoryPath,
+          category: action.payload.category,
           name: action.payload.name,
           detail: action.payload.detail,
           count: normalized.count,
@@ -316,7 +324,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           name: action.payload.next.name,
           detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
-          categoryPath: action.payload.next.categoryPath,
+          category: action.payload.next.category,
           count: normalized.count,
           efficiency: normalized.efficiency,
         };
@@ -327,7 +335,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           name: action.payload.next.name,
           detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
-          categoryPath: action.payload.next.categoryPath,
+          category: action.payload.next.category,
           count: normalized.count,
           efficiency: normalized.efficiency,
         });
@@ -408,7 +416,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     debounce((selections: SelectionEntry[]) => {
       const saved: SavedSelectionEntry[] = selections.map((s) => ({
         key: s.key,
-        categoryPath: s.categoryPath,
+        category: s.category,
         name: s.name,
         detail: s.detail,
         count: s.count,
@@ -459,7 +467,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
             detail,
             count: 3,
             modeSelections,
-            categoryPath: found.categoryPath
+            category: found.category
           }
         });
       }

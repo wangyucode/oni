@@ -15,7 +15,7 @@ import { getIconData } from "./utils";
 
 export type DupeDetailViewProps = {
   link: DetailLink;
-  categoryPath?: string[];
+  category?: string;
   mode?: "add" | "edit";
   editKey?: string;
   initialCount?: number;
@@ -25,7 +25,7 @@ export type DupeDetailViewProps = {
 
 export default function DupeDetailView({
   link,
-  categoryPath = [],
+  category = "",
   mode = "add",
   editKey,
   initialCount,
@@ -84,7 +84,7 @@ export default function DupeDetailView({
       detail: dupe,
       count,
       modeSelections,
-      categoryPath,
+      category,
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);

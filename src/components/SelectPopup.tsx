@@ -25,8 +25,9 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         return selectedLink?.name || currentMenu?.title || "类别";
     }, [currentMenu?.title, selectedLink?.name]);
 
-    const categoryPath = useMemo(() => {
-        return backStack.slice(1).map((m) => m.title).filter(Boolean);
+    const category = useMemo(() => {
+        const path = backStack.slice(1).map((m) => m.title).filter(Boolean);
+        return path.length > 0 ? path[0] : "";
     }, [backStack]);
 
     useEffect(() => {
@@ -79,7 +80,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
     }
 
     const content = selectedLink
-        ? <LinkDetailView link={selectedLink} categoryPath={categoryPath} onConfirmed={handleClose} />
+        ? <LinkDetailView link={selectedLink} category={category} onConfirmed={handleClose} />
         : renderMenu(currentMenu);
 
     return (

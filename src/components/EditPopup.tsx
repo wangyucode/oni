@@ -55,7 +55,7 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
                 name: selectedEntry.name,
                 detail: selectedEntry.detail,
               }}
-              categoryPath={selectedEntry.categoryPath}
+              category={selectedEntry.category}
               mode="edit"
               editKey={selectedEntry.key}
               initialCount={selectedEntry.count}
