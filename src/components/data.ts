@@ -50,6 +50,8 @@ export interface BuildingDetail {
 export interface CreatureDetail {
   resources: ResourceMap;
   life: string;
+  drop?: ResourceMap;
+  spawn?: number;
   modes: Mode[];
 }
 
