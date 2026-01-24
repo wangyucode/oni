@@ -4,19 +4,19 @@ import { Del, Edit } from "@nutui/icons-react-taro";
 
 import Icon from "./icons";
 import FilteredImage from "./FilteredImage";
-import { SelectionEntry } from "./SelectionsContext";
+import { SelectionEntryWithDetail } from "./SelectionsContext";
 import { IconData } from "./DataContext";
 import { getIconData } from "./utils";
 import { normalizeModeSelections } from "./selection/modeSelection";
 
 interface SelectionsViewProps {
-  selections: SelectionEntry[];
+  selections: SelectionEntryWithDetail[];
   iconMap: Map<string, IconData>;
-  onSelect: (entry: SelectionEntry) => void;
+  onSelect: (entry: SelectionEntryWithDetail) => void;
   onRemove: (key: string) => void;
 }
 
-function buildSummary(entry: SelectionEntry): string {
+function buildSummary(entry: SelectionEntryWithDetail): string {
   const detailAny = entry.detail as any;
   const modes = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
   const normalized = normalizeModeSelections(entry.detail, entry.modeSelections);

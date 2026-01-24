@@ -3,21 +3,21 @@ import { ScrollView, View } from "@tarojs/components";
 import { Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
-import { SelectionEntry, SelectionsActionsContext } from "./SelectionsContext";
+import { SelectionEntryWithDetail, SelectionsActionsContext } from "./SelectionsContext";
 import { DataContext } from "./DataContext";
 import LinkDetailView from "./LinkDetailView";
 import SelectionsView from "./SelectionsView";
 
 interface EditPopupProps {
   visible: boolean;
-  selections: SelectionEntry[];
+  selections: SelectionEntryWithDetail[];
   onClose: () => void;
 }
 
 export default function EditPopup({ visible, selections, onClose }: EditPopupProps) {
   const { iconMap } = useContext(DataContext);
   const { remove } = useContext(SelectionsActionsContext);
-  const [selectedEntry, setSelectedEntry] = useState<SelectionEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<SelectionEntryWithDetail | null>(null);
 
   useEffect(() => {
     if (!visible) setSelectedEntry(null);

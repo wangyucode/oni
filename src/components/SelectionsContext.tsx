@@ -12,10 +12,13 @@ export type SelectionEntry = {
   key: string;
   category: string;
   name: string;
-  detail: LinkDetail;
   count: number;
   modeSelections: ModeSelections;
   efficiency?: number;
+};
+
+export type SelectionEntryWithDetail = SelectionEntry & {
+  detail: LinkDetail;
 };
 
 type SavedSelectionEntry = SelectionEntry;
@@ -37,7 +40,7 @@ export type GroupedSelectionEntry = {
 };
 
 export type SelectionsContextValue = {
-  selections: SelectionEntry[];
+  selections: SelectionEntryWithDetail[];
   groupedSelections: GroupedSelectionEntry[];
   summary: SelectionsSummary;
 };
@@ -176,11 +179,22 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
   }
 
   if (!name) return null;
-  if (!detail || !Array.isArray(detail.modes)) return null;
+  // detail is optional now during restoration, we will re-verify it later if needed
+  // but we still need it for key generation if we want to be consistent.
+  // If detail is missing, we might have a problem with key generation.
+  // However, the key is already stored in the old data. If it's a new save, we don't store the key.
 
-  const modeSelections = normalizeModeSelections(detail as LinkDetail, raw.modeSelections);
+  const modeSelections = detail ? normalizeModeSelections(detail as LinkDetail, raw.modeSelections) : (raw.modeSelections || {});
   const efficiency = raw.efficiency !== undefined ? Number(raw.efficiency) : 100;
-  const key = createSelectionKey(name, detail as LinkDetail, modeSelections);
+  
+  let key = raw.key;
+  if (!key && detail) {
+    key = createSelectionKey(name, detail as LinkDetail, modeSelections);
+  }
+  if (!key) {
+    // Fallback key if detail is missing and key is missing
+    key = `${name}::${Object.values(modeSelections).join("|")}`;
+  }
 
   const normalized = normalizeCountAndEfficiency((count * efficiency) / 100);
 
@@ -188,11 +202,30 @@ function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
     key,
     category,
     name,
-    detail: detail as LinkDetail,
     count: normalized.count,
     modeSelections,
     efficiency: normalized.efficiency,
   };
+}
+
+function findDetailByName(data: Menu, name: string): LinkDetail | null {
+  const visited = new WeakSet<Menu>();
+  const dfs = (menu: Menu): LinkDetail | null => {
+    if (!menu || visited.has(menu)) return null;
+    visited.add(menu);
+    const items = Array.isArray(menu.items) ? menu.items : [];
+    for (const item of items) {
+      if (item?.name === name && item?.detail) {
+        return item.detail as LinkDetail;
+      }
+      if (item?.menu) {
+        const found = dfs(item.menu);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return dfs(data);
 }
 
 function findDupeDetail(data: Menu): { link: Link; category: string } | null {
@@ -275,7 +308,6 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           nextSelections[existingIndex] = {
             ...existing,
             name: action.payload.name,
-            detail: action.payload.detail,
             modeSelections: normalizedModeSelections,
             count: normalized.count,
             efficiency: normalized.efficiency,
@@ -290,7 +322,6 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
           key,
           category: action.payload.category,
           name: action.payload.name,
-          detail: action.payload.detail,
           count: normalized.count,
           modeSelections: normalizedModeSelections,
           efficiency: normalized.efficiency,
@@ -322,7 +353,6 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
         nextSelections[existingIndex] = {
           ...existing,
           name: action.payload.next.name,
-          detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
           category: action.payload.next.category,
           count: normalized.count,
@@ -333,7 +363,6 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
         nextSelections.push({
           key: nextKey,
           name: action.payload.next.name,
-          detail: action.payload.next.detail,
           modeSelections: normalizedModeSelections,
           category: action.payload.next.category,
           count: normalized.count,
@@ -362,7 +391,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
   }
 }
 
-function buildSummary(selections: SelectionEntry[]): SelectionsSummary {
+function buildSummary(selections: SelectionEntryWithDetail[]): SelectionsSummary {
   const resources: Record<string, number> = {};
   const resourceKinds: Record<string, ResourceUnitKind> = {};
   let totalPower = 0;
@@ -412,13 +441,24 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
   const { data } = useContext(DataContext);
   const [shouldInitDefaults, setShouldInitDefaults] = useState(false);
 
+  const enrichedSelections = useMemo(() => {
+    if (!data) return [];
+    return state.selections
+      .map((s) => {
+        const detail = findDetailByName(data, s.name);
+        if (!detail) return null;
+        const normalizedModeSelections = normalizeModeSelections(detail, s.modeSelections);
+        return { ...s, detail, modeSelections: normalizedModeSelections };
+      })
+      .filter(Boolean) as SelectionEntryWithDetail[];
+  }, [state.selections, data]);
+
   const debouncedSaveRef = useRef(
     debounce((selections: SelectionEntry[]) => {
       const saved: SavedSelectionEntry[] = selections.map((s) => ({
         key: s.key,
         category: s.category,
         name: s.name,
-        detail: s.detail,
         count: s.count,
         modeSelections: s.modeSelections,
         efficiency: s.efficiency,
@@ -487,7 +527,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     debouncedSaveRef.current(state.selections);
   }, [state.selections, shouldInitDefaults]);
 
-  const summary = useMemo(() => buildSummary(state.selections), [state.selections]);
+  const summary = useMemo(() => buildSummary(enrichedSelections), [enrichedSelections]);
   const groupedSelections = useMemo(() => buildGroupedSelections(state.selections), [state.selections]);
 
   const actions = useMemo<SelectionsActions>(
@@ -505,11 +545,11 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<SelectionsContextValue>(
     () => ({
-      selections: state.selections,
+      selections: enrichedSelections,
       groupedSelections,
       summary,
     }),
-    [state.selections, groupedSelections, summary]
+    [enrichedSelections, groupedSelections, summary]
   );
 
   return (
