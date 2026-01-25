@@ -1,25 +1,14 @@
 import Taro, { useShareAppMessage } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
-import { Avatar, Cell, Switch } from "@nutui/nutui-react-taro";
+import { Avatar, Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
 
 import icon from 'src/icon.png'
 import { sharedMessage } from "src/components/data";
-import { useUnit } from "src/components/UnitContext";
-
-
 
 export default function About() {
 
-    const { timeUnit, toggleTimeUnit } = useUnit();
-
     useShareAppMessage(() => sharedMessage);
-
-    const isCycle = timeUnit === '周期';
-
-    const toggleMode = () => {
-        toggleTimeUnit();
-    }
 
     function handleLogClick() {
         Taro.navigateTo({
@@ -44,16 +33,6 @@ export default function About() {
                 <Cell title="更新日志" extra={<ArrowRight size={16} />} onClick={handleLogClick} align="center" clickable />
                 <Cell title="支持运营" extra={<ArrowRight size={16} />} onClick={handleSupportClick} align="center" clickable />
             </Cell.Group>
-
-            <Cell.Group className="about-cells">
-                <Cell className='border border-black shadow-none' align="center" title="切换时间单位" extra={
-                      <>
-                        <Text className='text-primary font-bold mr-4'>{isCycle ? '周期' : '秒'}</Text>
-                        <Switch checked={isCycle} onChange={toggleMode} />
-                      </>
-                    } />
-            </Cell.Group>          
-
         </View>
     )
 }

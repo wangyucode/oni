@@ -2,7 +2,7 @@
 import { MouseEvent, useContext, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Badge, Button, Collapse } from '@nutui/nutui-react-taro'
+import { Badge, Button, Collapse, Cell, Switch } from '@nutui/nutui-react-taro'
 import { Add } from '@nutui/icons-react-taro';
 
 import Icon from 'src/components/icons'
@@ -24,7 +24,11 @@ const resultCategories = ['资源', '食物', '电力', '热量'];
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
-  const { timeUnit } = useUnit();
+  const { timeUnit, toggleTimeUnit } = useUnit();
+  const isCycle = timeUnit === '周期';
+  const toggleMode = () => {
+    toggleTimeUnit();
+  }
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   const [isShowEditPopup, setIsShowEditPopup] = useState(false);
   const { selections, groupedSelections, summary } = useSelections();
@@ -116,12 +120,12 @@ function Index() {
                       const iconData = getIconData(iconMap, selection.name);
                       if (!iconData?.icon) return <Icon name={selection.name} width={48} height={48} />;
                       return (
-                      <FilteredImage
-                        src={iconData.icon}
-                        iconFilter={iconData.iconFilter}
-                        style={{ width: 48, height: 48 }}
-                        mode="aspectFit"
-                      />
+                        <FilteredImage
+                          src={iconData.icon}
+                          iconFilter={iconData.iconFilter}
+                          style={{ width: 48, height: 48 }}
+                          mode="aspectFit"
+                        />
                       );
                     })()}
                   </Badge>
@@ -130,6 +134,15 @@ function Index() {
             </View>
           </Collapse.Item>
         </Collapse>
+
+        <Cell.Group className="index-cells">
+          <Cell className='border border-black shadow-none' align="center" title="时间单位" extra={
+            <>
+              <Text className='text-primary font-bold mr-4'>{isCycle ? '周期' : '秒'}</Text>
+              <Switch checked={isCycle} onChange={toggleMode} />
+            </>
+          } />
+        </Cell.Group>
       </View>
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
       <EditPopup
