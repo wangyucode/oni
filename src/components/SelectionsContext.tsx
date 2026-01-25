@@ -7,6 +7,7 @@ import { ResourceItem } from "./ResourceGrid";
 import { calculateSelectionTotals, ResourceUnitKind } from "./selection/calc";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
 import { DataContext } from "./DataContext";
+import { HUNGER_OPTIONS, useUnit } from "./UnitContext";
 
 export type SelectionEntry = {
   key: string;
@@ -396,7 +397,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
   }
 }
 
-function buildSummary(selections: SelectionEntryWithDetail[]): SelectionsSummary {
+function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelModifier: number): SelectionsSummary {
   const resources: Record<string, number> = {};
   const resourceKinds: Record<string, ResourceUnitKind> = {};
   let totalPower = 0;
@@ -412,7 +413,11 @@ function buildSummary(selections: SelectionEntryWithDetail[]): SelectionsSummary
   };
 
   selections.forEach((selection) => {
-    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections, selection.efficiency);
+    const isDupe = selection.category === "复制人";
+    const isBionic = selection.name.includes("仿生人");
+    const calorieModifier = isDupe ? hungerLevelModifier : 1;
+    const powerModifier = isBionic ? hungerLevelModifier : 1;
+    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections, selection.efficiency, calorieModifier, powerModifier);
     totalPower += totals.totalPower;
     totalHeat += totals.totalHeat;
     totalCalories += totals.totalCalories;
@@ -532,7 +537,10 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     debouncedSaveRef.current(state.selections);
   }, [state.selections, shouldInitDefaults]);
 
-  const summary = useMemo(() => buildSummary(enrichedSelections), [enrichedSelections]);
+  const { hungerLevel } = useUnit();
+  const hungerLevelModifier = useMemo(() => HUNGER_OPTIONS.find(o => o.label === hungerLevel)?.value ?? 1, [hungerLevel]);
+
+  const summary = useMemo(() => buildSummary(enrichedSelections, hungerLevelModifier), [enrichedSelections, hungerLevelModifier]);
   const groupedSelections = useMemo(() => buildGroupedSelections(state.selections), [state.selections]);
 
   const actions = useMemo<SelectionsActions>(

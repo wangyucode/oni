@@ -87,7 +87,9 @@ export function calculateSelectionTotals(
   detail: LinkDetail,
   count: number,
   modeSelections: ModeSelections,
-  efficiency: number = 100
+  efficiency: number = 100,
+  calorieModifier: number = 1,
+  powerModifier: number = 1
 ): SelectionTotals {
   const detailAny = detail as any;
   const modes: Mode[] = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
@@ -138,9 +140,9 @@ export function calculateSelectionTotals(
     resourceKinds[name] = mergeResourceKind(resourceKinds[name], parsed.kind);
   });
 
-  const totalPower = parseNumber(detailAny?.power) * count * effectiveTotalFactor * efficiencyFactor;
+  const totalPower = parseNumber(detailAny?.power) * count * effectiveTotalFactor * efficiencyFactor * powerModifier;
   const totalHeat = parseNumber(detailAny?.heat) * count * effectiveTotalFactor * efficiencyFactor;
-  const totalCalories = parseNumber(detailAny?.calorie) * count * effectiveTotalFactor * efficiencyFactor;
+  const totalCalories = parseNumber(detailAny?.calorie) * count * effectiveTotalFactor * efficiencyFactor * calorieModifier;
 
   return {
     resources,

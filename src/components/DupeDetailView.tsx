@@ -3,7 +3,7 @@ import { Text, View } from "@tarojs/components";
 
 import { DetailLink, DupeDetail } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
-import { useUnit } from "./UnitContext";
+import { HUNGER_OPTIONS, useUnit } from "./UnitContext";
 import { useSelectionsActions } from "./SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
 import { calculateSelectionTotals } from "./selection/calc";
@@ -33,7 +33,8 @@ export default function DupeDetailView({
   onConfirmed,
 }: DupeDetailViewProps) {
   const dupe = link.detail as DupeDetail;
-  const { timeUnit } = useUnit();
+  const { timeUnit, hungerLevel } = useUnit();
+  const hungerLevelModifier = useMemo(() => HUNGER_OPTIONS.find(o => o.label === hungerLevel)?.value ?? 1, [hungerLevel]);
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
@@ -59,8 +60,10 @@ export default function DupeDetailView({
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
 
   const { resources, resourceKinds, totalPower, totalCalories } = useMemo(() => {
-    return calculateSelectionTotals(dupe, count, normalizedModeSelections);
-  }, [count, dupe, normalizedModeSelections]);
+    const isBionic = link.name.includes("仿生人");
+    const powerModifier = isBionic ? hungerLevelModifier : 1;
+    return calculateSelectionTotals(dupe, count, normalizedModeSelections, 100, hungerLevelModifier, powerModifier);
+  }, [count, dupe, normalizedModeSelections, hungerLevelModifier, link.name]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({

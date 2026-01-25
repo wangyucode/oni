@@ -1,28 +1,42 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 export type TimeUnit = '秒' | '周期';
+export type HungerLevel = '无胃者' | '节食' | '默认' | '无底胃' | '饥肠辘辘';
 
 export const CYCLE_SECONDS = 600;
+
+export const HUNGER_OPTIONS = [
+  { label: '无胃者', value: 0 },
+  { label: '节食', value: 0.5 },
+  { label: '默认', value: 1 },
+  { label: '无底胃', value: 1.5 },
+  { label: '饥肠辘辘', value: 2 },
+];
 
 interface UnitContextType {
   timeUnit: TimeUnit;
   toggleTimeUnit: () => void;
+  hungerLevel: HungerLevel;
+  setHungerLevel: (level: HungerLevel) => void;
 }
 
 export const UnitContext = createContext<UnitContextType>({
   timeUnit: '周期',
   toggleTimeUnit: () => {},
+  hungerLevel: '默认',
+  setHungerLevel: () => {},
 });
 
 export function UnitProvider({ children }: { children: ReactNode }) {
   const [timeUnit, setTimeUnit] = useState<TimeUnit>('周期');
+  const [hungerLevel, setHungerLevel] = useState<HungerLevel>('默认');
 
   const toggleTimeUnit = () => {
     setTimeUnit(prev => prev === '秒' ? '周期' : '秒');
   };
 
   return (
-    <UnitContext.Provider value={{ timeUnit, toggleTimeUnit }}>
+    <UnitContext.Provider value={{ timeUnit, toggleTimeUnit, hungerLevel, setHungerLevel }}>
       {children}
     </UnitContext.Provider>
   );

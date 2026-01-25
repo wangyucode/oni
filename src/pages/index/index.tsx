@@ -2,13 +2,13 @@
 import { MouseEvent, useContext, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Badge, Button, Collapse, Cell, Switch } from '@nutui/nutui-react-taro'
-import { Add } from '@nutui/icons-react-taro';
+import { Badge, Button, Collapse, Cell, Switch, Picker, PickerOption, PickerOptions } from '@nutui/nutui-react-taro'
+import { Add, ArrowRight } from '@nutui/icons-react-taro';
 
 import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
 import ResourceGrid from 'src/components/ResourceGrid';
-import { useUnit } from 'src/components/UnitContext';
+import { HUNGER_OPTIONS, useUnit, HungerLevel } from 'src/components/UnitContext';
 import { useSelections, useSelectionsActions } from 'src/components/SelectionsContext';
 import { sharedMessage } from 'src/components/data';
 import FilteredImage from 'src/components/FilteredImage';
@@ -24,13 +24,38 @@ const resultCategories = ['资源', '食物', '电力', '热量'];
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
-  const { timeUnit, toggleTimeUnit } = useUnit();
+  const { timeUnit, toggleTimeUnit, hungerLevel, setHungerLevel } = useUnit();
   const isCycle = timeUnit === '周期';
   const toggleMode = () => {
     toggleTimeUnit();
   }
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   const [isShowEditPopup, setIsShowEditPopup] = useState(false);
+  const [setting, setSetting] = useState({
+    isShowSettingsPicker: false,
+    title: '',
+    options: [] as PickerOptions[],
+    defaultValue: [hungerLevel],
+  });
+
+  const onSettingConfirm = (selectedOptions: PickerOption[]) => {
+    const value = selectedOptions[0]?.value;
+    if (value === undefined) return;
+    if (setting.title === '饥饿/电力难度') {
+      setHungerLevel(value as HungerLevel);
+    }
+    setSetting({ ...setting, isShowSettingsPicker: false });
+  };
+
+  const showHungerPicker = () => {
+    setSetting({
+      isShowSettingsPicker: true,
+      title: '饥饿/电力难度',
+      options: [HUNGER_OPTIONS.map(o => ({ label: o.label, value: o.label }))],
+      defaultValue: [hungerLevel],
+    });
+  };
+
   const { selections, groupedSelections, summary } = useSelections();
   const { clear } = useSelectionsActions();
   const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
@@ -135,15 +160,29 @@ function Index() {
           </Collapse.Item>
         </Collapse>
 
-        <Cell.Group className="index-cells">
-          <Cell className='border border-black shadow-none' align="center" title="时间单位" extra={
+        <Cell.Group className="settings">
+          <Cell align="center" title="时间单位" extra={
             <>
               <Text className='text-primary font-bold mr-4'>{isCycle ? '周期' : '秒'}</Text>
               <Switch checked={isCycle} onChange={toggleMode} />
             </>
           } />
+          <Cell align="center" title="饥饿/电力难度" clickable onClick={showHungerPicker} extra={
+            <>
+              <Text className='text-primary font-bold mr-4'>{hungerLevel}</Text>
+              <ArrowRight size={16} />
+            </>
+          }  />
         </Cell.Group>
       </View>
+      <Picker
+        visible={setting.isShowSettingsPicker}
+        title={setting.title}
+        options={setting.options}
+        defaultValue={setting.defaultValue}
+        onConfirm={onSettingConfirm}
+        onCancel={() => setSetting({ ...setting, isShowSettingsPicker: false })}
+      />
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
       <EditPopup
         visible={isShowEditPopup}

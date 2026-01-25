@@ -7,11 +7,11 @@ import "./app.scss";
 function App(props) {
   return (
     <DataProvider>
-      <SelectionsProvider>
-        <UnitProvider>
+      <UnitProvider>
+        <SelectionsProvider>
           {props.children}
-        </UnitProvider>
-      </SelectionsProvider>
+        </SelectionsProvider>
+      </UnitProvider>
     </DataProvider>
   );
 }
