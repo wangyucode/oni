@@ -2,13 +2,13 @@
 import { MouseEvent, useContext, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { Badge, Button, Collapse, Cell, Switch, Picker, PickerOption, PickerOptions } from '@nutui/nutui-react-taro'
+import { Badge, Button, Collapse, Cell, Picker, PickerOption, PickerOptions, PickerOnChangeCallbackParameter, PickerValue } from '@nutui/nutui-react-taro'
 import { Add, ArrowRight } from '@nutui/icons-react-taro';
 
 import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
 import ResourceGrid from 'src/components/ResourceGrid';
-import { HUNGER_OPTIONS, useUnit, HungerLevel } from 'src/components/UnitContext';
+import { HUNGER_OPTIONS, TIME_UNIT_OPTIONS, useUnit, HungerLevel, TimeUnit } from 'src/components/UnitContext';
 import { useSelections, useSelectionsActions } from 'src/components/SelectionsContext';
 import { sharedMessage } from 'src/components/data';
 import FilteredImage from 'src/components/FilteredImage';
@@ -24,27 +24,34 @@ const resultCategories = ['资源', '食物', '电力', '热量'];
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
-  const { timeUnit, toggleTimeUnit, hungerLevel, setHungerLevel } = useUnit();
-  const isCycle = timeUnit === '周期';
-  const toggleMode = () => {
-    toggleTimeUnit();
-  }
+  const { timeUnit, setTimeUnit, hungerLevel, setHungerLevel } = useUnit();
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   const [isShowEditPopup, setIsShowEditPopup] = useState(false);
   const [setting, setSetting] = useState({
     isShowSettingsPicker: false,
     title: '',
     options: [] as PickerOptions[],
-    defaultValue: [hungerLevel],
+    value: [] as PickerValue[],
   });
 
   const onSettingConfirm = (selectedOptions: PickerOption[]) => {
-    const value = selectedOptions[0]?.value;
-    if (value === undefined) return;
+    const val = selectedOptions[0]?.value;
+    if (val === undefined) return;
     if (setting.title === '饥饿/电力难度') {
-      setHungerLevel(value as HungerLevel);
+      setHungerLevel(val as HungerLevel);
+    } else if (setting.title === '时间单位') {
+      setTimeUnit(val as TimeUnit);
     }
-    setSetting({ ...setting, isShowSettingsPicker: false });
+    setSetting({ ...setting, isShowSettingsPicker: false, value: [val] });
+  };
+
+  const showTimeUnitPicker = () => {
+    setSetting({
+      isShowSettingsPicker: true,
+      title: '时间单位',
+      options: [TIME_UNIT_OPTIONS],
+      value: [timeUnit],
+    });
   };
 
   const showHungerPicker = () => {
@@ -52,7 +59,7 @@ function Index() {
       isShowSettingsPicker: true,
       title: '饥饿/电力难度',
       options: [HUNGER_OPTIONS.map(o => ({ label: o.label, value: o.label }))],
-      defaultValue: [hungerLevel],
+      value: [hungerLevel],
     });
   };
 
@@ -161,10 +168,10 @@ function Index() {
         </Collapse>
 
         <Cell.Group className="settings">
-          <Cell align="center" title="时间单位" extra={
+          <Cell align="center" title="时间单位" clickable onClick={showTimeUnitPicker} extra={
             <>
-              <Text className='text-primary font-bold mr-4'>{isCycle ? '周期' : '秒'}</Text>
-              <Switch checked={isCycle} onChange={toggleMode} />
+              <Text className='text-primary font-bold mr-4'>{timeUnit}</Text>
+              <ArrowRight size={16} />
             </>
           } />
           <Cell align="center" title="饥饿/电力难度" clickable onClick={showHungerPicker} extra={
@@ -179,8 +186,9 @@ function Index() {
         visible={setting.isShowSettingsPicker}
         title={setting.title}
         options={setting.options}
-        defaultValue={setting.defaultValue}
+        value={setting.value}
         onConfirm={onSettingConfirm}
+        onChange={(param: PickerOnChangeCallbackParameter) => setSetting({ ...setting, value: param.value })}
         onCancel={() => setSetting({ ...setting, isShowSettingsPicker: false })}
       />
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
