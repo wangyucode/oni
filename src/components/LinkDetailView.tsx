@@ -5,6 +5,7 @@ import DupeDetailView from "./DupeDetailView";
 import CritterDetailView from "./CritterDetailView";
 import PlantDetailView from "./PlantDetailView";
 import ElementDetailView from "./ElementDetailView";
+import GeyserDetailView from "./GeyserDetailView";
 
 export type LinkDetailViewProps = {
   link: DetailLink;
@@ -23,6 +24,7 @@ export default function LinkDetailView(props: LinkDetailViewProps) {
   if (category === "建筑") return <BuildingDetailView {...props} />;
   if (category === "小动物") return <CritterDetailView {...props} />;
   if (category === "植物") return <PlantDetailView {...props} />;
-  if (category === "元素") return <ElementDetailView {...props} />;
+  if (category === "元素相变") return <ElementDetailView {...props} />;
+  if (category === "间歇泉") return <GeyserDetailView {...props} />;
   return null;
 }

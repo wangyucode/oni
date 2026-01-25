@@ -83,8 +83,13 @@ export const SelectionsActionsContext = createContext<SelectionsActions>({
 
 function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
   const normalized = normalizeModeSelections(detail, raw);
-  const modes = (detail as any).modes || [];
-  return modes.map((m: any) => normalized[m.name] || "").join("|");
+  const detailAny = detail as any;
+  const modes = detailAny.modes || [];
+  const parts = modes.map((m: any) => normalized[m.name] || "");
+  if (detailAny.min && detailAny.max && normalized["平均产量"]) {
+    parts.push(`平均产量:${normalized["平均产量"]}`);
+  }
+  return parts.join("|");
 }
 
 function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {

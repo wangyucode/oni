@@ -56,8 +56,8 @@ export interface CreatureDetail {
 
 export interface PlantDetail {
   resources: ResourceMap;
-  life: string;
-  modes: Mode[];
+  life?: string;
+  modes?: Mode[];
 }
 
 export interface TransDetail {
@@ -65,7 +65,8 @@ export interface TransDetail {
 }
 
 export interface GeyserDetail {
-  modes: Mode[];
+  min: ResourceMap;
+  max: ResourceMap;
 }
 
 export interface Mode {

@@ -29,6 +29,10 @@ function buildSummary(entry: SelectionEntryWithDetail): string {
     })
     .filter(Boolean);
 
+  if (normalized["平均产量"]) {
+    parts.push(`平均产量：${normalized["平均产量"]}`);
+  }
+
   if (entry.efficiency !== undefined && entry.efficiency !== 100) {
     parts.unshift(`效率：${entry.efficiency}%`);
   }

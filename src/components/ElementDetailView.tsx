@@ -1,7 +1,8 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
+import { InputNumber, Range } from "@nutui/nutui-react-taro";
 
-import { DetailLink } from "./data";
+import { DetailLink, TransDetail } from "./data";
 import ResourceGrid, { ResourceItem } from "./ResourceGrid";
 import { useSelectionsActions } from "./SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
@@ -18,6 +19,7 @@ export type ElementDetailViewProps = {
   editKey?: string;
   initialCount?: number;
   initialModeSelections?: ModeSelections;
+  initialEfficiency?: number;
   onConfirmed?: () => void;
 };
 
@@ -28,14 +30,16 @@ export default function ElementDetailView({
   editKey,
   initialCount,
   initialModeSelections,
+  initialEfficiency,
   onConfirmed,
 }: ElementDetailViewProps) {
-  const detail = link.detail;
+  const detail = link.detail as TransDetail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
   const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
+  const [efficiency, setEfficiency] = useState<number>(mode === "edit" ? (initialEfficiency ?? 100) : 100);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(detail, initialModeSelections);
     return buildDefaultModeSelections(detail);
@@ -44,18 +48,20 @@ export default function ElementDetailView({
   useEffect(() => {
     if (mode === "edit") {
       setCount(Math.max(0, Number(initialCount ?? 1) || 0));
+      setEfficiency(initialEfficiency ?? 100);
       setModeSelections(initialModeSelections ? normalizeModeSelections(detail, initialModeSelections) : buildDefaultModeSelections(detail));
       return;
     }
     setCount(1);
+    setEfficiency(100);
     setModeSelections(buildDefaultModeSelections(detail));
-  }, [detail, initialCount, initialModeSelections, link.name, mode]);
+  }, [detail, initialCount, initialEfficiency, initialModeSelections, link.name, mode]);
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(detail, modeSelections), [detail, modeSelections]);
 
   const { resources, resourceKinds } = useMemo(() => {
-    return calculateSelectionTotals(detail, count, normalizedModeSelections);
-  }, [count, detail, normalizedModeSelections]);
+    return calculateSelectionTotals(detail, count, normalizedModeSelections, efficiency);
+  }, [count, detail, normalizedModeSelections, efficiency]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({
@@ -73,6 +79,7 @@ export default function ElementDetailView({
       count,
       modeSelections,
       category,
+      efficiency,
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);
@@ -94,6 +101,24 @@ export default function ElementDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
+
+      <View className="flex flex-col gap-6">
+        <Text className="text-sm font-semibold">效率</Text>
+        <View className="flex gap-6 items-center">
+          <Range
+            min={0}
+            max={100}
+            step={1}
+            value={efficiency}
+            onChange={(val) => setEfficiency(Array.isArray(val) ? val[0] : val)}
+            maxDescription={null}
+            minDescription={null}
+            currentDescription={null}
+          />
+          <InputNumber min={0} max={100} step={1} value={efficiency} onChange={(val) => setEfficiency(Number(val))} />
+          <Text className="text-gray-600">%</Text>
+        </View>
+      </View>
 
       {detail.modes && detail.modes.length > 0 && (
         <View className="flex flex-col gap-6">

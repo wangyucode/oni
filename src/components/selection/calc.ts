@@ -98,6 +98,20 @@ export function calculateSelectionTotals(
   const efficiencyFactor = efficiency / 100;
   const normalizedSelections = normalizeModeSelections(detail, modeSelections);
 
+  if (detailAny.min && detailAny.max) {
+    const entries = Object.entries(detailAny.min as Record<string, string>);
+    if (entries.length > 0) {
+      const [name] = entries[0];
+      const rawValue = normalizedSelections["平均产量"];
+      const parsed = parseResourceRate(rawValue);
+      const resourceValue = count * parsed.valuePerSecond * efficiencyFactor;
+      if (resourceValue) {
+        resources[name] = resourceValue;
+        resourceKinds[name] = parsed.kind;
+      }
+    }
+  }
+
   modes.forEach((mode) => {
     const modeSelection = normalizedSelections[mode.name];
     mode.options.forEach((option) => {

@@ -11,12 +11,32 @@ export function buildDefaultModeSelections(detail: LinkDetail): ModeSelections {
 }
 
 export function normalizeModeSelections(detail: LinkDetail, raw: ModeSelections): ModeSelections {
-  const modes = (detail as any).modes as Mode[] | undefined;
-  if (!modes) return {};
+  const detailAny = detail as any;
+  const modes = detailAny.modes as Mode[] | undefined;
 
-  return Object.fromEntries(
-    modes.map((mode) => [mode.name, setModeSelection(mode, raw[mode.name])])
-  );
+  if (modes) {
+    return Object.fromEntries(
+      modes.map((mode) => [mode.name, setModeSelection(mode, raw[mode.name])])
+    );
+  }
+
+  if (detailAny.min && detailAny.max) {
+    const entries = Object.entries(detailAny.min as Record<string, string>);
+    if (entries.length > 0) {
+      const [name, minRaw] = entries[0];
+      const maxRaw = (detailAny.max as Record<string, string>)[name] || minRaw;
+      const unitStr = minRaw.replace(/^[\d\.]+/, "");
+      const minNum = parseFloat(minRaw) || 0;
+      const maxNum = parseFloat(maxRaw) || 0;
+      const defaultVal = (minNum + maxNum) / 2;
+
+      const currentVal = raw["平均产量"];
+      if (currentVal) return { "平均产量": currentVal };
+      return { "平均产量": `${defaultVal}${unitStr}` };
+    }
+  }
+
+  return {};
 }
 
 export function setModeSelection(mode: Mode, selected: string | undefined): string {

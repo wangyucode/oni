@@ -25,6 +25,8 @@ export default function Log() {
                         <Text>• 新增滑动条支持数字方式输入</Text>
                         <Text>• 关于改为设置，将显示单位切换功能从首页移动到设置页</Text>
                         <Text>• 小动物支持选择额外蛋是否孵化</Text>
+                        <Text>• 乔木树和漫殖藤支持选择枝桠数量</Text>
+                        <Text>• 支持选择间歇泉和其产量</Text>
                     </>
                 } />
             </Cell.Group>
