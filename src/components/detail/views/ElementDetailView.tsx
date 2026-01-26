@@ -1,20 +1,19 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
-import {InputNumber, Range} from "@nutui/nutui-react-taro";
+import { InputNumber, Range } from "@nutui/nutui-react-taro";
 
-import { BuildingDetail, DetailLink } from "./data";
-import ResourceGrid, { ResourceItem } from "./ResourceGrid";
-import { useUnit } from "./UnitContext";
-import { useSelectionsActions } from "./SelectionsContext";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
-import { calculateSelectionTotals } from "./selection/calc";
-import SelectionDetailHeader from "./detail/SelectionDetailHeader";
-import ModeSelectionEditor from "./detail/ModeSelectionEditor";
-import { convertHeat, formatSignedFloor } from "./detail/formatters";
-import { DataContext } from "./DataContext";
-import { getIconData } from "./utils";
+import { DetailLink, TransDetail } from "../../../types/data";
+import ResourceGrid, { ResourceItem } from "../../ui/ResourceGrid";
+import { useUnit } from "../../../contexts/UnitContext";
+import { useSelectionsActions } from "../../../contexts/SelectionsContext";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "../../selection/modeSelection";
+import { calculateSelectionTotals } from "../../selection/calc";
+import SelectionDetailHeader from "../SelectionDetailHeader";
+import ModeSelectionEditor from "../ModeSelectionEditor";
+import { DataContext } from "../../../contexts/DataContext";
+import { getIconData } from "../../../utils/utils";
 
-export type BuildingDetailViewProps = {
+export type ElementDetailViewProps = {
   link: DetailLink;
   category?: string;
   mode?: "add" | "edit";
@@ -25,7 +24,7 @@ export type BuildingDetailViewProps = {
   onConfirmed?: () => void;
 };
 
-export default function BuildingDetailView({
+export default function ElementDetailView({
   link,
   category = "",
   mode = "add",
@@ -34,9 +33,8 @@ export default function BuildingDetailView({
   initialModeSelections,
   initialEfficiency,
   onConfirmed,
-}: BuildingDetailViewProps) {
-  const building = link.detail as BuildingDetail;
-  const { timeUnit } = useUnit();
+}: ElementDetailViewProps) {
+  const detail = link.detail as TransDetail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
@@ -44,38 +42,41 @@ export default function BuildingDetailView({
   const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
   const [efficiency, setEfficiency] = useState<number>(mode === "edit" ? (initialEfficiency ?? 100) : 100);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
-    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(building, initialModeSelections);
-    return buildDefaultModeSelections(building);
+    if (mode === "edit" && initialModeSelections) return normalizeModeSelections(detail, initialModeSelections);
+    return buildDefaultModeSelections(detail);
   });
 
   useEffect(() => {
     if (mode === "edit") {
       setCount(Math.max(0, Number(initialCount ?? 1) || 0));
       setEfficiency(initialEfficiency ?? 100);
-      setModeSelections(initialModeSelections ? normalizeModeSelections(building, initialModeSelections) : buildDefaultModeSelections(building));
+      setModeSelections(initialModeSelections ? normalizeModeSelections(detail, initialModeSelections) : buildDefaultModeSelections(detail));
       return;
     }
     setCount(1);
     setEfficiency(100);
-    setModeSelections(buildDefaultModeSelections(building));
-  }, [building, initialCount, initialEfficiency, initialModeSelections, link.name, mode]);
+    setModeSelections(buildDefaultModeSelections(detail));
+  }, [detail, initialCount, initialEfficiency, initialModeSelections, link.name, mode]);
 
-  const normalizedModeSelections = useMemo(() => normalizeModeSelections(building, modeSelections), [building, modeSelections]);
+  const normalizedModeSelections = useMemo(() => normalizeModeSelections(detail, modeSelections), [detail, modeSelections]);
 
-  const { resources, resourceKinds, totalPower, totalHeat } = useMemo(() => {
-    return calculateSelectionTotals(building, count, normalizedModeSelections, efficiency, 1, 1);
-  }, [building, count, normalizedModeSelections, efficiency]);
+  const { resources, resourceKinds } = useMemo(() => {
+    return calculateSelectionTotals(detail, count, normalizedModeSelections, efficiency);
+  }, [count, detail, normalizedModeSelections, efficiency]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
-    return Object.entries(resources).map(([name, value]) => ({ name, value, count: 1, kind: resourceKinds[name] || "mass" }));
+    return Object.entries(resources).map(([name, value]) => ({
+      name,
+      value,
+      count: 1,
+      kind: resourceKinds[name] || "mass",
+    }));
   }, [resources, resourceKinds]);
-
-  const { convertedValue: convertedHeat, unit: heatUnit } = useMemo(() => convertHeat(totalHeat, timeUnit), [timeUnit, totalHeat]);
 
   function handlePrimaryAction(): void {
     const payload = {
       name: link.name,
-      detail: building,
+      detail,
       count,
       modeSelections,
       category,
@@ -101,6 +102,7 @@ export default function BuildingDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
+
       <View className="flex flex-col gap-6">
         <Text className="text-sm font-semibold">效率</Text>
         <View className="flex gap-6 items-center">
@@ -118,21 +120,11 @@ export default function BuildingDetailView({
           <Text className="text-gray-600">%</Text>
         </View>
       </View>
-      <View className="flex justify-between">
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">电力</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
-        </View>
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">热量</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
-        </View>
-      </View>
 
-      {building.modes && building.modes.length > 0 && (
+      {detail.modes && detail.modes.length > 0 && (
         <View className="flex flex-col gap-6">
           <Text className="text-sm font-semibold">模式</Text>
-          <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
+          <ModeSelectionEditor detail={detail} modes={detail.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
 

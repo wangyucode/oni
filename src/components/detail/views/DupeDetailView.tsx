@@ -1,17 +1,17 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
-import { DetailLink, DupeDetail } from "./data";
-import ResourceGrid, { ResourceItem } from "./ResourceGrid";
-import { HUNGER_OPTIONS, useUnit } from "./UnitContext";
-import { useSelectionsActions } from "./SelectionsContext";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
-import { calculateSelectionTotals } from "./selection/calc";
-import SelectionDetailHeader from "./detail/SelectionDetailHeader";
-import ModeSelectionEditor from "./detail/ModeSelectionEditor";
-import { convertCalories, formatSignedFloor } from "./detail/formatters";
-import { DataContext } from "./DataContext";
-import { getIconData } from "./utils";
+import { DetailLink, DupeDetail } from "../../../types/data";
+import ResourceGrid, { ResourceItem } from "../../ui/ResourceGrid";
+import { HUNGER_OPTIONS, useUnit } from "../../../contexts/UnitContext";
+import { useSelectionsActions } from "../../../contexts/SelectionsContext";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "../../selection/modeSelection";
+import { calculateSelectionTotals } from "../../selection/calc";
+import SelectionDetailHeader from "../SelectionDetailHeader";
+import ModeSelectionEditor from "../ModeSelectionEditor";
+import { convertCalories, formatSignedFloor } from "../formatters";
+import { DataContext } from "../../../contexts/DataContext";
+import { getIconData } from "../../../utils/utils";
 
 export type DupeDetailViewProps = {
   link: DetailLink;

@@ -1,4 +1,4 @@
-import { LinkDetail, Mode, Option } from "../data";
+import { LinkDetail, Mode, Option } from "../../types/data";
 
 export type ModeSelections = Record<string, string>;
 

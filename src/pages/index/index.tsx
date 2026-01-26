@@ -5,17 +5,17 @@ import { View, Text } from '@tarojs/components'
 import { Badge, Button, Collapse, Cell, Picker, PickerOption, PickerOptions, PickerOnChangeCallbackParameter, PickerValue } from '@nutui/nutui-react-taro'
 import { Add, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
 
-import Icon from 'src/components/icons'
-import SelectPopup from 'src/components/SelectPopup';
-import ResourceGrid from 'src/components/ResourceGrid';
-import { HUNGER_OPTIONS, TIME_UNIT_OPTIONS, useUnit, HungerLevel, TimeUnit } from 'src/components/UnitContext';
-import { useSelections, useSelectionsActions } from 'src/components/SelectionsContext';
-import { sharedMessage } from 'src/components/data';
-import FilteredImage from 'src/components/FilteredImage';
-import EditPopup from 'src/components/EditPopup';
-import { DataContext } from 'src/components/DataContext';
-import { getIconData } from 'src/components/utils';
-import GlobalSvgFilters from 'src/components/GlobalSvgFilters';
+import Icon from 'src/components/ui/icons'
+import SelectPopup from 'src/components/ui/SelectPopup';
+import ResourceGrid from 'src/components/ui/ResourceGrid';
+import { HUNGER_OPTIONS, TIME_UNIT_OPTIONS, useUnit, HungerLevel, TimeUnit } from 'src/contexts/UnitContext';
+import { useSelections, useSelectionsActions } from 'src/contexts/SelectionsContext';
+import { sharedMessage } from 'src/types/data';
+import FilteredImage from 'src/components/ui/FilteredImage';
+import EditPopup from 'src/components/ui/EditPopup';
+import { DataContext } from 'src/contexts/DataContext';
+import { getIconData } from 'src/utils/utils';
+import GlobalSvgFilters from 'src/components/ui/GlobalSvgFilters';
 
 import './index.scss'
 

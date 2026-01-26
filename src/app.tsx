@@ -1,6 +1,6 @@
-import { DataProvider } from "./components/DataContext";
-import { UnitProvider } from "./components/UnitContext";
-import { SelectionsProvider } from "./components/SelectionsContext";
+import { DataProvider } from "./contexts/DataContext";
+import { UnitProvider } from "./contexts/UnitContext";
+import { SelectionsProvider } from "./contexts/SelectionsContext";
 
 import "./app.scss";
 

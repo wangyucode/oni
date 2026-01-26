@@ -1,5 +1,5 @@
-import { DetailLink } from "./data";
-import { ModeSelections } from "./selection/modeSelection";
+import { DetailLink } from "../../../types/data";
+import { ModeSelections } from "../../selection/modeSelection";
 import BuildingDetailView from "./BuildingDetailView";
 import DupeDetailView from "./DupeDetailView";
 import CritterDetailView from "./CritterDetailView";

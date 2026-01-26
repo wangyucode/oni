@@ -2,8 +2,8 @@ import { Grid } from "@nutui/nutui-react-taro";
 
 import FilteredImage from "./FilteredImage";
 import { useContext } from "react";
-import { DataContext } from "./DataContext";
-import { getIconData } from "./utils";
+import { DataContext } from "../../contexts/DataContext";
+import { getIconData } from "../../utils/utils";
 
 
 export type MenuGridItem = {

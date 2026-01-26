@@ -3,11 +3,11 @@ import { ScrollView, Text, View } from "@tarojs/components";
 import { Button, Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
-import { DataContext } from "./DataContext";
+import { DataContext } from "../../contexts/DataContext";
 import MenuGrid from "./MenuGrid";
-import { DetailLink, Link, Menu, MenuLink } from "./data";
-import LinkDetailView from "./LinkDetailView";
-import { calculateGridColumns } from "./utils";
+import { DetailLink, Link, Menu, MenuLink } from "../../types/data";
+import LinkDetailView from "../detail/views/LinkDetailView";
+import { calculateGridColumns } from "../../utils/utils";
 
 interface SelectPopupProps {
     visible: boolean;

@@ -2,10 +2,10 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer, u
 import Taro from "@tarojs/taro";
 import { debounce } from "@tarojs/runtime";
 
-import { Link, LinkDetail, Menu } from "./data";
-import { ResourceItem } from "./ResourceGrid";
-import { calculateSelectionTotals, ResourceUnitKind } from "./selection/calc";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
+import { Link, LinkDetail, Menu } from "../types/data";
+import { ResourceItem } from "../components/ui/ResourceGrid";
+import { calculateSelectionTotals, ResourceUnitKind } from "../components/selection/calc";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "../components/selection/modeSelection";
 import { DataContext } from "./DataContext";
 import { HUNGER_OPTIONS, useUnit } from "./UnitContext";
 

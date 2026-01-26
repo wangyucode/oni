@@ -2,11 +2,11 @@ import { useMemo, useContext } from 'react';
 import { View, Text } from '@tarojs/components';
 import { Grid } from '@nutui/nutui-react-taro';
 import Icon from './icons';
-import { useUnit, transValue } from './UnitContext';
-import { DataContext } from './DataContext';
-import { calculateGridColumns } from './utils';
+import { useUnit, transValue } from '../../contexts/UnitContext';
+import { DataContext } from '../../contexts/DataContext';
+import { calculateGridColumns } from '../../utils/utils';
 import FilteredImage from './FilteredImage';
-import { ResourceUnitKind } from './selection/calc';
+import { ResourceUnitKind } from '../selection/calc';
 
 export interface ResourceItem {
   name: string;

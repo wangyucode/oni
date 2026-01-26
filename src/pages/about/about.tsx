@@ -4,7 +4,7 @@ import { Avatar, Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
 
 import icon from 'src/icon.png'
-import { sharedMessage } from "src/components/data";
+import { sharedMessage } from "src/types/data";
 
 export default function About() {
 

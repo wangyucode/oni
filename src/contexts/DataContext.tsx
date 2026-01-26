@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import Taro from "@tarojs/taro";
-import { API_BASE, Images, Menu, ORIGIN_BASE } from "./data";
+import { API_BASE, Images, Menu, ORIGIN_BASE } from "../types/data";
 
 export interface DataContextType {
     data: Menu | null;

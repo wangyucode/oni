@@ -1,5 +1,5 @@
-import { LinkDetail, Mode } from "../data";
-import { CYCLE_SECONDS } from "../UnitContext";
+import { LinkDetail, Mode } from "../../types/data";
+import { CYCLE_SECONDS } from "../../contexts/UnitContext";
 import { ModeSelections, optionFactor, normalizeModeSelections } from "./modeSelection";
 
 export type SelectionTotals = {

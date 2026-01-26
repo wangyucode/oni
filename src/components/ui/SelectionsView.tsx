@@ -4,10 +4,10 @@ import { Del, Edit } from "@nutui/icons-react-taro";
 
 import Icon from "./icons";
 import FilteredImage from "./FilteredImage";
-import { SelectionEntryWithDetail } from "./SelectionsContext";
-import { IconData } from "./DataContext";
-import { getIconData } from "./utils";
-import { normalizeModeSelections } from "./selection/modeSelection";
+import { SelectionEntryWithDetail } from "../../contexts/SelectionsContext";
+import { IconData } from "../../contexts/DataContext";
+import { getIconData } from "../../utils/utils";
+import { normalizeModeSelections } from "../selection/modeSelection";
 
 interface SelectionsViewProps {
   selections: SelectionEntryWithDetail[];

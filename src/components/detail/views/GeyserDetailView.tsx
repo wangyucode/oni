@@ -2,16 +2,16 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 import { InputNumber, Range } from "@nutui/nutui-react-taro";
 
-import { GeyserDetail, DetailLink } from "./data";
-import ResourceGrid, { ResourceItem } from "./ResourceGrid";
-import { useSelectionsActions } from "./SelectionsContext";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "./selection/modeSelection";
-import { calculateSelectionTotals } from "./selection/calc";
-import SelectionDetailHeader from "./detail/SelectionDetailHeader";
-import { DataContext } from "./DataContext";
-import { getIconData } from "./utils";
-
-import { useUnit, transValue } from "./UnitContext";
+import { DetailLink, GeyserDetail } from "../../../types/data";
+import ResourceGrid, { ResourceItem } from "../../ui/ResourceGrid";
+import { useUnit, transValue } from "../../../contexts/UnitContext";
+import { useSelectionsActions } from "../../../contexts/SelectionsContext";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "../../selection/modeSelection";
+import { calculateSelectionTotals } from "../../selection/calc";
+import SelectionDetailHeader from "../SelectionDetailHeader";
+import ModeSelectionEditor from "../ModeSelectionEditor";
+import { DataContext } from "../../../contexts/DataContext";
+import { getIconData } from "../../../utils/utils";
 
 export type GeyserDetailViewProps = {
   link: DetailLink;

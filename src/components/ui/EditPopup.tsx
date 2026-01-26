@@ -3,9 +3,9 @@ import { ScrollView, View } from "@tarojs/components";
 import { Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
-import { SelectionEntryWithDetail, SelectionsActionsContext } from "./SelectionsContext";
-import { DataContext } from "./DataContext";
-import LinkDetailView from "./LinkDetailView";
+import { SelectionEntryWithDetail, SelectionsActionsContext } from "../../contexts/SelectionsContext";
+import { DataContext } from "../../contexts/DataContext";
+import LinkDetailView from "../detail/views/LinkDetailView";
 import SelectionsView from "./SelectionsView";
 
 interface EditPopupProps {
