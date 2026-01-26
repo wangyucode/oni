@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { View } from '@tarojs/components';
+import { View, Text } from '@tarojs/components';
+import { Divider, Loading } from '@nutui/nutui-react-taro';
+
 import WikiBreadcrumb, { WikiBreadcrumbRef } from '@/components/wiki/WikiBreadcrumb';
+import LargeLink from '@/components/wiki/widgets/LargeLink';
+import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
 import { Page } from '@/types/data';
 
 import './wiki.scss';
@@ -10,63 +14,45 @@ export default function Wiki() {
   const [currentPage, setCurrentPage] = useState<Page | null>(null);
 
   useEffect(() => {
-    breadcrumbRef.current?.onPush("/entry/home");
+    onPush("/entry/home");
   }, []);
+
+  function onPush(url: string) {
+    breadcrumbRef.current?.onPush(url);
+  }
 
   return (
     <View className='page wiki'>
-      <WikiBreadcrumb 
-        ref={breadcrumbRef} 
-        onPageChange={(page) => setCurrentPage(page)} 
+      <WikiBreadcrumb
+        ref={breadcrumbRef}
+        onPageChange={(page) => setCurrentPage(page)}
       />
-      
-      <View className="wiki-body">
+
+      <View className={`body bg-white rounded-8 p-8 flex flex-col gap-1 ${currentPage ? '' : 'justify-center'}`}>
         {currentPage ? (
-          <View className="wiki-page-content">
-            <View className="wiki-title">{currentPage.title}</View>
-            <View className="wiki-sections">
-              {currentPage.sections?.map((section, idx) => (
-                <View key={idx} className={`wiki-section layout-${section.layout}`}>
-                  {section.widgets?.map((widget, wIdx) => {
-                    switch (widget.type) {
-                      case 'title':
-                        return <View key={wIdx} className="widget-title">{widget.data.text}</View>;
-                      case 'body':
-                        return (
-                          <View key={wIdx} className="widget-body">
-                            {widget.data.map((segment, sIdx) => (
-                              <View 
-                                key={sIdx} 
-                                className={`segment-${segment.type} ${segment.type === 'link' ? 'link-text' : ''}`}
-                                onClick={() => segment.type === 'link' && segment.data.link && breadcrumbRef.current?.onPush(segment.data.link)}
-                              >
-                                {segment.data.text}
-                              </View>
-                            ))}
-                          </View>
-                        );
-                      case 'large-link':
-                        return (
-                          <View 
-                            key={wIdx} 
-                            className="widget-large-link"
-                            onClick={() => breadcrumbRef.current?.onPush(widget.data.link)}
-                          >
-                            <View className="link-text">{widget.data.text}</View>
-                          </View>
-                        );
-                      default:
-                        return <View key={wIdx}>[{widget.type}]</View>;
-                    }
-                  })}
-                </View>
-              ))}
-            </View>
-          </View>
+          <>
+            {currentPage.sections?.map((section, idx) => (
+              <View key={idx} className={`section layout-${section.layout}`}>
+                {section.widgets?.map((widget, wIdx) => {
+                  switch (widget.type) {
+                    case 'title':
+                      return <Text key={wIdx} className='font-bold text-lg'>{widget.data.text}</Text>;
+                    case 'divider':
+                      return <Divider key={wIdx} />;
+                    case 'large-link':
+                      return <LargeLink key={wIdx} data={widget.data} onPush={onPush} />;
+                    default:
+                      return <View key={wIdx}>[{widget.type}]</View>;
+                  }
+                })}
+              </View>
+            ))}
+          </>
         ) : (
-          <View className="loading">加载中...</View>
+          <Loading className='loading' />
         )}
       </View>
+      <GlobalSvgFilters />
     </View>
   );
 }

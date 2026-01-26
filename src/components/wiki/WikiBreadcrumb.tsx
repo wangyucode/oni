@@ -18,9 +18,11 @@ const WikiBreadcrumb = forwardRef<WikiBreadcrumbRef, Props>(({ onPageChange }, r
   const { getPage } = useContext(WikiContext);
 
   const onPush = useCallback(async (link: string) => {
+    if (stack.some(page => page.link === link)) return;
     try {
       const page = await getPage(link);
       setStack(prev => {
+        if (prev.some(p => p.link === link)) return prev;
         const next = [...prev, page];
         onPageChange?.(page);
         return next;
@@ -28,7 +30,7 @@ const WikiBreadcrumb = forwardRef<WikiBreadcrumbRef, Props>(({ onPageChange }, r
     } catch (error) {
       console.error('Failed to push wiki page:', error);
     }
-  }, [getPage, onPageChange]);
+  }, [getPage, onPageChange, stack]);
 
   const onPopTo = useCallback((index: number) => {
     setStack(prev => {
@@ -48,7 +50,7 @@ const WikiBreadcrumb = forwardRef<WikiBreadcrumbRef, Props>(({ onPageChange }, r
   if (stack.length === 0) return null;
 
   return (
-    <ScrollView scrollX className="wiki-breadcrumb-container">
+    <ScrollView scrollX className="wiki-breadcrumb-container rounded-8">
       <View className="wiki-breadcrumb">
         {stack.map((page, index) => (
           <View key={page.link + index} className="breadcrumb-item-wrapper">

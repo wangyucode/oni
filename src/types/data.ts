@@ -206,7 +206,7 @@ type DividerWidget = {
     type: 'divider';
 }
 
-type LargeLinkWidget = {
+export type LargeLinkWidget = {
     type: 'large-link';
     data: {
         link: string; // a[href]

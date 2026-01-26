@@ -1,77 +1,38 @@
 .page.wiki {
-    background-color: transparent;
+  background-color: transparent;
 
-    .wiki-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 16PX 0;
-    }
+  .body {
+    flex: 1;
+    overflow-y: auto;
 
-    .wiki-page-content {
-        display: flex;
-        flex-direction: column;
-        gap: 16PX;
-    }
+    .section {
+      --nutui-divider-margin: 4px 0;
+      display: flex;
 
-    .wiki-title {
-        font-size: 24PX;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 8PX;
-    }
-
-    .wiki-section {
-        background: rgba(255, 255, 255, 0.6);
-        border-radius: 8PX;
-        padding: 12PX;
-        margin-bottom: 12PX;
-
-        &.layout-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100PX, 1fr));
-            gap: 12PX;
+      &.layout{
+        &-col{
+          flex-direction: column;
         }
-    }
 
-    .widget-title {
-        font-size: 18PX;
-        font-weight: bold;
-        color: #7F3D5E;
-        margin-bottom: 8PX;
-    }
-
-    .widget-body {
-        font-size: 14PX;
-        color: #666;
-        line-height: 1.6;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4PX;
-    }
-
-    .link-text {
-        color: #7F3D5E;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-
-    .widget-large-link {
-        background: #7F3D5E;
-        color: white;
-        padding: 12PX;
-        border-radius: 6PX;
-        text-align: center;
-        font-weight: bold;
-
-        .link-text {
-            color: white;
-            text-decoration: none;
+        &-grid{
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap:4PX;
         }
+      }
+    }
+
+    .large-link {
+      cursor: pointer;
+      &:active {
+        background-color: var(--nutui-color-primary);
+      }
     }
 
     .loading {
-        text-align: center;
-        padding: 40PX;
-        color: #999;
+      --nutui-loading-icon-size: 48PX
     }
+  }
+
+
 }
