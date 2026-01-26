@@ -1,6 +1,6 @@
 
 import { MouseEvent, useContext, useState } from 'react';
-import { useShareAppMessage } from '@tarojs/taro';
+import Taro, { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { Badge, Button, Collapse, Cell, Picker, PickerOption, PickerOptions, PickerOnChangeCallbackParameter, PickerValue } from '@nutui/nutui-react-taro'
 import { Add, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
@@ -34,6 +34,13 @@ function Index() {
     value: [] as PickerValue[],
   });
 
+  const { selections, groupedSelections, summary, projects, currentProjectIndex } = useSelections();
+  const { clear, addProject, deleteProject, switchProject } = useSelectionsActions();
+  const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
+  const { iconMap } = useContext(DataContext);
+
+  const currentProject = projects[currentProjectIndex];
+
   const onSettingConfirm = (selectedOptions: PickerOption[]) => {
     const val = selectedOptions[0]?.value;
     if (val === undefined) return;
@@ -41,6 +48,9 @@ function Index() {
       setHungerLevel(val as HungerLevel);
     } else if (setting.title === '时间单位') {
       setTimeUnit(val as TimeUnit);
+    } else if (setting.title === '选择方案') {
+      const index = projects.findIndex(p => p.name === val);
+      if (index >= 0) switchProject(index);
     }
     setSetting({ ...setting, isShowSettingsPicker: false, value: [val] });
   };
@@ -63,10 +73,32 @@ function Index() {
     });
   };
 
-  const { selections, groupedSelections, summary } = useSelections();
-  const { clear } = useSelectionsActions();
-  const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
-  const { iconMap } = useContext(DataContext);
+  const showProjectPicker = () => {
+    setSetting({
+      isShowSettingsPicker: true,
+      title: '选择方案',
+      options: [projects.map(p => ({ label: p.name, value: p.name }))],
+      value: [currentProject.name],
+    });
+  };
+
+  function handleAddProject(e: MouseEvent) {
+    addProject();
+    e.stopPropagation();
+  }
+
+  function handleDeleteProject(e: MouseEvent) {
+    Taro.showModal({
+      title: '删除方案',
+      content: `确定要删除方案 "${currentProject.name}" 吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          deleteProject(currentProjectIndex);
+        }
+      }
+    });
+    e.stopPropagation();
+  }
 
   function handleAdd() {
     setIsShowSelectPopup(true);
@@ -168,11 +200,11 @@ function Index() {
         </Collapse>
 
         <Cell.Group className="settings">
-          <Cell align="center" title="方案" clickable onClick={() => console.log("showProjectPicker")} extra={
+          <Cell align="center" title="方案" clickable onClick={showProjectPicker} extra={
             <View className='flex gap-4 items-center'>
-              <Text className='text-primary font-bold mr-4'>方案1</Text>
-              <Button type="success" size='small'><Plus size={16} color='#fff' /></Button>
-              <Button type="danger" size='small'><Del size={16} color='#fff' /></Button>
+              <Text className='text-primary font-bold mr-4'>{currentProject.name}</Text>
+              <Button type="success" size='small' onClick={handleAddProject}><Plus size={16} color='#fff' /></Button>
+              <Button type="danger" size='small' onClick={handleDeleteProject}><Del size={16} color='#fff' /></Button>
               <ArrowRight size={16} />
             </View>
           } />

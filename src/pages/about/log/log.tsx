@@ -21,12 +21,14 @@ export default function Log() {
                 <Cell title="1.5.0" extra='2025-09-14' description='新增显示单位切换功能' />
                 <Cell title="2.0.0" extra='2026-01-21' description={
                     <>
+                        <Text>• 感谢大家的支持，反馈和建议</Text>
                         <Text>• 调整首页显示，资源在上，选择在下，统一选择入口</Text>
                         <Text>• 新增滑动条支持数字方式输入</Text>
                         <Text>• 关于改为设置，将显示单位切换功能从首页移动到设置页</Text>
                         <Text>• 小动物支持选择额外蛋是否孵化</Text>
                         <Text>• 乔木树和漫殖藤支持选择枝桠数量</Text>
                         <Text>• 支持选择间歇泉和其产量</Text>
+                        <Text>• 新增饥饿/功率难度设置</Text>
                         <Text>• 新增饥饿/功率难度设置</Text>
                     </>
                 } />

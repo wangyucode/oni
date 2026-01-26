@@ -9,6 +9,11 @@ import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } f
 import { DataContext } from "./DataContext";
 import { HUNGER_OPTIONS, useUnit } from "./UnitContext";
 
+export type Project = {
+  name: string; // 方案1，方案2等
+  selections: SelectionEntry[];
+};
+
 export type SelectionEntry = {
   key: string;
   category: string;
@@ -21,8 +26,6 @@ export type SelectionEntry = {
 export type SelectionEntryWithDetail = SelectionEntry & {
   detail: LinkDetail;
 };
-
-type SavedSelectionEntry = SelectionEntry;
 
 export type SelectionsSummary = {
   resources: Record<string, number>;
@@ -44,6 +47,8 @@ export type SelectionsContextValue = {
   selections: SelectionEntryWithDetail[];
   groupedSelections: GroupedSelectionEntry[];
   summary: SelectionsSummary;
+  projects: Project[];
+  currentProjectIndex: number;
 };
 
 type UpsertPayload = {
@@ -60,6 +65,9 @@ export type SelectionsActions = {
   update: (fromKey: string, payload: UpsertPayload) => void;
   remove: (key: string) => void;
   clear: () => void;
+  addProject: () => void;
+  deleteProject: (index: number) => void;
+  switchProject: (index: number) => void;
 };
 
 export const SelectionsContext = createContext<SelectionsContextValue>({
@@ -73,6 +81,8 @@ export const SelectionsContext = createContext<SelectionsContextValue>({
     totalHeat: 0,
     totalCalories: 0,
   },
+  projects: [{ name: "方案1", selections: [] }],
+  currentProjectIndex: 0,
 });
 
 export const SelectionsActionsContext = createContext<SelectionsActions>({
@@ -80,6 +90,9 @@ export const SelectionsActionsContext = createContext<SelectionsActions>({
   update: () => {},
   remove: () => {},
   clear: () => {},
+  addProject: () => {},
+  deleteProject: () => {},
+  switchProject: () => {},
 });
 
 function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
@@ -103,22 +116,6 @@ function normalizeCountAndEfficiency(totalEffective: number): { count: number; e
   const count = Math.ceil(totalEffective);
   const efficiency = Math.round((totalEffective / count) * 10000) / 100;
   return { count, efficiency };
-}
-
-function mergeSelectionsByKey(selections: SelectionEntry[]): SelectionEntry[] {
-  const byKey = new Map<string, SelectionEntry>();
-  selections.forEach((s) => {
-    const existing = byKey.get(s.key);
-    if (!existing) {
-      byKey.set(s.key, s);
-      return;
-    }
-    const existingEffective = (existing.count * (existing.efficiency ?? 100)) / 100;
-    const incomingEffective = (s.count * (s.efficiency ?? 100)) / 100;
-    const normalized = normalizeCountAndEfficiency(existingEffective + incomingEffective);
-    byKey.set(s.key, { ...existing, count: normalized.count, efficiency: normalized.efficiency });
-  });
-  return Array.from(byKey.values()).filter((s) => s.count > 0);
 }
 
 function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionEntry[] {
@@ -151,67 +148,6 @@ function buildGroupedSelections(selections: SelectionEntry[]): GroupedSelectionE
       count: Math.ceil(rawCount),
     }))
     .filter((s) => s.count > 0);
-}
-
-function normalizeRestoredSelectionEntry(raw: any): SelectionEntry | null {
-  if (!raw || typeof raw !== "object") return null;
-  let category = "";
-  if (typeof raw.category === "string") {
-    category = raw.category;
-  } else if (Array.isArray(raw.categoryPath) && raw.categoryPath.length > 0) {
-    category = String(raw.categoryPath[0]);
-  }
-  const count = Number(raw.count) || 0;
-  if (count <= 0) return null;
-
-  let name = "";
-  const rawItem = raw.item;
-  if (rawItem && typeof rawItem === "object") {
-    name = String((rawItem as any).name || "");
-  } else if (typeof raw.name === "string") {
-    name = raw.name;
-  }
-
-  const rawDetail = raw.detail;
-  if (!name && rawDetail && typeof rawDetail === "object") {
-    name = String((rawDetail as any).name || "");
-  }
-
-  let detail: any = null;
-  if (rawDetail && typeof rawDetail === "object" && Array.isArray((rawDetail as any).modes)) {
-    detail = rawDetail;
-  } else if (rawDetail && typeof rawDetail === "object" && (rawDetail as any).detail) {
-    detail = (rawDetail as any).detail;
-  }
-
-  if (!name) return null;
-  // detail is optional now during restoration, we will re-verify it later if needed
-  // but we still need it for key generation if we want to be consistent.
-  // If detail is missing, we might have a problem with key generation.
-  // However, the key is already stored in the old data. If it's a new save, we don't store the key.
-
-  const modeSelections = detail ? normalizeModeSelections(detail as LinkDetail, raw.modeSelections) : (raw.modeSelections || {});
-  const efficiency = raw.efficiency !== undefined ? Number(raw.efficiency) : 100;
-  
-  let key = raw.key;
-  if (!key && detail) {
-    key = createSelectionKey(name, detail as LinkDetail, modeSelections);
-  }
-  if (!key) {
-    // Fallback key if detail is missing and key is missing
-    key = `${name}::${Object.values(modeSelections).join("|")}`;
-  }
-
-  const normalized = normalizeCountAndEfficiency((count * efficiency) / 100);
-
-  return {
-    key,
-    category,
-    name,
-    count: normalized.count,
-    modeSelections,
-    efficiency: normalized.efficiency,
-  };
 }
 
 function findDetailByName(data: Menu, name: string): LinkDetail | null {
@@ -277,17 +213,25 @@ function findDupeDetail(data: Menu): { link: Link; category: string } | null {
 }
 
 type SelectionsState = {
-  selections: SelectionEntry[];
+  projects: Project[];
+  currentProjectIndex: number;
 };
 
 type SelectionsAction =
   | { type: "upsert"; payload: UpsertPayload }
   | { type: "update"; payload: { fromKey: string; next: UpsertPayload } }
   | { type: "remove"; payload: { key: string } }
-  | { type: "replace"; payload: { selections: SelectionEntry[] } }
-  | { type: "clear" };
+  | { type: "replace_all"; payload: { projects: Project[]; currentProjectIndex?: number } }
+  | { type: "clear" }
+  | { type: "add_project" }
+  | { type: "delete_project"; payload: { index: number } }
+  | { type: "switch_project"; payload: { index: number } };
 
 function selectionsReducer(state: SelectionsState, action: SelectionsAction): SelectionsState {
+  const { projects, currentProjectIndex } = state;
+  const currentProject = projects[currentProjectIndex];
+  const selections = currentProject.selections;
+
   switch (action.type) {
     case "upsert": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.detail, action.payload.modeSelections);
@@ -295,45 +239,44 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
       const incomingEffectiveCount = (action.payload.count * incomingEff) / 100;
       const key = createSelectionKey(action.payload.name, action.payload.detail, normalizedModeSelections);
 
+      let nextSelections = selections.slice();
       if (action.payload.count <= 0) {
-        return {
-          selections: state.selections.filter((s) => s.key !== key),
-        };
-      }
-
-      const existingIndex = state.selections.findIndex((s) => s.key === key);
-      const nextSelections = state.selections.slice();
-      if (existingIndex >= 0) {
-        const existing = nextSelections[existingIndex];
-        const nextTotalEffective = (existing.count * (existing.efficiency ?? 100)) / 100 + incomingEffectiveCount;
-        const normalized = normalizeCountAndEfficiency(nextTotalEffective);
-
-        if (normalized.count <= 0) {
-          nextSelections.splice(existingIndex, 1);
-        } else {
-          nextSelections[existingIndex] = {
-            ...existing,
-            name: action.payload.name,
-            modeSelections: normalizedModeSelections,
-            count: normalized.count,
-            efficiency: normalized.efficiency,
-          };
-        }
+        nextSelections = nextSelections.filter((s) => s.key !== key);
       } else {
-        if (incomingEffectiveCount <= 0) {
-          return state;
+        const existingIndex = nextSelections.findIndex((s) => s.key === key);
+        if (existingIndex >= 0) {
+          const existing = nextSelections[existingIndex];
+          const nextTotalEffective = (existing.count * (existing.efficiency ?? 100)) / 100 + incomingEffectiveCount;
+          const normalized = normalizeCountAndEfficiency(nextTotalEffective);
+
+          if (normalized.count <= 0) {
+            nextSelections.splice(existingIndex, 1);
+          } else {
+            nextSelections[existingIndex] = {
+              ...existing,
+              name: action.payload.name,
+              modeSelections: normalizedModeSelections,
+              count: normalized.count,
+              efficiency: normalized.efficiency,
+            };
+          }
+        } else {
+          if (incomingEffectiveCount <= 0) return state;
+          const normalized = normalizeCountAndEfficiency(incomingEffectiveCount);
+          nextSelections.push({
+            key,
+            category: action.payload.category,
+            name: action.payload.name,
+            count: normalized.count,
+            modeSelections: normalizedModeSelections,
+            efficiency: normalized.efficiency,
+          });
         }
-        const normalized = normalizeCountAndEfficiency(incomingEffectiveCount);
-        nextSelections.push({
-          key,
-          category: action.payload.category,
-          name: action.payload.name,
-          count: normalized.count,
-          modeSelections: normalizedModeSelections,
-          efficiency: normalized.efficiency,
-        });
       }
-      return { selections: nextSelections };
+
+      const nextProjects = projects.slice();
+      nextProjects[currentProjectIndex] = { ...currentProject, selections: nextSelections };
+      return { ...state, projects: nextProjects };
     }
     case "update": {
       const normalizedModeSelections = normalizeModeSelections(action.payload.next.detail, action.payload.next.modeSelections);
@@ -342,54 +285,96 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
       const nextKey = createSelectionKey(action.payload.next.name, action.payload.next.detail, normalizedModeSelections);
       const fromKey = action.payload.fromKey;
 
-      const baseSelections = state.selections.filter((s) => s.key !== fromKey);
+      const baseSelections = selections.filter((s) => s.key !== fromKey);
+      let nextSelections = baseSelections.slice();
 
-      if (incomingEffectiveCount <= 0) {
-        return { selections: baseSelections };
+      if (incomingEffectiveCount > 0) {
+        const existingIndex = nextSelections.findIndex((s) => s.key === nextKey);
+        if (existingIndex >= 0) {
+          const existing = nextSelections[existingIndex];
+          const nextTotalEffective = (existing.count * (existing.efficiency ?? 100)) / 100 + incomingEffectiveCount;
+          const normalized = normalizeCountAndEfficiency(nextTotalEffective);
+
+          nextSelections[existingIndex] = {
+            ...existing,
+            name: action.payload.next.name,
+            modeSelections: normalizedModeSelections,
+            category: action.payload.next.category,
+            count: normalized.count,
+            efficiency: normalized.efficiency,
+          };
+        } else {
+          const normalized = normalizeCountAndEfficiency(incomingEffectiveCount);
+          nextSelections.push({
+            key: nextKey,
+            name: action.payload.next.name,
+            modeSelections: normalizedModeSelections,
+            category: action.payload.next.category,
+            count: normalized.count,
+            efficiency: normalized.efficiency,
+          });
+        }
       }
 
-      const existingIndex = baseSelections.findIndex((s) => s.key === nextKey);
-      const nextSelections = baseSelections.slice();
-
-      if (existingIndex >= 0) {
-        const existing = nextSelections[existingIndex];
-        const nextTotalEffective = (existing.count * (existing.efficiency ?? 100)) / 100 + incomingEffectiveCount;
-        const normalized = normalizeCountAndEfficiency(nextTotalEffective);
-
-        nextSelections[existingIndex] = {
-          ...existing,
-          name: action.payload.next.name,
-          modeSelections: normalizedModeSelections,
-          category: action.payload.next.category,
-          count: normalized.count,
-          efficiency: normalized.efficiency,
-        };
-      } else {
-        const normalized = normalizeCountAndEfficiency(incomingEffectiveCount);
-        nextSelections.push({
-          key: nextKey,
-          name: action.payload.next.name,
-          modeSelections: normalizedModeSelections,
-          category: action.payload.next.category,
-          count: normalized.count,
-          efficiency: normalized.efficiency,
-        });
-      }
-
-      return { selections: nextSelections };
+      const nextProjects = projects.slice();
+      nextProjects[currentProjectIndex] = { ...currentProject, selections: nextSelections };
+      return { ...state, projects: nextProjects };
     }
     case "remove": {
-      return {
-        selections: state.selections.filter((s) => s.key !== action.payload.key),
-      };
+      const nextSelections = selections.filter((s) => s.key !== action.payload.key);
+      const nextProjects = projects.slice();
+      nextProjects[currentProjectIndex] = { ...currentProject, selections: nextSelections };
+      return { ...state, projects: nextProjects };
     }
-    case "replace": {
+    case "replace_all": {
       return {
-        selections: mergeSelectionsByKey(action.payload.selections),
+        ...state,
+        projects: action.payload.projects,
+        currentProjectIndex: action.payload.currentProjectIndex ?? state.currentProjectIndex,
       };
     }
     case "clear": {
-      return { selections: [] };
+      const nextProjects = projects.slice();
+      nextProjects[currentProjectIndex] = { ...currentProject, selections: [] };
+      return { ...state, projects: nextProjects };
+    }
+    case "add_project": {
+      const nextProjects = projects.slice();
+      let nextNum = 1;
+      while (nextProjects.some((p) => p.name === `方案${nextNum}`)) {
+        nextNum++;
+      }
+      nextProjects.push({
+        name: `方案${nextNum}`,
+        selections: [],
+      });
+      return {
+        ...state,
+        projects: nextProjects,
+        currentProjectIndex: nextProjects.length - 1,
+      };
+    }
+    case "delete_project": {
+      if (projects.length <= 1) {
+        const nextProjects = [{ name: "方案1", selections: [] }];
+        return { ...state, projects: nextProjects, currentProjectIndex: 0 };
+      }
+      const nextProjects = projects.filter((_, i) => i !== action.payload.index);
+      let nextIndex = currentProjectIndex;
+      if (nextIndex >= nextProjects.length) {
+        nextIndex = nextProjects.length - 1;
+      }
+      return {
+        ...state,
+        projects: nextProjects,
+        currentProjectIndex: nextIndex,
+      };
+    }
+    case "switch_project": {
+      return {
+        ...state,
+        currentProjectIndex: action.payload.index,
+      };
     }
     default: {
       return state;
@@ -446,14 +431,19 @@ function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelModifie
 }
 
 export function SelectionsProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(selectionsReducer, { selections: [] });
+  const [state, dispatch] = useReducer(selectionsReducer, {
+    projects: [{ name: "方案1", selections: [] }],
+    currentProjectIndex: 0,
+  });
   const hydratedRef = useRef(false);
   const { data } = useContext(DataContext);
   const [shouldInitDefaults, setShouldInitDefaults] = useState(false);
 
+  const currentProject = state.projects[state.currentProjectIndex];
+
   const enrichedSelections = useMemo(() => {
     if (!data) return [];
-    return state.selections
+    return currentProject.selections
       .map((s) => {
         const detail = findDetailByName(data, s.name);
         if (!detail) return null;
@@ -461,35 +451,27 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         return { ...s, detail, modeSelections: normalizedModeSelections };
       })
       .filter(Boolean) as SelectionEntryWithDetail[];
-  }, [state.selections, data]);
+  }, [currentProject.selections, data]);
 
   const debouncedSaveRef = useRef(
-    debounce((selections: SelectionEntry[]) => {
-      const saved: SavedSelectionEntry[] = selections.map((s) => ({
-        key: s.key,
-        category: s.category,
-        name: s.name,
-        count: s.count,
-        modeSelections: s.modeSelections,
-        efficiency: s.efficiency,
-      }));
+    debounce((projects: Project[], currentProjectIndex: number) => {
       Taro.setStorage({
-        key: "selections",
-        data: saved,
+        key: "projects_data",
+        data: { projects, currentProjectIndex },
       });
     }, 1000)
   );
 
   useEffect(() => {
-    const saved = Taro.getStorageSync("selections") as SavedSelectionEntry[] | undefined;
-    if (Array.isArray(saved) && saved.length) {
-      const restored: SelectionEntry[] = saved
-        .map((s) => normalizeRestoredSelectionEntry(s))
-        .filter(Boolean) as SelectionEntry[];
-
-      dispatch({ type: "replace", payload: { selections: restored } });
-    } else {
-      setShouldInitDefaults(true);
+    const savedData = Taro.getStorageSync("projects_data");
+    if (savedData && Array.isArray(savedData.projects)) {
+      dispatch({
+        type: "replace_all",
+        payload: {
+          projects: savedData.projects,
+          currentProjectIndex: savedData.currentProjectIndex || 0,
+        },
+      });
     }
     hydratedRef.current = true;
   }, []);
@@ -517,8 +499,8 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
             detail,
             count: 3,
             modeSelections,
-            category: found.category
-          }
+            category: found.category,
+          },
         });
       }
       setShouldInitDefaults(false);
@@ -527,21 +509,14 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydratedRef.current) return;
-    if (!state.selections.length) {
-      // Don't clear storage immediately if we are waiting for defaults
-      if (!shouldInitDefaults) {
-        Taro.removeStorage({ key: "selections" });
-      }
-      return;
-    }
-    debouncedSaveRef.current(state.selections);
-  }, [state.selections, shouldInitDefaults]);
+    debouncedSaveRef.current(state.projects, state.currentProjectIndex);
+  }, [state.projects, state.currentProjectIndex]);
 
   const { hungerLevel } = useUnit();
-  const hungerLevelModifier = useMemo(() => HUNGER_OPTIONS.find(o => o.label === hungerLevel)?.value ?? 1, [hungerLevel]);
+  const hungerLevelModifier = useMemo(() => HUNGER_OPTIONS.find((o) => o.label === hungerLevel)?.value ?? 1, [hungerLevel]);
 
   const summary = useMemo(() => buildSummary(enrichedSelections, hungerLevelModifier), [enrichedSelections, hungerLevelModifier]);
-  const groupedSelections = useMemo(() => buildGroupedSelections(state.selections), [state.selections]);
+  const groupedSelections = useMemo(() => buildGroupedSelections(currentProject.selections), [currentProject.selections]);
 
   const actions = useMemo<SelectionsActions>(
     () => ({
@@ -550,8 +525,10 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       remove: (key) => dispatch({ type: "remove", payload: { key } }),
       clear: () => {
         dispatch({ type: "clear" });
-        Taro.removeStorage({ key: "selections" });
       },
+      addProject: () => dispatch({ type: "add_project" }),
+      deleteProject: (index) => dispatch({ type: "delete_project", payload: { index } }),
+      switchProject: (index) => dispatch({ type: "switch_project", payload: { index } }),
     }),
     []
   );
@@ -561,8 +538,10 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       selections: enrichedSelections,
       groupedSelections,
       summary,
+      projects: state.projects,
+      currentProjectIndex: state.currentProjectIndex,
     }),
-    [enrichedSelections, groupedSelections, summary]
+    [enrichedSelections, groupedSelections, summary, state.projects, state.currentProjectIndex]
   );
 
   return (
