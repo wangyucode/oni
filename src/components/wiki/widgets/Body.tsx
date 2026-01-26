@@ -24,6 +24,12 @@ const Body = ({ data, onPush }: BodyProps) => {
                 {segmentData.text}
               </Text>
             );
+          case 'hotkey':
+            return (
+              <Text key={index} className='font-bold text-primary mx-2'>
+                {segmentData.text}
+              </Text>
+            );
           case 'link':
             return (
               <Text

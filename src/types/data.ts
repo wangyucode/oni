@@ -194,6 +194,7 @@ export type BodyWidget = {
 export type BodySegment = {
     type:
     'text' |
+    'hotkey'|
     'link' | // a.codex-link[href]
     "bold"; // b
     data: {

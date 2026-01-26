@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from '@/components/wiki/widgets/Image';
+import Conversion from '@/components/wiki/widgets/Conversion';
 import { View, Text } from '@tarojs/components';
 import { Divider, Loading } from '@nutui/nutui-react-taro';
 
@@ -52,6 +53,8 @@ export default function Wiki() {
                       return <Divider key={wIdx} />;
                     case 'large-link':
                       return <LargeLink key={wIdx} data={widget.data} onPush={onPush} />;
+                    case 'conversion':
+                      return <Conversion key={wIdx} data={widget.data} onPush={onPush} />;
                     case 'body':
                       return <Body key={wIdx} data={widget.data} onPush={onPush} />;
                     default:
