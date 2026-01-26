@@ -3,7 +3,7 @@ import { MouseEvent, useContext, useState } from 'react';
 import { useShareAppMessage } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { Badge, Button, Collapse, Cell, Picker, PickerOption, PickerOptions, PickerOnChangeCallbackParameter, PickerValue } from '@nutui/nutui-react-taro'
-import { Add, ArrowRight } from '@nutui/icons-react-taro';
+import { Add, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
 
 import Icon from 'src/components/icons'
 import SelectPopup from 'src/components/SelectPopup';
@@ -37,7 +37,7 @@ function Index() {
   const onSettingConfirm = (selectedOptions: PickerOption[]) => {
     const val = selectedOptions[0]?.value;
     if (val === undefined) return;
-    if (setting.title === '饥饿/电力难度') {
+    if (setting.title === '饥饿/功率难度') {
       setHungerLevel(val as HungerLevel);
     } else if (setting.title === '时间单位') {
       setTimeUnit(val as TimeUnit);
@@ -57,7 +57,7 @@ function Index() {
   const showHungerPicker = () => {
     setSetting({
       isShowSettingsPicker: true,
-      title: '饥饿/电力难度',
+      title: '饥饿/功率难度',
       options: [HUNGER_OPTIONS.map(o => ({ label: o.label, value: o.label }))],
       value: [hungerLevel],
     });
@@ -168,18 +168,27 @@ function Index() {
         </Collapse>
 
         <Cell.Group className="settings">
+          <Cell align="center" title="方案" clickable onClick={() => console.log("showProjectPicker")} extra={
+            <View className='flex gap-4 items-center'>
+              <Text className='text-primary font-bold mr-4'>方案1</Text>
+              <Button type="success" size='small'><Plus size={16} color='#fff' /></Button>
+              <Button type="danger" size='small'><Del size={16} color='#fff' /></Button>
+              <ArrowRight size={16} />
+            </View>
+          } />
           <Cell align="center" title="时间单位" clickable onClick={showTimeUnitPicker} extra={
             <>
               <Text className='text-primary font-bold mr-4'>{timeUnit}</Text>
               <ArrowRight size={16} />
             </>
           } />
-          <Cell align="center" title="饥饿/电力难度" clickable onClick={showHungerPicker} extra={
+          <Cell align="center" title="饥饿/功率难度" clickable onClick={showHungerPicker} extra={
             <>
               <Text className='text-primary font-bold mr-4'>{hungerLevel}</Text>
               <ArrowRight size={16} />
             </>
-          }  />
+          } />  
+          
         </Cell.Group>
       </View>
       <Picker

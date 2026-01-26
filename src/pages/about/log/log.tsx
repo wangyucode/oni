@@ -27,7 +27,7 @@ export default function Log() {
                         <Text>• 小动物支持选择额外蛋是否孵化</Text>
                         <Text>• 乔木树和漫殖藤支持选择枝桠数量</Text>
                         <Text>• 支持选择间歇泉和其产量</Text>
-                        <Text>• 新增饥饿/电力难度设置</Text>
+                        <Text>• 新增饥饿/功率难度设置</Text>
                     </>
                 } />
             </Cell.Group>

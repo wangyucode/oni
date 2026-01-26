@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 export type TimeUnit = '秒' | '周期';
-export type HungerLevel = '无胃者' | '节食' | '默认' | '无底胃' | '饥肠辘辘';
+export type HungerLevel = '无胃者/模拟件' | '节食/节能' | '默认' | '无底胃/耗电' | '饥肠辘辘/吸电鬼';
 
 export const CYCLE_SECONDS = 600;
 
@@ -11,11 +11,11 @@ export const TIME_UNIT_OPTIONS = [
 ];
 
 export const HUNGER_OPTIONS = [
-  { label: '无胃者', value: 0 },
-  { label: '节食', value: 0.5 },
+  { label: '无胃者/模拟件', value: 0 },
+  { label: '节食/节能', value: 0.5 },
   { label: '默认', value: 1 },
-  { label: '无底胃', value: 1.5 },
-  { label: '饥肠辘辘', value: 2 },
+  { label: '无底胃/耗电', value: 1.5 },
+  { label: '饥肠辘辘/吸电鬼', value: 2 },
 ];
 
 interface UnitContextType {
