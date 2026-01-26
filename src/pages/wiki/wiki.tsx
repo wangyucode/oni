@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import Image from '@/components/wiki/widgets/Image';
 import { View, Text } from '@tarojs/components';
 import { Divider, Loading } from '@nutui/nutui-react-taro';
 
 import WikiBreadcrumb, { WikiBreadcrumbRef } from '@/components/wiki/WikiBreadcrumb';
 import LargeLink from '@/components/wiki/widgets/LargeLink';
+import Body from '@/components/wiki/widgets/Body';
 import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
 import { Page } from '@/types/data';
 
 import './wiki.scss';
+import Video from '@/components/wiki/widgets/Video';
 
 export default function Wiki() {
   const breadcrumbRef = useRef<WikiBreadcrumbRef>(null);
@@ -38,10 +41,19 @@ export default function Wiki() {
                   switch (widget.type) {
                     case 'title':
                       return <Text key={wIdx} className='font-bold text-lg'>{widget.data.text}</Text>;
+                    case 'subtitle':
+                    case 'section-header':
+                      return <Text key={wIdx} className='font-bold text-md'>{widget.data.text}</Text>;
+                    case 'image':
+                      return <Image key={wIdx} data={widget.data} />;
+                    case 'video':
+                      return <Video key={wIdx} />;
                     case 'divider':
                       return <Divider key={wIdx} />;
                     case 'large-link':
                       return <LargeLink key={wIdx} data={widget.data} onPush={onPush} />;
+                    case 'body':
+                      return <Body key={wIdx} data={widget.data} onPush={onPush} />;
                     default:
                       return <View key={wIdx}>[{widget.type}]</View>;
                   }

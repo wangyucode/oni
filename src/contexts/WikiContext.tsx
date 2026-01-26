@@ -33,16 +33,14 @@ export function WikiProvider({ children }: { children: ReactNode }) {
 
             const data = res.data as any;
             if (!data?.success) {
-                throw new Error(data?.message || "Request failed");
+                return await getPage("/entry/pagenotfound");
             }
             
             const page = data.payload as Page;
             cache.current.set(link, page);
             return page;
         } catch (err: any) {
-            const message = err?.errMsg || err?.message || "Request failed";
-            console.error(`Failed to fetch wiki page for ${link}:`, message);
-            throw new Error(message);
+            return await getPage("/entry/pagenotfound");
         }
     }, []);
 

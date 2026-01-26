@@ -95,7 +95,7 @@ export interface Section {
     widgets: Widgets[]; // .codex-*
 }
 
-type Widgets =
+export type Widgets =
     SubtitleWidget | // class="codex-text subtitle"
     ImageWidget | // class="codex-image-container"
     BodyWidget | // class="codex-text body"
@@ -108,14 +108,14 @@ type Widgets =
     VideoWidget | // class="codex-video"
     GridWidget; // class="codex-element-grid"
 
-type GridWidget = {
+export type GridWidget = {
     type: 'grid';
     data: {
         items: Element[]; // a.element-card
     };
 }
 
-type Element = {
+export type Element = {
     link: string; // a.elemnt-card[href]
     icon: string; // img[src]
     style?: string; // div.large-icon-container[style]
@@ -123,14 +123,14 @@ type Element = {
 }
 
 
-type VideoWidget = {
+export type VideoWidget = {
     type: 'video';
     data: {
         src: string; // video > source[src]
     };
 }
 
-type ConversionWidget = {
+export type ConversionWidget = {
     type: 'conversion';
     data: {
         from: ConversionItem[]; // div.conversion-items
@@ -139,7 +139,7 @@ type ConversionWidget = {
     };
 }
 
-type ConversionItem = {
+export type ConversionItem = {
     link?: string; // .conversion-item[href]
     icon: string; // img[src]
     style?: string; // div.item-icon[style]
@@ -147,28 +147,28 @@ type ConversionItem = {
     value?: string; // span.item-subtext
 }
 
-type SectionHeaderWidget = {
+export type SectionHeaderWidget = {
     type: 'section-header';
     data: {
         text: string; // h3
     };
 }
 
-type TitleWidget = {
+export type TitleWidget = {
     type: 'title';
     data: {
         text: string; // p
     };
 }
 
-type SubtitleWidget = {
+export type SubtitleWidget = {
     type: 'subtitle';
     data: {
         text: string; // p
     };
 }
 
-type ImageWidget = {
+export type ImageWidget = {
     type: 'image';
     data: {
         src: string; // img[src]
@@ -176,7 +176,7 @@ type ImageWidget = {
     };
 }
 
-type SmallLinkWidget = {
+export type SmallLinkWidget = {
     type: 'small-link';
     data: {
         link: string; // [href]
@@ -186,12 +186,12 @@ type SmallLinkWidget = {
     };
 }
 
-type BodyWidget = {
+export type BodyWidget = {
     type: 'body';
     data: BodySegment[]
 }
 
-type BodySegment = {
+export type BodySegment = {
     type:
     'text' |
     'link' | // a.codex-link[href]
@@ -202,7 +202,7 @@ type BodySegment = {
     };
 }
 
-type DividerWidget = {
+export type DividerWidget = {
     type: 'divider';
 }
 

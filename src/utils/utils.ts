@@ -31,3 +31,14 @@ export function getIconData(
     if (icon && /^https?:\/\//.test(icon)) return { icon };
     return iconMap.get(icon || name);
 }
+
+/**
+ * get `url(#colorMultiply-000000FF)` from `filter: url(#colorMultiply-000000FF);`
+ * @param style 
+ * @returns 
+ */
+export function getFilter(style?: string) {
+    if (!style) return undefined;
+    const match = style.match(/filter:\s*(url\(#[^)]+\))/i);
+    return match ? match[1] : undefined;
+}

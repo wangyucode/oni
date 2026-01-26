@@ -34,6 +34,10 @@ page,
             flex-wrap: wrap;
         }
 
+        .inline {
+            display: inline;
+        }
+
         .items-center {
             align-items: center;
         }
@@ -175,6 +179,16 @@ page,
 
         .mr-4 {
             margin-right: 4PX;
+        }
+
+        .my-4 {
+            margin-top: 4PX;
+            margin-bottom: 4PX;
+        }
+
+        .mx-2 {
+            margin-left: 2PX;
+            margin-right: 2PX;
         }
 
         .w-full {

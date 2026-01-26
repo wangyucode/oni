@@ -1,6 +1,7 @@
 import { View, Text } from '@tarojs/components';
 import { LargeLinkWidget, ORIGIN_BASE } from '@/types/data';
 import FilteredImage from '@/components/ui/FilteredImage';
+import { getFilter } from '@/utils/utils';
 
 interface LargeLinkProps {
   data: LargeLinkWidget['data'];
@@ -17,7 +18,7 @@ const LargeLink = ({ data, onPush }: LargeLinkProps) => {
       {data.icon && (
         <FilteredImage
           src={`${ORIGIN_BASE}/upload/oni/v3${data.icon}`}
-          iconFilter={data.style}
+          iconFilter={getFilter(data.style)}
           style={{ width: 64, height: 64 }}
           mode="aspectFit" />
       )}
