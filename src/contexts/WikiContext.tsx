@@ -14,6 +14,7 @@ export function WikiProvider({ children }: { children: ReactNode }) {
     const cache = useRef<Map<string, Page>>(new Map());
 
     const getPage = useCallback(async (link: string): Promise<Page> => {
+        // await new Promise(resolve => setTimeout(resolve, 2000));
         // 内部用link缓存
         if (cache.current.has(link)) {
             return cache.current.get(link)!;

@@ -19,6 +19,7 @@ export default function Wiki() {
 
   function onPush(url: string) {
     breadcrumbRef.current?.onPush(url);
+    setCurrentPage(null);
   }
 
   return (
