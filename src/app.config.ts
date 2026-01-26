@@ -1,6 +1,7 @@
 export default defineAppConfig({
   pages: [
     "pages/index/index",
+    "pages/wiki/wiki",
     "pages/about/about",
     "pages/about/log/log",
     "pages/about/support/support",
@@ -17,6 +18,12 @@ export default defineAppConfig({
     backgroundColor: "#3E4357",
     borderStyle: "black",
     list: [
+      {
+        pagePath: "pages/wiki/wiki",
+        iconPath: "components/ui/icons/research-1.png",
+        selectedIconPath: "components/ui/icons/research.png",
+        text: "百科",
+      },
       {
         pagePath: "pages/index/index",
         iconPath: "components/ui/icons/refine-1.png",
