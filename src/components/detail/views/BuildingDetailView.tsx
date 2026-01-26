@@ -2,17 +2,17 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 import {InputNumber, Range} from "@nutui/nutui-react-taro";
 
-import { BuildingDetail, DetailLink } from "../../../types/data";
-import ResourceGrid, { ResourceItem } from "../../ui/ResourceGrid";
-import { useUnit } from "../../../contexts/UnitContext";
-import { useSelectionsActions } from "../../../contexts/SelectionsContext";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "../../selection/modeSelection";
-import { calculateSelectionTotals } from "../../selection/calc";
-import SelectionDetailHeader from "../SelectionDetailHeader";
-import ModeSelectionEditor from "../ModeSelectionEditor";
-import { convertHeat, formatSignedFloor } from "../formatters";
-import { DataContext } from "../../../contexts/DataContext";
-import { getIconData } from "../../../utils/utils";
+import { BuildingDetail, DetailLink } from "@/types/data";
+import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
+import { useUnit } from "@/contexts/UnitContext";
+import { useSelectionsActions } from "@/contexts/SelectionsContext";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
+import { calculateSelectionTotals } from "@/components/selection/calc";
+import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
+import ModeSelectionEditor from "@/components/detail/ModeSelectionEditor";
+import { convertHeat, formatSignedFloor } from "@/components/detail/formatters";
+import { DataContext } from "@/contexts/DataContext";
+import { getIconData } from "@/utils/utils";
 
 export type BuildingDetailViewProps = {
   link: DetailLink;

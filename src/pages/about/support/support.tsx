@@ -3,9 +3,9 @@ import { View, Text, Image, Button, Navigator } from "@tarojs/components";
 import Taro, { useShareAppMessage } from "@tarojs/taro";
 import { Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
-import BackButton from "src/components/ui/BackButton";
-import { sharedMessage, API_BASE } from "src/types/data";
-import icon from 'src/icon.png';
+import BackButton from "@/components/ui/BackButton";
+import { sharedMessage, API_BASE } from "@/types/data";
+import icon from '@/icon.png';
 
 import './support.scss';
 

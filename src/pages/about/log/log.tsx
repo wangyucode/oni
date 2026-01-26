@@ -1,8 +1,8 @@
 import { View, Text } from "@tarojs/components";
 import { Cell } from "@nutui/nutui-react-taro";
 import { useShareAppMessage } from "@tarojs/taro";
-import { sharedMessage } from "src/types/data";
-import BackButton from "src/components/ui/BackButton";
+import { sharedMessage } from "@/types/data";
+import BackButton from "@/components/ui/BackButton";
 
 import './log.scss'
 

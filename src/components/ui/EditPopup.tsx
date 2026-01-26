@@ -3,10 +3,10 @@ import { ScrollView, View } from "@tarojs/components";
 import { Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
-import { SelectionEntryWithDetail, SelectionsActionsContext } from "../../contexts/SelectionsContext";
-import { DataContext } from "../../contexts/DataContext";
-import LinkDetailView from "../detail/views/LinkDetailView";
-import SelectionsView from "./SelectionsView";
+import { SelectionEntryWithDetail, SelectionsActionsContext } from "@/contexts/SelectionsContext";
+import { DataContext } from "@/contexts/DataContext";
+import LinkDetailView from "@/components/detail/views/LinkDetailView";
+import SelectionsView from "@/components/ui/SelectionsView";
 
 interface EditPopupProps {
   visible: boolean;

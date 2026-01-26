@@ -1,15 +1,15 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
 
-import { DetailLink, PlantDetail } from "../../../types/data";
-import ResourceGrid, { ResourceItem } from "../../ui/ResourceGrid";
-import { useSelectionsActions } from "../../../contexts/SelectionsContext";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "../../selection/modeSelection";
-import { calculateSelectionTotals } from "../../selection/calc";
-import SelectionDetailHeader from "../SelectionDetailHeader";
-import ModeSelectionEditor from "../ModeSelectionEditor";
-import { DataContext } from "../../../contexts/DataContext";
-import { getIconData } from "../../../utils/utils";
+import { DetailLink, PlantDetail } from "@/types/data";
+import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
+import { useSelectionsActions } from "@/contexts/SelectionsContext";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
+import { calculateSelectionTotals } from "@/components/selection/calc";
+import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
+import ModeSelectionEditor from "@/components/detail/ModeSelectionEditor";
+import { DataContext } from "@/contexts/DataContext";
+import { getIconData } from "@/utils/utils";
 
 export type PlantDetailViewProps = {
   link: DetailLink;

@@ -2,12 +2,12 @@ import { Text, View } from "@tarojs/components";
 import { Button } from "@nutui/nutui-react-taro";
 import { Del, Edit } from "@nutui/icons-react-taro";
 
-import Icon from "./icons";
-import FilteredImage from "./FilteredImage";
-import { SelectionEntryWithDetail } from "../../contexts/SelectionsContext";
-import { IconData } from "../../contexts/DataContext";
-import { getIconData } from "../../utils/utils";
-import { normalizeModeSelections } from "../selection/modeSelection";
+import Icon from "@/components/ui/icons";
+import FilteredImage from "@/components/ui/FilteredImage";
+import { SelectionEntryWithDetail } from "@/contexts/SelectionsContext";
+import { IconData } from "@/contexts/DataContext";
+import { getIconData } from "@/utils/utils";
+import { normalizeModeSelections } from "@/components/selection/modeSelection";
 
 interface SelectionsViewProps {
   selections: SelectionEntryWithDetail[];

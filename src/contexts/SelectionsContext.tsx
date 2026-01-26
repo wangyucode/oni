@@ -2,12 +2,12 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer, u
 import Taro from "@tarojs/taro";
 import { debounce } from "@tarojs/runtime";
 
-import { Link, LinkDetail, Menu } from "../types/data";
-import { ResourceItem } from "../components/ui/ResourceGrid";
-import { calculateSelectionTotals, ResourceUnitKind } from "../components/selection/calc";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "../components/selection/modeSelection";
-import { DataContext } from "./DataContext";
-import { HUNGER_OPTIONS, useUnit } from "./UnitContext";
+import { Link, LinkDetail, Menu } from "@/types/data";
+import { ResourceItem } from "@/components/ui/ResourceGrid";
+import { calculateSelectionTotals, ResourceUnitKind } from "@/components/selection/calc";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
+import { DataContext } from "@/contexts/DataContext";
+import { HUNGER_OPTIONS, useUnit } from "@/contexts/UnitContext";
 
 export type Project = {
   name: string; // 方案1，方案2等

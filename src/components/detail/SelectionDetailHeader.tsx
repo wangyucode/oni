@@ -1,7 +1,7 @@
 import { Text, View } from "@tarojs/components";
 import { Button, InputNumber } from "@nutui/nutui-react-taro";
 
-import FilteredImage from "../ui/FilteredImage";
+import FilteredImage from "@/components/ui/FilteredImage";
 
 export type SelectionDetailHeaderProps = {
   icon?: string;

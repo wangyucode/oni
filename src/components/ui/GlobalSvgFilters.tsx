@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { View } from '@tarojs/components';
-import { DataContext } from '../../contexts/DataContext';
+import { DataContext } from '@/contexts/DataContext';
 
 export default function GlobalSvgFilters() {
     if (process.env.TARO_ENV !== 'h5') return null;

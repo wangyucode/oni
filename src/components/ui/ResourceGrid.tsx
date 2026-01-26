@@ -1,12 +1,12 @@
 import { useMemo, useContext } from 'react';
 import { View, Text } from '@tarojs/components';
 import { Grid } from '@nutui/nutui-react-taro';
-import Icon from './icons';
-import { useUnit, transValue } from '../../contexts/UnitContext';
-import { DataContext } from '../../contexts/DataContext';
-import { calculateGridColumns } from '../../utils/utils';
-import FilteredImage from './FilteredImage';
-import { ResourceUnitKind } from '../selection/calc';
+import Icon from '@/components/ui/icons';
+import { useUnit, transValue } from '@/contexts/UnitContext';
+import { DataContext } from '@/contexts/DataContext';
+import { calculateGridColumns } from '@/utils/utils';
+import FilteredImage from '@/components/ui/FilteredImage';
+import { ResourceUnitKind } from '@/components/selection/calc';
 
 export interface ResourceItem {
   name: string;

@@ -1,11 +1,11 @@
-import { DetailLink } from "../../../types/data";
-import { ModeSelections } from "../../selection/modeSelection";
-import BuildingDetailView from "./BuildingDetailView";
-import DupeDetailView from "./DupeDetailView";
-import CritterDetailView from "./CritterDetailView";
-import PlantDetailView from "./PlantDetailView";
-import ElementDetailView from "./ElementDetailView";
-import GeyserDetailView from "./GeyserDetailView";
+import { DetailLink } from "@/types/data";
+import { ModeSelections } from "@/components/selection/modeSelection";
+import BuildingDetailView from "@/components/detail/views/BuildingDetailView";
+import DupeDetailView from "@/components/detail/views/DupeDetailView";
+import CritterDetailView from "@/components/detail/views/CritterDetailView";
+import PlantDetailView from "@/components/detail/views/PlantDetailView";
+import ElementDetailView from "@/components/detail/views/ElementDetailView";
+import GeyserDetailView from "@/components/detail/views/GeyserDetailView";
 
 export type LinkDetailViewProps = {
   link: DetailLink;

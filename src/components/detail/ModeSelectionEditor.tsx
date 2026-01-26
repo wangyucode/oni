@@ -1,8 +1,8 @@
 import { Collapse, Radio, RadioGroup } from "@nutui/nutui-react-taro";
 
-import Icon from "../ui/icons";
-import { LinkDetail, Mode } from "../../types/data";
-import { ModeSelections, normalizeModeSelections, setModeSelection } from "../selection/modeSelection";
+import Icon from "@/components/ui/icons";
+import { LinkDetail, Mode } from "@/types/data";
+import { ModeSelections, normalizeModeSelections, setModeSelection } from "@/components/selection/modeSelection";
 
 export type ModeSelectionEditorProps = {
   detail: LinkDetail;

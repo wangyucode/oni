@@ -1,6 +1,6 @@
-import { LinkDetail, Mode } from "../../types/data";
-import { CYCLE_SECONDS } from "../../contexts/UnitContext";
-import { ModeSelections, optionFactor, normalizeModeSelections } from "./modeSelection";
+import { LinkDetail, Mode } from "@/types/data";
+import { CYCLE_SECONDS } from "@/contexts/UnitContext";
+import { ModeSelections, optionFactor, normalizeModeSelections } from "@/components/selection/modeSelection";
 
 export type SelectionTotals = {
   resources: Record<string, number>;
