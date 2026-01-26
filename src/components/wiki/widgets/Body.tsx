@@ -20,7 +20,7 @@ const Body = ({ data, onPush }: BodyProps) => {
             );
           case 'bold':
             return (
-              <Text key={index} className='font-bold'>
+              <Text key={index} className='font-bold mx-2'>
                 {segmentData.text}
               </Text>
             );
