@@ -12,7 +12,7 @@ export default function Image({ data }: Props) {
         <FilteredImage
             src={`${ORIGIN_BASE}/upload/oni/v3${data.src}`}
             iconFilter={getFilter(data.style)}
-            style={{ width: 196, height: 196 }}
+            style={{ width: 128, height: 128 }}
             mode="aspectFit" />
     );
 }

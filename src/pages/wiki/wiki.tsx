@@ -33,7 +33,7 @@ export default function Wiki() {
         onPageChange={(page) => setCurrentPage(page)}
       />
 
-      <View className={`body bg-white rounded-8 p-8 flex flex-col gap-1 ${currentPage ? '' : 'justify-center'}`}>
+      <View className={`body bg-white rounded-8 p-8 flex flex-col gap-8 ${currentPage ? '' : 'justify-center'}`}>
         {currentPage ? (
           <>
             {currentPage.sections?.map((section, idx) => (

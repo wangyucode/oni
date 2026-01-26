@@ -9,26 +9,39 @@
     .section {
       --nutui-divider-margin: 4px 0;
       display: flex;
+      gap: 8PX;
 
-      &.layout{
-        &-col{
+      &.layout {
+        &-col {
           flex-direction: column;
         }
 
-        &-grid{
+        &-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap:4PX;
         }
       }
     }
 
     .large-link {
       cursor: pointer;
+
       &:active {
-        background-color: var(--nutui-color-primary);
+        background-color: #BF7FA8;
       }
     }
+
+    .conversion-panel {
+      padding-bottom: 8PX;
+      border-bottom: 1PX solid #ddd;
+
+      .conversion-item {
+        &:active {
+          background-color: #BF7FA8;
+        }
+      }
+    }
+
 
     .loading {
       --nutui-loading-icon-size: 48PX
