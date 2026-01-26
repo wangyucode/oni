@@ -1,0 +1,38 @@
+.wiki-breadcrumb-container {
+  width: 100%;
+  background: #fff;
+  border-radius: 8PX;
+  padding: 8PX 12PX;
+  box-sizing: border-box;
+  white-space: nowrap;
+  flex: 0 0 auto;
+
+  .wiki-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4PX;
+
+    .breadcrumb-item-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4PX;
+    }
+
+    .breadcrumb-item {
+      font-size: 14PX;
+      color: #7F3D5E; // Primary color
+      text-decoration: underline;
+      
+      &.active {
+        color: #333;
+        font-weight: bold;
+        text-decoration: none;
+      }
+    }
+
+    .separator {
+      color: #999;
+      font-size: 14PX;
+    }
+  }
+}
