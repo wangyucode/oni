@@ -1,6 +1,5 @@
 import { Collapse, Radio, RadioGroup } from "@nutui/nutui-react-taro";
-
-import Icon from "@/components/ui/icons";
+import { ArrowDown } from "@nutui/icons-react-taro";
 import { LinkDetail, Mode } from "@/types/data";
 import { ModeSelections, normalizeModeSelections, setModeSelection } from "@/components/selection/modeSelection";
 
@@ -20,7 +19,7 @@ export default function ModeSelectionEditor({
   const normalized = normalizeModeSelections(detail, modeSelections);
 
   return (
-    <Collapse defaultActiveName={modes.map((_, i) => String(i))} expandIcon={<Icon width={12} height={16} name="rightArrow" />} rotate={90}>
+    <Collapse defaultActiveName={modes.map((_, i) => String(i))} expandIcon={<ArrowDown className="text-white"/>}>
       {modes.map((mode, modeIndex) => (
         <Collapse.Item title={mode.name} name={String(modeIndex)} key={`${mode.name}-${modeIndex}`}>
             <RadioGroup

@@ -9,7 +9,6 @@ import { useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
-import ModeSelectionEditor from "@/components/detail/ModeSelectionEditor";
 import { DataContext } from "@/contexts/DataContext";
 import { getIconData } from "@/utils/utils";
 

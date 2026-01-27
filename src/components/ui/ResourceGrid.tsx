@@ -1,7 +1,6 @@
 import { useMemo, useContext } from 'react';
 import { View, Text } from '@tarojs/components';
 import { Grid } from '@nutui/nutui-react-taro';
-import Icon from '@/components/ui/icons';
 import { useUnit, transValue } from '@/contexts/UnitContext';
 import { DataContext } from '@/contexts/DataContext';
 import { calculateGridColumns } from '@/utils/utils';
@@ -123,7 +122,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
         const type = convertedValue < 0 ? "consume" : "produce";
         return (
           <Grid.Item key={name}>
-            {iconSrc ? <FilteredImage src={iconSrc} iconFilter={iconFilter} style={{ width: 48, height: 48 }} mode="aspectFit" /> : <Icon name={name} width={48} height={48} />}
+            {iconSrc && <FilteredImage src={iconSrc} iconFilter={iconFilter} style={{ width: 48, height: 48 }} mode="aspectFit" />}
             <Text className='text-xs'>{name}</Text>
             <Text className={`text-sm font-bold ${type}`}>
               {valueStr}

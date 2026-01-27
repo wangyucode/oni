@@ -3,9 +3,7 @@ import { MouseEvent, useContext, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
 import { View, Text, AdCustom } from '@tarojs/components'
 import { Badge, Button, Collapse, Cell, Picker, PickerOption, PickerOptions, PickerOnChangeCallbackParameter, PickerValue } from '@nutui/nutui-react-taro'
-import { Add, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
-
-import Icon from '@/components/ui/icons'
+import { Add, ArrowDown, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
 import SelectPopup from '@/components/ui/SelectPopup';
 import ResourceGrid from '@/components/ui/ResourceGrid';
 import { HUNGER_OPTIONS, TIME_UNIT_OPTIONS, useUnit, HungerLevel, TimeUnit } from '@/contexts/UnitContext';
@@ -137,10 +135,23 @@ function Index() {
   // 强制刷新，小程序端的 NutUI Collapse 在展开时会缓存内容高度；
   const resourceCollapseKey = process.env.TARO_ENV === 'weapp' ? resourceItems.length.toString() : 'resource';
 
+  function renderIcon(name: string) {
+    const iconData = getIconData(iconMap, name);
+    if (!iconData?.icon) return null;
+    return (
+      <FilteredImage
+        src={iconData.icon}
+        iconFilter={iconData.iconFilter}
+        style={{ width: 48, height: 48 }}
+        mode="aspectFit"
+      />
+    );
+  }
+
   return (
     <View className='page index'>
       <View className='flex flex-col flex-1 gap-8'>
-        <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
+        <Collapse defaultActiveName={resultCategories} expandIcon={<ArrowDown className="text-white"/>}>
           <Collapse.Item title="资源" name='资源' key={resourceCollapseKey}>
             <ResourceGrid items={resourceItems}/>
           </Collapse.Item>
@@ -172,8 +183,7 @@ function Index() {
         <Collapse
           className='flex flex-col'
           defaultActiveName={['选择']}
-          expandIcon={<Icon width={12} height={16} name='rightArrow' />}
-          rotate={90}>
+          expandIcon={<ArrowDown className="text-white"/>}>
           <Collapse.Item title="选择" name="选择" extra={<Button className='rounded-4 text-white' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
             <View className='flex flex-wrap gap-8 mt-8'>
               {groupedSelections.map((selection) =>
@@ -184,18 +194,7 @@ function Index() {
                   }}
                 >
                   <Badge value={selection.count} max={999}>
-                    {(() => {
-                      const iconData = getIconData(iconMap, selection.name);
-                      if (!iconData?.icon) return <Icon name={selection.name} width={48} height={48} />;
-                      return (
-                        <FilteredImage
-                          src={iconData.icon}
-                          iconFilter={iconData.iconFilter}
-                          style={{ width: 48, height: 48 }}
-                          mode="aspectFit"
-                        />
-                      );
-                    })()}
+                    {renderIcon(selection.name)}
                   </Badge>
                 </View>)}
               <Button className='w-48 h-48 rounded-4 border border-primary ml-4 p-0' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>

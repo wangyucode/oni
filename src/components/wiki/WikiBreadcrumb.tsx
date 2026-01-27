@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, forwardRef, useState, useContext, useCallback, useEffect, useRef } from 'react';
+import { useImperativeHandle, forwardRef, useState, useContext, useCallback, useEffect, useRef } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro, { InterstitialAd } from '@tarojs/taro';
 import { WikiContext } from '@/contexts/WikiContext';

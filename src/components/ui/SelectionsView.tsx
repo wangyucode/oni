@@ -2,7 +2,6 @@ import { Text, View } from "@tarojs/components";
 import { Button } from "@nutui/nutui-react-taro";
 import { Del, Edit } from "@nutui/icons-react-taro";
 
-import Icon from "@/components/ui/icons";
 import FilteredImage from "@/components/ui/FilteredImage";
 import { SelectionEntryWithDetail } from "@/contexts/SelectionsContext";
 import { IconData } from "@/contexts/DataContext";

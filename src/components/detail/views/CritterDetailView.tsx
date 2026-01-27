@@ -3,7 +3,6 @@ import { Text, View } from "@tarojs/components";
 
 import { CreatureDetail, DetailLink } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
-import { useUnit } from "@/contexts/UnitContext";
 import { useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";

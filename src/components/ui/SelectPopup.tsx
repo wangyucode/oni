@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, View } from "@tarojs/components";
-import { Button, Popup } from "@nutui/nutui-react-taro";
+import { Popup } from "@nutui/nutui-react-taro";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 
 import { DataContext } from "@/contexts/DataContext";
