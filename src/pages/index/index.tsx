@@ -134,13 +134,15 @@ function Index() {
 
   const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);
   const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
+  // 强制刷新，小程序端的 NutUI Collapse 在展开时会缓存内容高度；
+  const resourceCollapseKey = process.env.TARO_ENV === 'weapp' ? resourceItems.length.toString() : 'resource';
 
   return (
     <View className='page index'>
       <View className='flex flex-col flex-1 gap-8'>
         <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
-          <Collapse.Item title="资源" name='资源'>
-            <ResourceGrid items={resourceItems} />
+          <Collapse.Item title="资源" name='资源' key={resourceCollapseKey}>
+            <ResourceGrid items={resourceItems}/>
           </Collapse.Item>
           <Collapse.Item title="食物" name="食物">
             <View className="text-center">

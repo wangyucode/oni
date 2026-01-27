@@ -60,15 +60,13 @@ export default function SelectionsView({ selections, iconMap, onSelect, onRemove
             key={entry.key}
             onClick={() => onSelect(entry)}
           >
-              {iconData?.icon ? (
+              {iconData?.icon && (
                 <FilteredImage
                   src={iconData.icon}
                   iconFilter={iconData.iconFilter}
                   className="w-40 h-40"
                   mode="aspectFit"
                 />
-              ) : (
-                <Icon name={entry.name} width={40} height={40} />
               )}
             <View className="flex flex-col gap-4 flex-1">
               <View className="flex items-center gap-8">
