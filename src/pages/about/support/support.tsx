@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { View, Text, Image, Button, Navigator } from "@tarojs/components";
+import { View, Text, Image, Button, Navigator, Ad } from "@tarojs/components";
 import Taro, { InterstitialAd, useShareAppMessage } from "@tarojs/taro";
 import { Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
@@ -21,7 +21,7 @@ export default function Support() {
         if (process.env.TARO_ENV !== 'weapp') return;
         const ad = adRef.current;
         if (!ad || adLoadedRef.current) return;
-        ad.load().catch(() => {});
+        ad.load().catch(() => { });
     }, []);
 
     useEffect(() => {
@@ -31,7 +31,7 @@ export default function Support() {
 
         if (process.env.TARO_ENV === 'weapp') {
             try {
-                const ad = Taro.createInterstitialAd({adUnitId: 'adunit-3dac8eb71db869b2'});
+                const ad = Taro.createInterstitialAd({ adUnitId: 'adunit-3dac8eb71db869b2' });
                 adRef.current = ad;
                 ad.onLoad(() => {
                     adLoadedRef.current = true;
@@ -48,7 +48,7 @@ export default function Support() {
                 console.log(error);
             }
         }
-        
+
         Taro.request({
             url: `${API_BASE}/api/v1/wechat/apps`,
             method: 'GET',
@@ -88,7 +88,9 @@ export default function Support() {
                 <Text className="text-sm text-gray">《oni产物计算器》的开发，维护，数据整理，需要支付高昂的token和服务器费用，您可以通过以下方式支持我。</Text>
             </View>
             <Cell.Group className="cells">
-                <Cell className="px-13 py-0" clickable title="查看并点击广告" extra={<ArrowRight size={16} />} onClick={handleClickAd} />
+                {process.env.TARO_ENV === 'weapp' ?
+                    <Cell clickable title="查看并点击广告" extra={<ArrowRight size={16} />} onClick={handleClickAd} />
+                    : <Cell title="访问小程序版查看并点击广告❤️" />}
                 <Cell className="px-13 py-0" clickable>
                     <Button openType="share" className="btn-share flex items-center justify-between w-full h-42 p-0 bg-transparent">
                         <Text className="text-sm text-gray">分享给好友❤️</Text>
@@ -112,6 +114,7 @@ export default function Support() {
                 <Cell title="意见反馈QQ群" extra={<Text selectable>1026563022</Text>} />
                 <Cell title="联系我" extra={<Text selectable>wangyu@wycode.cn</Text>} />
             </Cell.Group>
+            {process.env.TARO_ENV === 'weapp' && <Ad unitId='adunit-737af672508ba1fa' adIntervals={30}/>}
         </View>
     )
 }

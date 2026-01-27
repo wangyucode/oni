@@ -165,7 +165,7 @@ function Index() {
           </Collapse.Item>
         </Collapse>
 
-        {process.env.TARO_ENV !== 'weapp' && <Ad unitId='adunit-737af672508ba1fa' adIntervals={30}/>}
+        {process.env.TARO_ENV === 'weapp' && <Ad unitId='adunit-737af672508ba1fa' adIntervals={30}/>}
 
         <Collapse
           className='flex flex-col'
