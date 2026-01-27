@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { View, Text, Image, Button, Navigator } from "@tarojs/components";
-import Taro, { useShareAppMessage } from "@tarojs/taro";
+import Taro, { InterstitialAd, useShareAppMessage } from "@tarojs/taro";
 import { Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
 import BackButton from "@/components/ui/BackButton";
@@ -12,14 +12,43 @@ import './support.scss';
 export default function Support() {
 
     useShareAppMessage(() => sharedMessage);
+    const adRef = useRef<InterstitialAd | null>(null);
+    const adLoadedRef = useRef(false);
 
     const [apps, setApps] = useState([]);
+
+    const loadAd = useCallback(() => {
+        if (process.env.TARO_ENV !== 'weapp') return;
+        const ad = adRef.current;
+        if (!ad || adLoadedRef.current) return;
+        ad.load().catch(() => {});
+    }, []);
 
     useEffect(() => {
         Taro.showLoading({
             title: '加载中',
         });
 
+        if (process.env.TARO_ENV === 'weapp') {
+            try {
+                const ad = Taro.createInterstitialAd({adUnitId: 'adunit-3dac8eb71db869b2'});
+                adRef.current = ad;
+                ad.onLoad(() => {
+                    adLoadedRef.current = true;
+                });
+                ad.onError(() => {
+                    adLoadedRef.current = false;
+                });
+                ad.onClose(() => {
+                    adLoadedRef.current = false;
+                    loadAd();
+                });
+                loadAd();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        
         Taro.request({
             url: `${API_BASE}/api/v1/wechat/apps`,
             method: 'GET',
@@ -32,17 +61,34 @@ export default function Support() {
             complete: () => {
                 Taro.hideLoading();
             }
-        })
-    }, []);
+        });
+    }, [loadAd]);
+
+    const handleClickAd = () => {
+        const ad = adRef.current;
+        if (!ad) return;
+        if (!adLoadedRef.current) {
+            loadAd();
+            return;
+        }
+        ad.show().then(() => {
+            adLoadedRef.current = false;
+            loadAd();
+        }).catch(() => {
+            adLoadedRef.current = false;
+            loadAd();
+        });
+    }
 
     return (
         <View className='page support flex flex-col gap-4'>
             {process.env.TARO_ENV === 'h5' && <BackButton />}
             <View className="flex flex-col items-center bg-white gap-8 p-16 rounded-6">
                 <Image className="w-64 h-64" src={icon} />
-                <Text className="text-sm text-gray">《oni产物计算器》的更新维护离不开您的支持！您可以通过以下方式支持我。</Text>
+                <Text className="text-sm text-gray">《oni产物计算器》的开发，维护，数据整理，需要支付高昂的token和服务器费用，您可以通过以下方式支持我。</Text>
             </View>
             <Cell.Group className="cells">
+                <Cell className="px-13 py-0" clickable title="查看并点击广告" extra={<ArrowRight size={16} />} onClick={handleClickAd} />
                 <Cell className="px-13 py-0" clickable>
                     <Button openType="share" className="btn-share flex items-center justify-between w-full h-42 p-0 bg-transparent">
                         <Text className="text-sm text-gray">分享给好友❤️</Text>
