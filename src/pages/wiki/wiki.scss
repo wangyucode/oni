@@ -23,7 +23,7 @@
       }
     }
 
-    .large-link {
+    .large-link, .small-link {
       cursor: pointer;
 
       &:active {
@@ -40,6 +40,12 @@
           background-color: #BF7FA8;
         }
       }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8PX;
     }
 
 

@@ -8,17 +8,17 @@ interface LargeLinkProps {
   onPush: (url: string) => void;
 }
 
-const LargeLink = ({ data, onPush }: LargeLinkProps) => {
+const SmallLink = ({ data, onPush }: LargeLinkProps) => {
   return (
     <View
-      className='large-link bg-white p-8 flex flex-col items-center border border-gray rounded-4 gap-4'
+      className='small-link bg-white px-8 flex items-center border border-gray rounded-4 gap-4 w-fit'
       onClick={() => onPush(data.link)}
     >
       {data.icon && (
         <FilteredImage
           src={`${ORIGIN_BASE}/upload/oni/v3${data.icon}`}
           iconFilter={getFilter(data.style)}
-          style={{ width: 64, height: 64 }}
+          style={{ width: 32, height: 32 }}
           mode="aspectFit" />
       )}
       <Text className='text-md'>{data.text}</Text>
@@ -26,4 +26,4 @@ const LargeLink = ({ data, onPush }: LargeLinkProps) => {
   );
 };
 
-export default LargeLink;
+export default SmallLink;

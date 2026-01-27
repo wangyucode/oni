@@ -12,6 +12,8 @@ import { Page } from '@/types/data';
 
 import './wiki.scss';
 import Video from '@/components/wiki/widgets/Video';
+import Grid from '@/components/wiki/widgets/Grid';
+import SmallLink from '@/components/wiki/widgets/SmallLink';
 
 export default function Wiki() {
   const breadcrumbRef = useRef<WikiBreadcrumbRef>(null);
@@ -53,12 +55,16 @@ export default function Wiki() {
                       return <Divider key={wIdx} />;
                     case 'large-link':
                       return <LargeLink key={wIdx} data={widget.data} onPush={onPush} />;
+                    case 'small-link':
+                      return <SmallLink key={wIdx} data={widget.data} onPush={onPush} />;
                     case 'conversion':
                       return <Conversion key={wIdx} data={widget.data} onPush={onPush} />;
+                    case 'grid':
+                      return <Grid key={wIdx} data={widget.data} onPush={onPush} />;
                     case 'body':
                       return <Body key={wIdx} data={widget.data} onPush={onPush} />;
                     default:
-                      return <View key={wIdx}>[{widget.type}]</View>;
+                      return <View key={wIdx}>[{(widget as any).type}]</View>;
                   }
                 })}
               </View>
