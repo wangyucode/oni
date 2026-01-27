@@ -25,9 +25,6 @@
         border: 1PX solid #ddd;
     }
 
-    .select-open {
-        overflow: hidden;
-    }
 
     .nut-collapse-item-header {
         background-color: #7F3D5E;
@@ -48,17 +45,6 @@
 
     .nut-collapse .nut-collapse-item-content-text {
         padding: 8PX;
-    }
-
-    .nut-collapse .tips {
-        font-size: 12PX;
-    }
-
-    .nut-collapse .avatar-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8PX;
-        margin-top: 8PX;
     }
 
     .nut-badge .nut-image {

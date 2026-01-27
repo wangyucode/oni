@@ -76,7 +76,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
     function renderMenu(menu: Menu | null): JSX.Element | null {
         if (!menu) return null;
         if (!menu.items?.length) return null;
-        return <MenuGrid<Link> columns={calculateGridColumns(menu.items.length)} items={menu.items} onItemClick={handleSelectLink} />;
+        return <MenuGrid<Link> columns={calculateGridColumns(menu.items.length, 3)} items={menu.items} onItemClick={handleSelectLink} />;
     }
 
     const content = selectedLink

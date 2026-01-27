@@ -111,7 +111,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
     <Grid
       className="resource-grid"
       gap={0}
-      columns={calculateGridColumns(sortedResources.length)}
+      columns={calculateGridColumns(sortedResources.length, 4)}
     >
       {sortedResources.map(([name, entry]) => {
         const { convertedValue, unit } = convertResourceValue(entry.value, entry.kind);

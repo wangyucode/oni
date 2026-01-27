@@ -1,8 +1,11 @@
-export function calculateGridColumns(count: number): number {
-    if (count <= 5) return Math.max(count, 2);
+export function calculateGridColumns(count: number, minCols: number = 4): number {
+    if (count <= 5) return Math.max(count, minCols);
     if (count > 12) return 5;
     
-    const candidates = [5, 4, 3];
+    const candidates: number[] = [];
+    for (let i= minCols; i <= 5; i++) {
+        candidates.push(i);
+    }
     let bestCols = 5;
     let bestScore = -1;
 
