@@ -68,11 +68,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }, [requestJson]);
 
     useEffect(() => {
-        const appVersion = Taro.getStorageSync('appVersion');
-        if (appVersion !== process.env.TARO_APP_VERSION) {
-            Taro.clearStorageSync();
-            Taro.setStorageSync('appVersion', process.env.TARO_APP_VERSION);
-        }
         fetchData();
     }, [fetchData]);
 

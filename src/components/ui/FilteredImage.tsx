@@ -152,7 +152,7 @@ export default function FilteredImage({ iconFilter, style, src, ...rest }: Filte
 
   if (env === "h5") {
     const nextStyle = iconFilter ? { ...(style as any), filter: iconFilter } : style;
-    return <Image {...rest} src={src} style={nextStyle} className="flex items-center justify-center" />;
+    return <Image {...rest} src={src} style={nextStyle} className={`flex items-center justify-center ${rest.className || ""}`} />;
   }
 
   return <Image {...rest} src={resolvedSrc} style={style} />;

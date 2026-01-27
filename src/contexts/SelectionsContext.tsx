@@ -86,13 +86,13 @@ export const SelectionsContext = createContext<SelectionsContextValue>({
 });
 
 export const SelectionsActionsContext = createContext<SelectionsActions>({
-  upsert: () => {},
-  update: () => {},
-  remove: () => {},
-  clear: () => {},
-  addProject: () => {},
-  deleteProject: () => {},
-  switchProject: () => {},
+  upsert: () => { },
+  update: () => { },
+  remove: () => { },
+  clear: () => { },
+  addProject: () => { },
+  deleteProject: () => { },
+  switchProject: () => { },
 });
 
 function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): string {
@@ -463,8 +463,13 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
+    const appVersion = Taro.getStorageSync('appVersion');
+    if (appVersion !== process.env.TARO_APP_VERSION) {
+      Taro.clearStorageSync();
+      Taro.setStorageSync('appVersion', process.env.TARO_APP_VERSION);
+    }
     const savedData = Taro.getStorageSync("projects_data");
-    if (savedData && Array.isArray(savedData.projects)) {
+    if (savedData && Array.isArray(savedData.projects) && savedData.projects.length > 0) {
       dispatch({
         type: "replace_all",
         payload: {
@@ -472,6 +477,8 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
           currentProjectIndex: savedData.currentProjectIndex || 0,
         },
       });
+    } else {
+      setShouldInitDefaults(true);
     }
     hydratedRef.current = true;
   }, []);
