@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { View, Text, Image, Button, Navigator, Ad } from "@tarojs/components";
+import { View, Text, Image, Button, Navigator, AdCustom } from "@tarojs/components";
 import Taro, { InterstitialAd, useShareAppMessage } from "@tarojs/taro";
 import { Cell } from "@nutui/nutui-react-taro";
 import { ArrowRight } from "@nutui/icons-react-taro";
@@ -114,7 +114,7 @@ export default function Support() {
                 <Cell title="意见反馈QQ群" extra={<Text selectable>1026563022</Text>} />
                 <Cell title="联系我" extra={<Text selectable>wangyu@wycode.cn</Text>} />
             </Cell.Group>
-            {process.env.TARO_ENV === 'weapp' && <Ad unitId='adunit-737af672508ba1fa' adIntervals={30}/>}
+            {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-737af672508ba1fa' adIntervals={30} />}
         </View>
     )
 }

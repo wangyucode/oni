@@ -1,4 +1,4 @@
-import { View, Text } from "@tarojs/components";
+import { View, Text, AdCustom } from "@tarojs/components";
 import { Cell } from "@nutui/nutui-react-taro";
 import { useShareAppMessage } from "@tarojs/taro";
 import { sharedMessage } from "@/types/data";
@@ -32,6 +32,7 @@ export default function Log() {
                     </>
                 } />
             </Cell.Group>
+            {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-737af672508ba1fa' adIntervals={30} />}
         </View>
     )
 }

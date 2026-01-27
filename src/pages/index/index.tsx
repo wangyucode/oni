@@ -1,7 +1,7 @@
 
 import { MouseEvent, useContext, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
-import { View, Text, Ad } from '@tarojs/components'
+import { View, Text, AdCustom } from '@tarojs/components'
 import { Badge, Button, Collapse, Cell, Picker, PickerOption, PickerOptions, PickerOnChangeCallbackParameter, PickerValue } from '@nutui/nutui-react-taro'
 import { Add, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
 
@@ -165,7 +165,7 @@ function Index() {
           </Collapse.Item>
         </Collapse>
 
-        {process.env.TARO_ENV === 'weapp' && <Ad unitId='adunit-737af672508ba1fa' adIntervals={30}/>}
+        {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-1f8971b0756777eb' adIntervals={30}/>}
 
         <Collapse
           className='flex flex-col'

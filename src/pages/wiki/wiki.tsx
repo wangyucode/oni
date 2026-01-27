@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from '@/components/wiki/widgets/Image';
 import Conversion from '@/components/wiki/widgets/Conversion';
-import { View, Text } from '@tarojs/components';
+import { View, Text, AdCustom } from '@tarojs/components';
 import { Divider, Loading } from '@nutui/nutui-react-taro';
 
 import WikiBreadcrumb, { WikiBreadcrumbRef } from '@/components/wiki/WikiBreadcrumb';
@@ -73,6 +73,8 @@ export default function Wiki() {
         ) : (
           <Loading className='loading' />
         )}
+        
+        {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-ff208853f5f6f304' adIntervals={30}/>}
       </View>
       <GlobalSvgFilters />
     </View>
