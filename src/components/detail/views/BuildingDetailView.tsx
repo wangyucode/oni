@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
-import {InputNumber, Range} from "@nutui/nutui-react-taro";
+import { Collapse, InputNumber, Range } from "@nutui/nutui-react-taro";
+import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { BuildingDetail, DetailLink } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
@@ -101,6 +102,11 @@ export default function BuildingDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
+        <Collapse.Item title="资源" name="资源">
+          <ResourceGrid items={resourceItems} />
+        </Collapse.Item>
+      </Collapse>
       <View className="flex flex-col gap-6">
         <Text className="text-sm font-semibold">效率</Text>
         <View className="flex gap-6 items-center">
@@ -135,11 +141,6 @@ export default function BuildingDetailView({
           <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
-
-      <View className="flex flex-col gap-6">
-        <Text className="text-sm font-semibold">资源</Text>
-        <ResourceGrid items={resourceItems} />
-      </View>
     </View>
   );
 }

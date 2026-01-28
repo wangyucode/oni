@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
-import { InputNumber, Range } from "@nutui/nutui-react-taro";
+import { Collapse, InputNumber, Range } from "@nutui/nutui-react-taro";
+import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { DetailLink, GeyserDetail } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
@@ -134,6 +135,11 @@ export default function GeyserDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
+        <Collapse.Item title="资源" name="资源">
+          <ResourceGrid items={resourceItems} />
+        </Collapse.Item>
+      </Collapse>
 
       <View className="flex flex-col gap-6 mt-12">
         <View className="flex justify-between items-center">
@@ -159,11 +165,6 @@ export default function GeyserDetailView({
             onChange={(val) => setModeSelections(prev => ({ ...prev, "平均产量": `${val}${unit}` }))}
           />
           <Text className="text-gray-600">{unit}</Text>
-        </View>
-
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">资源</Text>
-          <ResourceGrid items={resourceItems} />
         </View>
       </View>
     </View>

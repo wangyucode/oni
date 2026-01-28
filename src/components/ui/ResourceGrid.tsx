@@ -44,7 +44,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
       fractionDigits = 6;
     }
     const fixed = value.toFixed(fractionDigits);
-    const trimmed = fixed.replace(/\.?0+$/, "");
+    const trimmed = fixed.includes(".") ? fixed.replace(/\.?0+$/, "") : fixed;
     return trimmed === "-0" ? "0" : trimmed;
   };
 

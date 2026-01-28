@@ -1,5 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
+import { Collapse } from "@nutui/nutui-react-taro";
+import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { DetailLink, DupeDetail } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
@@ -109,6 +111,11 @@ export default function DupeDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
+        <Collapse.Item title="资源" name="资源">
+          <ResourceGrid items={resourceItems} />
+        </Collapse.Item>
+      </Collapse>
 
       {isBionic && dupe.power ? (
         <View className="flex gap-12">
@@ -130,11 +137,6 @@ export default function DupeDetailView({
           <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
-
-      <View className="flex flex-col gap-6">
-        <Text className="text-sm font-semibold">资源</Text>
-        <ResourceGrid items={resourceItems} />
-      </View>
     </View>
   );
 }

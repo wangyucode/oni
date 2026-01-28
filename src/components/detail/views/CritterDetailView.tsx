@@ -1,5 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Text, View } from "@tarojs/components";
+import { Collapse } from "@nutui/nutui-react-taro";
+import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { CreatureDetail, DetailLink } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
@@ -94,6 +96,11 @@ export default function CritterDetailView({
         onCountChange={setCount}
         onAction={handlePrimaryAction}
       />
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
+        <Collapse.Item title="资源" name="资源">
+          <ResourceGrid items={resourceItems} />
+        </Collapse.Item>
+      </Collapse>
 
       <View className="flex justify-between flex-wrap gap-8">
         {critter.life ? (
@@ -124,11 +131,6 @@ export default function CritterDetailView({
           <ModeSelectionEditor detail={critter} modes={critter.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
-
-      <View className="flex flex-col gap-6">
-        <Text className="text-sm font-semibold">资源</Text>
-        <ResourceGrid items={resourceItems} />
-      </View>
     </View>
   );
 }

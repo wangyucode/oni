@@ -22,13 +22,13 @@ export default function Log() {
                 <Cell title="2.0.0" extra='2026-01-21' description={
                     <>
                         <Text>• 感谢大家的支持，反馈和建议</Text>
-                        <Text>• 优化首页资源显示，统一资源选择方式</Text>
-                        <Text>• 新增滑动条支持数字方式输入</Text>
+                        <Text>• 优化资源显示，统一资源选择方式</Text>
+                        <Text>• 智能切换重量单位</Text>
                         <Text>• 小动物支持选择额外蛋是否孵化</Text>
                         <Text>• 乔木树和漫殖藤支持选择枝桠数量</Text>
                         <Text>• 支持选择间歇泉和其产量</Text>
                         <Text>• 新增饥饿/功率难度设置</Text>
-                        <Text>• 新增百科功能</Text>
+                        <Text>• 新增数据库/百科功能</Text>
                     </>
                 } />
             </Cell.Group>
