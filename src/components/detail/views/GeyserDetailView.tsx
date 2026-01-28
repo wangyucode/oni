@@ -6,7 +6,7 @@ import { ArrowDown } from "@nutui/icons-react-taro";
 import { DetailLink, GeyserDetail } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
 import { useUnit, transValue } from "@/contexts/UnitContext";
-import { useSelectionsActions } from "@/contexts/SelectionsContext";
+import { SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
@@ -32,6 +32,7 @@ export default function GeyserDetailView({
   initialModeSelections,
 }: GeyserDetailViewProps) {
   const geyser = link.detail as GeyserDetail;
+  const { selections } = useContext(SelectionsContext);
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const { timeUnit } = useUnit();
@@ -105,6 +106,11 @@ export default function GeyserDetailView({
     }).join(', ');
   }, [resources, timeUnit]);
 
+  const lastSelectionKey = useMemo(() => {
+    const matches = selections.filter((item) => item.name === link.name && item.category === category);
+    return matches.length ? matches[matches.length - 1].key : "";
+  }, [category, link.name, selections]);
+
   useEffect(() => {
     const payload = {
       name: link.name,
@@ -117,8 +123,18 @@ export default function GeyserDetailView({
       update(editKey, payload);
       return;
     }
+    if (count <= 0) {
+      if (lastSelectionKey) {
+        update(lastSelectionKey, payload);
+      }
+      return;
+    }
+    if (lastSelectionKey) {
+      update(lastSelectionKey, payload);
+      return;
+    }
     upsert(payload);
-  }, [category, count, editKey, geyser, link.name, mode, modeSelections, upsert, update]);
+  }, [category, count, editKey, geyser, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">

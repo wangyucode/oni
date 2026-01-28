@@ -6,7 +6,7 @@ import { ArrowDown } from "@nutui/icons-react-taro";
 import { BuildingDetail, DetailLink } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
 import { useUnit } from "@/contexts/UnitContext";
-import { useSelectionsActions } from "@/contexts/SelectionsContext";
+import { SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
@@ -36,6 +36,7 @@ export default function BuildingDetailView({
 }: BuildingDetailViewProps) {
   const building = link.detail as BuildingDetail;
   const { timeUnit } = useUnit();
+  const { selections } = useContext(SelectionsContext);
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
@@ -71,6 +72,11 @@ export default function BuildingDetailView({
 
   const { convertedValue: convertedHeat, unit: heatUnit } = useMemo(() => convertHeat(totalHeat, timeUnit), [timeUnit, totalHeat]);
 
+  const lastSelectionKey = useMemo(() => {
+    const matches = selections.filter((item) => item.name === link.name && item.category === category);
+    return matches.length ? matches[matches.length - 1].key : "";
+  }, [category, link.name, selections]);
+
   useEffect(() => {
     const payload = {
       name: link.name,
@@ -84,8 +90,18 @@ export default function BuildingDetailView({
       update(editKey, payload);
       return;
     }
+    if (count <= 0) {
+      if (lastSelectionKey) {
+        update(lastSelectionKey, payload);
+      }
+      return;
+    }
+    if (lastSelectionKey) {
+      update(lastSelectionKey, payload);
+      return;
+    }
     upsert(payload);
-  }, [building, category, count, editKey, efficiency, link.name, mode, modeSelections, upsert, update]);
+  }, [building, category, count, editKey, efficiency, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">

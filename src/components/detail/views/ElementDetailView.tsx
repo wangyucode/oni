@@ -5,7 +5,7 @@ import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { DetailLink, TransDetail } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
-import { useSelectionsActions } from "@/contexts/SelectionsContext";
+import { SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
@@ -33,6 +33,7 @@ export default function ElementDetailView({
   initialEfficiency,
 }: ElementDetailViewProps) {
   const detail = link.detail as TransDetail;
+  const { selections } = useContext(SelectionsContext);
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
@@ -71,6 +72,11 @@ export default function ElementDetailView({
     }));
   }, [resources, resourceKinds]);
 
+  const lastSelectionKey = useMemo(() => {
+    const matches = selections.filter((item) => item.name === link.name && item.category === category);
+    return matches.length ? matches[matches.length - 1].key : "";
+  }, [category, link.name, selections]);
+
   useEffect(() => {
     const payload = {
       name: link.name,
@@ -84,8 +90,18 @@ export default function ElementDetailView({
       update(editKey, payload);
       return;
     }
+    if (count <= 0) {
+      if (lastSelectionKey) {
+        update(lastSelectionKey, payload);
+      }
+      return;
+    }
+    if (lastSelectionKey) {
+      update(lastSelectionKey, payload);
+      return;
+    }
     upsert(payload);
-  }, [category, count, detail, editKey, efficiency, link.name, mode, modeSelections, upsert, update]);
+  }, [category, count, detail, editKey, efficiency, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">
