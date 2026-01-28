@@ -1,5 +1,5 @@
 - 项目用于《缺氧》Oxygen Not Include 游戏的资源汇总计算
 - 项目采用Taro框架，UI框架采用NutUI组件库，实现多端（微信小程序、H5）的跨端开发
 - 时刻维持代码简单，直观，扩展性高，可读性好，移除废弃代码
-- 后端数据完全可控，不要过分设计，不考虑向后兼容，不考虑未来的需求
+- 后端数据完全可控，不要过分设计，不考虑前后兼容，不考虑未来的需求
 - 数据类型定义在data.ts，数据来自两个接口：/api/v1/yml/calculator/index.yml 和 /api/v1/yml/calculator/images.yml

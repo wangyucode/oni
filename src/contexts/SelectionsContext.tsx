@@ -7,7 +7,7 @@ import { ResourceItem } from "@/components/ui/ResourceGrid";
 import { calculateSelectionTotals, ResourceUnitKind } from "@/components/selection/calc";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { DataContext } from "@/contexts/DataContext";
-import { HUNGER_OPTIONS, useUnit } from "@/contexts/UnitContext";
+import { CYCLE_SECONDS, HUNGER_OPTIONS, useUnit } from "@/contexts/UnitContext";
 
 export type Project = {
   name: string; // 方案1，方案2等
@@ -388,6 +388,7 @@ function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelModifie
   let totalPower = 0;
   let totalHeat = 0;
   let totalCalories = 0;
+  let totalResourceCaloriesPerSecond = 0;
 
   const mergeKind = (a: ResourceUnitKind | undefined, b: ResourceUnitKind | undefined): ResourceUnitKind | undefined => {
     if (!b) return a;
@@ -410,8 +411,12 @@ function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelModifie
     Object.entries(totals.resources).forEach(([name, value]) => {
       resources[name] = (resources[name] || 0) + value;
       resourceKinds[name] = mergeKind(resourceKinds[name], totals.resourceKinds[name]) as ResourceUnitKind;
+      if (totals.resourceKinds[name] === "kcal") {
+        totalResourceCaloriesPerSecond += value;
+      }
     });
   });
+  totalCalories += totalResourceCaloriesPerSecond * CYCLE_SECONDS;
 
   const resourceItems: ResourceItem[] = Object.entries(resources).map(([name, value]) => ({
     name,

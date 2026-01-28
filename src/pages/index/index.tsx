@@ -14,6 +14,7 @@ import EditPopup from '@/components/ui/EditPopup';
 import { DataContext } from '@/contexts/DataContext';
 import { getIconData } from '@/utils/utils';
 import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
+import { convertCalories, convertHeat } from '@/components/detail/formatters';
 
 import './index.scss'
 
@@ -115,23 +116,8 @@ function Index() {
     e.stopPropagation();
   }
 
-  const convertCalories = (calories: number): { convertedValue: number, unit: string } => {
-    if (timeUnit === '秒') {
-      return { convertedValue: calories / 600 * 1000, unit: '卡路里/秒' };
-    }
-    return { convertedValue: calories, unit: '千卡/周期' };
-  };
-
-  const convertHeat = (heat: number): { convertedValue: number, unit: string } => {
-    const kHeat = heat / 1000;
-    if (timeUnit === '周期') {
-      return { convertedValue: kHeat * 600, unit: '千复制热/周期' };
-    }
-    return { convertedValue: kHeat, unit: '千复制热/秒' };
-  };
-
-  const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);
-  const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
+  const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories, timeUnit);
+  const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat, timeUnit);
   // 强制刷新，小程序端的 NutUI Collapse 在展开时会缓存内容高度；
   const resourceCollapseKey = process.env.TARO_ENV === 'weapp' ? resourceItems.length.toString() : 'resource';
 
