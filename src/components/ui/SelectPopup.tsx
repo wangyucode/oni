@@ -80,7 +80,7 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
     }
 
     const content = selectedLink
-        ? <LinkDetailView link={selectedLink} category={category} onConfirmed={handleClose} />
+        ? <LinkDetailView link={selectedLink} category={category} />
         : renderMenu(currentMenu);
 
     return (

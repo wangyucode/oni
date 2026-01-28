@@ -15,7 +15,6 @@ export type LinkDetailViewProps = {
   initialCount?: number;
   initialModeSelections?: ModeSelections;
   initialEfficiency?: number;
-  onConfirmed?: () => void;
 };
 
 export default function LinkDetailView(props: LinkDetailViewProps) {

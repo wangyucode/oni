@@ -21,7 +21,6 @@ export type ElementDetailViewProps = {
   initialCount?: number;
   initialModeSelections?: ModeSelections;
   initialEfficiency?: number;
-  onConfirmed?: () => void;
 };
 
 export default function ElementDetailView({
@@ -32,14 +31,13 @@ export default function ElementDetailView({
   initialCount,
   initialModeSelections,
   initialEfficiency,
-  onConfirmed,
 }: ElementDetailViewProps) {
   const detail = link.detail as TransDetail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
-  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
+  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 0);
   const [efficiency, setEfficiency] = useState<number>(mode === "edit" ? (initialEfficiency ?? 100) : 100);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(detail, initialModeSelections);
@@ -53,7 +51,7 @@ export default function ElementDetailView({
       setModeSelections(initialModeSelections ? normalizeModeSelections(detail, initialModeSelections) : buildDefaultModeSelections(detail));
       return;
     }
-    setCount(1);
+    setCount(0);
     setEfficiency(100);
     setModeSelections(buildDefaultModeSelections(detail));
   }, [detail, initialCount, initialEfficiency, initialModeSelections, link.name, mode]);
@@ -73,7 +71,7 @@ export default function ElementDetailView({
     }));
   }, [resources, resourceKinds]);
 
-  function handlePrimaryAction(): void {
+  useEffect(() => {
     const payload = {
       name: link.name,
       detail,
@@ -84,12 +82,10 @@ export default function ElementDetailView({
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);
-      onConfirmed?.();
       return;
     }
     upsert(payload);
-    onConfirmed?.();
-  }
+  }, [category, count, detail, editKey, efficiency, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">
@@ -98,9 +94,7 @@ export default function ElementDetailView({
         iconFilter={iconData?.iconFilter}
         name={link.name}
         count={count}
-        actionLabel={mode === "edit" ? "确认" : "添加"}
         onCountChange={setCount}
-        onAction={handlePrimaryAction}
       />
       <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
         <Collapse.Item title="资源" name="资源">

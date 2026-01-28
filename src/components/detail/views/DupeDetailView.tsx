@@ -22,7 +22,6 @@ export type DupeDetailViewProps = {
   editKey?: string;
   initialCount?: number;
   initialModeSelections?: ModeSelections;
-  onConfirmed?: () => void;
 };
 
 export default function DupeDetailView({
@@ -32,7 +31,6 @@ export default function DupeDetailView({
   editKey,
   initialCount,
   initialModeSelections,
-  onConfirmed,
 }: DupeDetailViewProps) {
   const dupe = link.detail as DupeDetail;
   const { timeUnit, hungerLevel } = useUnit();
@@ -45,7 +43,7 @@ export default function DupeDetailView({
   const iconData = getIconData(iconMap, link.name, link.icon);
 
   const [count, setCount] = useState<number>(
-    mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1
+    mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 0
   );
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(dupe, initialModeSelections);
@@ -58,7 +56,7 @@ export default function DupeDetailView({
       setModeSelections(initialModeSelections ? normalizeModeSelections(dupe, initialModeSelections) : buildDefaultModeSelections(dupe));
       return;
     }
-    setCount(1);
+    setCount(0);
     setModeSelections(buildDefaultModeSelections(dupe));
   }, [link.name, dupe, mode, initialCount, initialModeSelections]);
 
@@ -90,7 +88,7 @@ export default function DupeDetailView({
     [timeUnit, totalCalories]
   );
 
-  function handlePrimaryAction(): void {
+  useEffect(() => {
     const payload = {
       name: link.name,
       detail: dupe,
@@ -100,12 +98,10 @@ export default function DupeDetailView({
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);
-      onConfirmed?.();
       return;
     }
     upsert(payload);
-    onConfirmed?.();
-  }
+  }, [category, count, dupe, editKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">
@@ -114,9 +110,7 @@ export default function DupeDetailView({
         iconFilter={iconData?.iconFilter}
         name={link.name}
         count={count}
-        actionLabel={mode === "edit" ? "确认" : "添加"}
         onCountChange={setCount}
-        onAction={handlePrimaryAction}
       />
       <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
         <Collapse.Item title="资源" name="资源">

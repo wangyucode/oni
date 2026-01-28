@@ -20,7 +20,6 @@ export type CritterDetailViewProps = {
   editKey?: string;
   initialCount?: number;
   initialModeSelections?: ModeSelections;
-  onConfirmed?: () => void;
 };
 
 export default function CritterDetailView({
@@ -30,14 +29,13 @@ export default function CritterDetailView({
   editKey,
   initialCount,
   initialModeSelections,
-  onConfirmed,
 }: CritterDetailViewProps) {
   const critter = link.detail as CreatureDetail;
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
-  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
+  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 0);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(critter, initialModeSelections);
     return buildDefaultModeSelections(critter);
@@ -49,7 +47,7 @@ export default function CritterDetailView({
       setModeSelections(initialModeSelections ? normalizeModeSelections(critter, initialModeSelections) : buildDefaultModeSelections(critter));
       return;
     }
-    setCount(1);
+    setCount(0);
     setModeSelections(buildDefaultModeSelections(critter));
   }, [critter, initialCount, initialModeSelections, link.name, mode]);
 
@@ -68,7 +66,7 @@ export default function CritterDetailView({
     }));
   }, [resources, resourceKinds]);
 
-  function handlePrimaryAction(): void {
+  useEffect(() => {
     const payload = {
       name: link.name,
       detail: critter,
@@ -78,12 +76,10 @@ export default function CritterDetailView({
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);
-      onConfirmed?.();
       return;
     }
     upsert(payload);
-    onConfirmed?.();
-  }
+  }, [category, count, critter, editKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">
@@ -92,9 +88,7 @@ export default function CritterDetailView({
         iconFilter={iconData?.iconFilter}
         name={link.name}
         count={count}
-        actionLabel={mode === "edit" ? "确认" : "添加"}
         onCountChange={setCount}
-        onAction={handlePrimaryAction}
       />
       <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
         <Collapse.Item title="资源" name="资源">

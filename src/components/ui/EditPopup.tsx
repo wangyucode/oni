@@ -61,7 +61,6 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
               initialCount={selectedEntry.count}
               initialModeSelections={selectedEntry.modeSelections}
               initialEfficiency={selectedEntry.efficiency}
-              onConfirmed={handleClose}
             />
           ) : (
             <SelectionsView

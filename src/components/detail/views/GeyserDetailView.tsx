@@ -21,7 +21,6 @@ export type GeyserDetailViewProps = {
   initialCount?: number;
   initialModeSelections?: ModeSelections;
   initialEfficiency?: number;
-  onConfirmed?: () => void;
 };
 
 export default function GeyserDetailView({
@@ -31,7 +30,6 @@ export default function GeyserDetailView({
   editKey,
   initialCount,
   initialModeSelections,
-  onConfirmed,
 }: GeyserDetailViewProps) {
   const geyser = link.detail as GeyserDetail;
   const { upsert, update } = useSelectionsActions();
@@ -39,7 +37,7 @@ export default function GeyserDetailView({
   const { timeUnit } = useUnit();
   const iconData = getIconData(iconMap, link.name, link.icon);
 
-  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
+  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 0);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(geyser, initialModeSelections);
     return buildDefaultModeSelections(geyser);
@@ -51,7 +49,7 @@ export default function GeyserDetailView({
       setModeSelections(initialModeSelections ? normalizeModeSelections(geyser, initialModeSelections) : buildDefaultModeSelections(geyser));
       return;
     }
-    setCount(1);
+    setCount(0);
     setModeSelections(buildDefaultModeSelections(geyser));
   }, [geyser, initialCount, initialModeSelections, link.name, mode]);
 
@@ -107,7 +105,7 @@ export default function GeyserDetailView({
     }).join(', ');
   }, [resources, timeUnit]);
 
-  function handlePrimaryAction(): void {
+  useEffect(() => {
     const payload = {
       name: link.name,
       detail: geyser,
@@ -117,12 +115,10 @@ export default function GeyserDetailView({
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);
-      onConfirmed?.();
       return;
     }
     upsert(payload);
-    onConfirmed?.();
-  }
+  }, [category, count, editKey, geyser, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">
@@ -131,9 +127,7 @@ export default function GeyserDetailView({
         iconFilter={iconData?.iconFilter}
         name={link.name}
         count={count}
-        actionLabel={mode === "edit" ? "确认" : "添加"}
         onCountChange={setCount}
-        onAction={handlePrimaryAction}
       />
       <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
         <Collapse.Item title="资源" name="资源">

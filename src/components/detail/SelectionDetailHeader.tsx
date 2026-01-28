@@ -1,5 +1,5 @@
 import { Text, View } from "@tarojs/components";
-import { Button, InputNumber } from "@nutui/nutui-react-taro";
+import { InputNumber } from "@nutui/nutui-react-taro";
 
 import FilteredImage from "@/components/ui/FilteredImage";
 
@@ -8,9 +8,7 @@ export type SelectionDetailHeaderProps = {
   iconFilter?: string;
   name: string;
   count: number;
-  actionLabel: string;
   onCountChange: (nextCount: number) => void;
-  onAction: () => void;
 };
 
 export default function SelectionDetailHeader({
@@ -18,9 +16,7 @@ export default function SelectionDetailHeader({
   iconFilter,
   name,
   count,
-  actionLabel,
   onCountChange,
-  onAction,
 }: SelectionDetailHeaderProps) {
   return (
     <View className="flex items-center gap-8">
@@ -38,11 +34,7 @@ export default function SelectionDetailHeader({
             onCountChange(Number.isFinite(next) ? Math.max(0, next) : 0);
           }}
         />
-        <Button onClick={onAction} type="primary">
-          {actionLabel}
-        </Button>
       </View>
     </View>
   );
 }
-

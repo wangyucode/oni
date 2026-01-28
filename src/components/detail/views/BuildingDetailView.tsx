@@ -23,7 +23,6 @@ export type BuildingDetailViewProps = {
   initialCount?: number;
   initialModeSelections?: ModeSelections;
   initialEfficiency?: number;
-  onConfirmed?: () => void;
 };
 
 export default function BuildingDetailView({
@@ -34,7 +33,6 @@ export default function BuildingDetailView({
   initialCount,
   initialModeSelections,
   initialEfficiency,
-  onConfirmed,
 }: BuildingDetailViewProps) {
   const building = link.detail as BuildingDetail;
   const { timeUnit } = useUnit();
@@ -42,7 +40,7 @@ export default function BuildingDetailView({
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
-  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 1);
+  const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 0);
   const [efficiency, setEfficiency] = useState<number>(mode === "edit" ? (initialEfficiency ?? 100) : 100);
   const [modeSelections, setModeSelections] = useState<ModeSelections>(() => {
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(building, initialModeSelections);
@@ -56,7 +54,7 @@ export default function BuildingDetailView({
       setModeSelections(initialModeSelections ? normalizeModeSelections(building, initialModeSelections) : buildDefaultModeSelections(building));
       return;
     }
-    setCount(1);
+    setCount(0);
     setEfficiency(100);
     setModeSelections(buildDefaultModeSelections(building));
   }, [building, initialCount, initialEfficiency, initialModeSelections, link.name, mode]);
@@ -73,7 +71,7 @@ export default function BuildingDetailView({
 
   const { convertedValue: convertedHeat, unit: heatUnit } = useMemo(() => convertHeat(totalHeat, timeUnit), [timeUnit, totalHeat]);
 
-  function handlePrimaryAction(): void {
+  useEffect(() => {
     const payload = {
       name: link.name,
       detail: building,
@@ -84,12 +82,10 @@ export default function BuildingDetailView({
     };
     if (mode === "edit" && editKey) {
       update(editKey, payload);
-      onConfirmed?.();
       return;
     }
     upsert(payload);
-    onConfirmed?.();
-  }
+  }, [building, category, count, editKey, efficiency, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">
@@ -98,9 +94,7 @@ export default function BuildingDetailView({
         iconFilter={iconData?.iconFilter}
         name={link.name}
         count={count}
-        actionLabel={mode === "edit" ? "确认" : "添加"}
         onCountChange={setCount}
-        onAction={handlePrimaryAction}
       />
       <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
         <Collapse.Item title="资源" name="资源">
