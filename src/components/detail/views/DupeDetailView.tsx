@@ -36,7 +36,10 @@ export default function DupeDetailView({
 }: DupeDetailViewProps) {
   const dupe = link.detail as DupeDetail;
   const { timeUnit, hungerLevel } = useUnit();
-  const hungerLevelModifier = useMemo(() => HUNGER_OPTIONS.find(o => o.label === hungerLevel)?.value ?? 1, [hungerLevel]);
+  const hungerLevelDeltas = useMemo(
+    () => HUNGER_OPTIONS.find(o => o.label === hungerLevel) ?? { calorieDelta: 0, powerDelta: 0 },
+    [hungerLevel]
+  );
   const { upsert, update } = useSelectionsActions();
   const { iconMap } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
@@ -63,9 +66,9 @@ export default function DupeDetailView({
 
   const { resources, resourceKinds, totalPower, totalCalories } = useMemo(() => {
     const isBionic = link.name.includes("仿生人");
-    const powerModifier = isBionic ? hungerLevelModifier : 1;
-    return calculateSelectionTotals(dupe, count, normalizedModeSelections, 100, hungerLevelModifier, powerModifier);
-  }, [count, dupe, normalizedModeSelections, hungerLevelModifier, link.name]);
+    const powerDelta = isBionic ? hungerLevelDeltas.powerDelta : 0;
+    return calculateSelectionTotals(dupe, count, normalizedModeSelections, 100, hungerLevelDeltas.calorieDelta, powerDelta);
+  }, [count, dupe, normalizedModeSelections, hungerLevelDeltas, link.name]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({

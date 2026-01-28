@@ -382,7 +382,7 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
   }
 }
 
-function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelModifier: number): SelectionsSummary {
+function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelDeltas: { calorieDelta: number; powerDelta: number }): SelectionsSummary {
   const resources: Record<string, number> = {};
   const resourceKinds: Record<string, ResourceUnitKind> = {};
   let totalPower = 0;
@@ -399,11 +399,11 @@ function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelModifie
   };
 
   selections.forEach((selection) => {
-    const isDupe = selection.category === "复制人";
+    const isDupe = selection.name.includes("复制人");
     const isBionic = selection.name.includes("仿生人");
-    const calorieModifier = isDupe ? hungerLevelModifier : 1;
-    const powerModifier = isBionic ? hungerLevelModifier : 1;
-    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections, selection.efficiency, calorieModifier, powerModifier);
+    const calorieDelta = isDupe ? hungerLevelDeltas.calorieDelta : 0;
+    const powerDelta = isBionic ? hungerLevelDeltas.powerDelta : 0;
+    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections, selection.efficiency, calorieDelta, powerDelta);
     totalPower += totals.totalPower;
     totalHeat += totals.totalHeat;
     totalCalories += totals.totalCalories;
@@ -525,9 +525,12 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
   }, [state.projects, state.currentProjectIndex]);
 
   const { hungerLevel } = useUnit();
-  const hungerLevelModifier = useMemo(() => HUNGER_OPTIONS.find((o) => o.label === hungerLevel)?.value ?? 1, [hungerLevel]);
+  const hungerLevelDeltas = useMemo(
+    () => HUNGER_OPTIONS.find((o) => o.label === hungerLevel) ?? { calorieDelta: 0, powerDelta: 0 },
+    [hungerLevel]
+  );
 
-  const summary = useMemo(() => buildSummary(enrichedSelections, hungerLevelModifier), [enrichedSelections, hungerLevelModifier]);
+  const summary = useMemo(() => buildSummary(enrichedSelections, hungerLevelDeltas), [enrichedSelections, hungerLevelDeltas]);
   const groupedSelections = useMemo(() => buildGroupedSelections(currentProject.selections), [currentProject.selections]);
 
   const actions = useMemo<SelectionsActions>(

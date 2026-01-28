@@ -11,11 +11,11 @@ export const TIME_UNIT_OPTIONS = [
 ];
 
 export const HUNGER_OPTIONS = [
-  { label: '无胃者/模拟件', value: 0 },
-  { label: '节食/节能', value: 0.5 },
-  { label: '默认', value: 1 },
-  { label: '无底胃/耗电', value: 1.5 },
-  { label: '饥肠辘辘/吸电鬼', value: 2 },
+  { label: '无胃者/模拟件', calorieDelta: 1000, powerDelta: 200 },
+  { label: '节食/节能', calorieDelta: 500, powerDelta: 100 },
+  { label: '默认', calorieDelta: 0, powerDelta: 0 },
+  { label: '无底胃/耗电', calorieDelta: -500, powerDelta: -100 },
+  { label: '饥肠辘辘/吸电鬼', calorieDelta: -1000, powerDelta: -200 },
 ];
 
 interface UnitContextType {

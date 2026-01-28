@@ -88,14 +88,14 @@ export function calculateSelectionTotals(
   count: number,
   modeSelections: ModeSelections,
   efficiency: number = 100,
-  calorieModifier: number = 1,
-  powerModifier: number = 1
+  calorieDelta: number = 0,
+  powerDelta: number = 0
 ): SelectionTotals {
   const detailAny = detail as any;
   const modes: Mode[] = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
   const resources: Record<string, number> = {};
   const resourceKinds: Record<string, ResourceUnitKind> = {};
-  let totalFactor = 0;
+  let totalFactor = 1;
 
   const efficiencyFactor = efficiency / 100;
   const normalizedSelections = normalizeModeSelections(detail, modeSelections);
@@ -118,8 +118,6 @@ export function calculateSelectionTotals(
     const modeSelection = normalizedSelections[mode.name];
     mode.options.forEach((option) => {
       const factor = optionFactor(option, modeSelection);
-      totalFactor += factor;
-
       Object.entries(option.resources || {}).forEach(([name, rawValue]) => {
         const parsed = parseResourceRate(rawValue);
         const resourceValue = count * parsed.valuePerSecond * factor * efficiencyFactor;
@@ -140,9 +138,9 @@ export function calculateSelectionTotals(
     resourceKinds[name] = mergeResourceKind(resourceKinds[name], parsed.kind);
   });
 
-  const totalPower = parseNumber(detailAny?.power) * count * effectiveTotalFactor * efficiencyFactor * powerModifier;
+  const totalPower = parseNumber(detailAny?.power) * count * effectiveTotalFactor * efficiencyFactor + powerDelta * count;
   const totalHeat = parseNumber(detailAny?.heat) * count * effectiveTotalFactor * efficiencyFactor;
-  const totalCalories = parseNumber(detailAny?.calorie) * count * effectiveTotalFactor * efficiencyFactor * calorieModifier;
+  const totalCalories = parseNumber(detailAny?.calorie) * count * effectiveTotalFactor * efficiencyFactor + calorieDelta * count;
 
   return {
     resources,

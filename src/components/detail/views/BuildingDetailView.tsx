@@ -64,7 +64,7 @@ export default function BuildingDetailView({
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(building, modeSelections), [building, modeSelections]);
 
   const { resources, resourceKinds, totalPower, totalHeat } = useMemo(() => {
-    return calculateSelectionTotals(building, count, normalizedModeSelections, efficiency, 1, 1);
+    return calculateSelectionTotals(building, count, normalizedModeSelections, efficiency);
   }, [building, count, normalizedModeSelections, efficiency]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
