@@ -29,7 +29,7 @@ export default function SelectionDetailHeader({
       ) : null}
       <Text className="text-md font-semibold">{name}</Text>
       <View style={{ flex: 1 }} />
-      <View className="flex justify-end gap-16 w-120">
+      <View className="flex justify-end gap-16">
         <InputNumber
           value={count}
           min={0}
