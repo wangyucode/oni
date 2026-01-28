@@ -22,6 +22,32 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
   const { timeUnit } = useUnit();
   const { iconMap } = useContext(DataContext);
 
+  const formatValue = (value: number) => {
+    if (!Number.isFinite(value)) return "0";
+    const absValue = Math.abs(value);
+    let fractionDigits = 0;
+    if (absValue === 0) {
+      fractionDigits = 0;
+    } else if (absValue >= 100) {
+      fractionDigits = 0;
+    } else if (absValue >= 10) {
+      fractionDigits = 1;
+    } else if (absValue >= 1) {
+      fractionDigits = 2;
+    } else if (absValue >= 0.1) {
+      fractionDigits = 3;
+    } else if (absValue >= 0.01) {
+      fractionDigits = 4;
+    } else if (absValue >= 0.001) {
+      fractionDigits = 5;
+    } else {
+      fractionDigits = 6;
+    }
+    const fixed = value.toFixed(fractionDigits);
+    const trimmed = fixed.replace(/\.?0+$/, "");
+    return trimmed === "-0" ? "0" : trimmed;
+  };
+
   const aggregatedResources = useMemo(() => {
     const map = new Map<string, { value: number; kind: ResourceUnitKind }>();
     items.forEach(item => {
@@ -79,23 +105,21 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
       };
     }
 
-    // Mass handling
-    if (absValue >= 1000) {
+    if (absValue >= 1000000) {
+      return {
+        convertedValue: valueByTime / 1000000,
+        unit: `吨/${timeUnit}`
+      };
+    } else if (absValue >= 1000) {
       return {
         convertedValue: valueByTime / 1000,
         unit: `千克/${timeUnit}`
       };
-    } else if (absValue >= 1 || absValue === 0) {
-      return {
-        convertedValue: valueByTime,
-        unit: `克/${timeUnit}`
-      };
-    } else {
-      return {
-        convertedValue: valueByTime * 1000,
-        unit: `毫克/${timeUnit}`
-      };
     }
+    return {
+      convertedValue: valueByTime,
+      unit: `克/${timeUnit}`
+    };
   };
 
   if (sortedResources.length === 0) {
@@ -114,8 +138,8 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
     >
       {sortedResources.map(([name, entry]) => {
         const { convertedValue, unit } = convertResourceValue(entry.value, entry.kind);
-        const formattedValue = Number(convertedValue.toFixed(2));
-        const valueStr = formattedValue > 0 ? '+' + formattedValue : formattedValue.toString();
+        const formattedValue = formatValue(convertedValue);
+        const valueStr = convertedValue > 0 ? `+${formattedValue}` : formattedValue;
         const iconData = iconMap.get(name);
         const iconSrc = iconData?.icon;
         const iconFilter = iconData?.iconFilter;

@@ -3,3 +3,4 @@
 - 时刻维持代码简单，直观，扩展性高，可读性好，移除废弃代码
 - 后端数据完全可控，不要过分设计，不考虑前后兼容，不考虑未来的需求
 - 数据类型定义在data.ts，数据来自两个接口：/api/v1/yml/calculator/index.yml 和 /api/v1/yml/calculator/images.yml
+- 无需验证和测试，仅总结手动测试要点
