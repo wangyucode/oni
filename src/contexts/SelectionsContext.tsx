@@ -401,9 +401,12 @@ function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelDeltas:
   selections.forEach((selection) => {
     const isDupe = selection.name.includes("复制人");
     const isBionic = selection.name.includes("仿生人");
-    const calorieDelta = isDupe ? hungerLevelDeltas.calorieDelta : 0;
+    const normalizedModeSelections = normalizeModeSelections(selection.detail, selection.modeSelections);
+    const trait = normalizedModeSelections["特质"];
+    const isBottomlessStomach = isDupe && trait === "无底洞之胃";
+    const calorieDelta = isDupe ? hungerLevelDeltas.calorieDelta + (isBottomlessStomach ? -500 : 0) : 0;
     const powerDelta = isBionic ? hungerLevelDeltas.powerDelta : 0;
-    const totals = calculateSelectionTotals(selection.detail, selection.count, selection.modeSelections, selection.efficiency, calorieDelta, powerDelta);
+    const totals = calculateSelectionTotals(selection.detail, selection.count, normalizedModeSelections, selection.efficiency, calorieDelta, powerDelta);
     totalPower += totals.totalPower;
     totalHeat += totals.totalHeat;
     totalCalories += totals.totalCalories;

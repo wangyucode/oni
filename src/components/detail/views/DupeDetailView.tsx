@@ -65,9 +65,13 @@ export default function DupeDetailView({
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
 
   const { resources, resourceKinds, totalPower, totalCalories } = useMemo(() => {
+    const isDupe = link.name.includes("复制人");
     const isBionic = link.name.includes("仿生人");
+    const trait = normalizedModeSelections["特质"];
+    const isBottomlessStomach = isDupe && trait === "无底洞之胃";
+    const calorieDelta = isDupe ? hungerLevelDeltas.calorieDelta + (isBottomlessStomach ? -500 : 0) : 0;
     const powerDelta = isBionic ? hungerLevelDeltas.powerDelta : 0;
-    return calculateSelectionTotals(dupe, count, normalizedModeSelections, 100, hungerLevelDeltas.calorieDelta, powerDelta);
+    return calculateSelectionTotals(dupe, count, normalizedModeSelections, 100, calorieDelta, powerDelta);
   }, [count, dupe, normalizedModeSelections, hungerLevelDeltas, link.name]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
