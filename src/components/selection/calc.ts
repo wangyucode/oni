@@ -15,7 +15,8 @@ export type ResourceUnitKind = "mass" | "count" | "kcal" | "growth";
 
 export function parseNumber(raw: string | undefined): number {
   if (!raw) return 0;
-  const match = raw.match(/[+-]?\d+(?:\.\d+)?/);
+  const cleaned = raw.replace(/[,，]/g, "");
+  const match = cleaned.match(/[+-]?\d+(?:\.\d+)?/);
   if (!match) return 0;
   const value = Number(match[0]);
   return Number.isFinite(value) ? value : 0;
