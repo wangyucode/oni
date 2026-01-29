@@ -90,6 +90,7 @@ export default function DupeDetailView({
       kind: resourceKinds[name] || "mass",
     }));
   }, [resources, resourceKinds]);
+  const resourceCollapseKey = process.env.TARO_ENV === "weapp" ? resourceItems.length.toString() : "resource";
 
   const isDupe = link.name.includes("复制人");
   const isBionic = link.name.includes("仿生人");
@@ -143,7 +144,7 @@ export default function DupeDetailView({
         onCountChange={setCount}
       />
       <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源">
+        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>

@@ -120,6 +120,7 @@ function Index() {
   const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat, timeUnit);
   // 强制刷新，小程序端的 NutUI Collapse 在展开时会缓存内容高度；
   const resourceCollapseKey = process.env.TARO_ENV === 'weapp' ? resourceItems.length.toString() : 'resource';
+  const selectionCollapseKey = process.env.TARO_ENV === 'weapp' ? groupedSelections.length.toString() : 'selection';
 
   function renderIcon(name: string) {
     const iconData = getIconData(iconMap, name);
@@ -170,7 +171,7 @@ function Index() {
           className='flex flex-col'
           defaultActiveName={['选择']}
           expandIcon={<ArrowDown className="text-white"/>}>
-          <Collapse.Item title="选择" name="选择" extra={<Button className='rounded-4 text-white' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
+          <Collapse.Item title="选择" name="选择" key={selectionCollapseKey} extra={<Button className='rounded-4 text-white' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
             <View className='flex flex-wrap gap-8 mt-8'>
               {groupedSelections.map((selection) =>
                 <View

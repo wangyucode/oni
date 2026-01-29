@@ -36,13 +36,6 @@ export default function Support() {
                 ad.onLoad(() => {
                     adLoadedRef.current = true;
                 });
-                ad.onError(() => {
-                    adLoadedRef.current = false;
-                });
-                ad.onClose(() => {
-                    adLoadedRef.current = false;
-                    loadAd();
-                });
                 loadAd();
             } catch (error) {
                 console.log(error);
@@ -70,14 +63,12 @@ export default function Support() {
         if (!adLoadedRef.current) {
             loadAd();
             return;
+        } else {
+            ad.show().catch(() => {
+                loadAd();
+            });
         }
-        ad.show().then(() => {
-            adLoadedRef.current = false;
-            loadAd();
-        }).catch(() => {
-            adLoadedRef.current = false;
-            loadAd();
-        });
+
     }
 
     return (

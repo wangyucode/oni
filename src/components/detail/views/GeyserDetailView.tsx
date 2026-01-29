@@ -94,6 +94,7 @@ export default function GeyserDetailView({
       kind: resourceKinds[name] || "mass",
     }));
   }, [resources, resourceKinds]);
+  const resourceCollapseKey = process.env.TARO_ENV === "weapp" ? resourceItems.length.toString() : "resource";
 
   const averageOutputText = useMemo(() => {
     return Object.entries(resources).map(([name, value]) => {
@@ -160,7 +161,7 @@ export default function GeyserDetailView({
         onCountChange={setCount}
       />
       <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源">
+        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
