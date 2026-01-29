@@ -106,7 +106,7 @@ function serializeModeSelections(detail: LinkDetail, raw: ModeSelections): strin
   return parts.join("|");
 }
 
-function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {
+export function createSelectionKey(itemName: string, detail: LinkDetail, modeSelections: ModeSelections): string {
   const modeKey = serializeModeSelections(detail, modeSelections);
   return `${itemName}::${modeKey}`;
 }

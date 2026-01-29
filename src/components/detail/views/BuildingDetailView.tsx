@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Text, View } from "@tarojs/components";
 import { Collapse, InputNumber, Range } from "@nutui/nutui-react-taro";
 import { ArrowDown } from "@nutui/icons-react-taro";
@@ -6,7 +6,7 @@ import { ArrowDown } from "@nutui/icons-react-taro";
 import { BuildingDetail, DetailLink } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
 import { useUnit } from "@/contexts/UnitContext";
-import { SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
+import { createSelectionKey, SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
@@ -47,6 +47,7 @@ export default function BuildingDetailView({
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(building, initialModeSelections);
     return buildDefaultModeSelections(building);
   });
+  const editKeyRef = useRef<string>(editKey || "");
 
   useEffect(() => {
     if (mode === "edit") {
@@ -59,6 +60,14 @@ export default function BuildingDetailView({
     setEfficiency(100);
     setModeSelections(buildDefaultModeSelections(building));
   }, [building, initialCount, initialEfficiency, initialModeSelections, link.name, mode]);
+
+  useEffect(() => {
+    if (mode === "edit") {
+      if (editKey) editKeyRef.current = editKey;
+      return;
+    }
+    editKeyRef.current = "";
+  }, [editKey, mode]);
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(building, modeSelections), [building, modeSelections]);
 
@@ -86,9 +95,14 @@ export default function BuildingDetailView({
       category,
       efficiency,
     };
-    if (mode === "edit" && editKey) {
-      update(editKey, payload);
-      return;
+    const nextKey = createSelectionKey(link.name, building, modeSelections);
+    if (mode === "edit") {
+      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      if (fromKey) {
+        update(fromKey, payload);
+        editKeyRef.current = nextKey;
+        return;
+      }
     }
     if (count <= 0) {
       if (lastSelectionKey) {

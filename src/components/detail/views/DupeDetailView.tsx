@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Text, View } from "@tarojs/components";
 import { Collapse } from "@nutui/nutui-react-taro";
 import { ArrowDown } from "@nutui/icons-react-taro";
@@ -6,7 +6,7 @@ import { ArrowDown } from "@nutui/icons-react-taro";
 import { DetailLink, DupeDetail } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
 import { HUNGER_OPTIONS, useUnit } from "@/contexts/UnitContext";
-import { SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
+import { createSelectionKey, SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
@@ -50,6 +50,7 @@ export default function DupeDetailView({
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(dupe, initialModeSelections);
     return buildDefaultModeSelections(dupe);
   });
+  const editKeyRef = useRef<string>(editKey || "");
 
   useEffect(() => {
     if (mode === "edit") {
@@ -60,6 +61,14 @@ export default function DupeDetailView({
     setCount(0);
     setModeSelections(buildDefaultModeSelections(dupe));
   }, [link.name, dupe, mode, initialCount, initialModeSelections]);
+
+  useEffect(() => {
+    if (mode === "edit") {
+      if (editKey) editKeyRef.current = editKey;
+      return;
+    }
+    editKeyRef.current = "";
+  }, [editKey, mode]);
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(dupe, modeSelections), [dupe, modeSelections]);
 
@@ -102,9 +111,14 @@ export default function DupeDetailView({
       modeSelections,
       category,
     };
-    if (mode === "edit" && editKey) {
-      update(editKey, payload);
-      return;
+    const nextKey = createSelectionKey(link.name, dupe, modeSelections);
+    if (mode === "edit") {
+      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      if (fromKey) {
+        update(fromKey, payload);
+        editKeyRef.current = nextKey;
+        return;
+      }
     }
     if (count <= 0) {
       if (lastSelectionKey) {

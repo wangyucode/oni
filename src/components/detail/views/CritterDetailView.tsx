@@ -1,11 +1,11 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Text, View } from "@tarojs/components";
 import { Collapse } from "@nutui/nutui-react-taro";
 import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { CreatureDetail, DetailLink } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
-import { SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
+import { createSelectionKey, SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
@@ -41,6 +41,7 @@ export default function CritterDetailView({
     if (mode === "edit" && initialModeSelections) return normalizeModeSelections(critter, initialModeSelections);
     return buildDefaultModeSelections(critter);
   });
+  const editKeyRef = useRef<string>(editKey || "");
 
   useEffect(() => {
     if (mode === "edit") {
@@ -51,6 +52,14 @@ export default function CritterDetailView({
     setCount(0);
     setModeSelections(buildDefaultModeSelections(critter));
   }, [critter, initialCount, initialModeSelections, link.name, mode]);
+
+  useEffect(() => {
+    if (mode === "edit") {
+      if (editKey) editKeyRef.current = editKey;
+      return;
+    }
+    editKeyRef.current = "";
+  }, [editKey, mode]);
 
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(critter, modeSelections), [critter, modeSelections]);
 
@@ -80,9 +89,14 @@ export default function CritterDetailView({
       modeSelections,
       category,
     };
-    if (mode === "edit" && editKey) {
-      update(editKey, payload);
-      return;
+    const nextKey = createSelectionKey(link.name, critter, modeSelections);
+    if (mode === "edit") {
+      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      if (fromKey) {
+        update(fromKey, payload);
+        editKeyRef.current = nextKey;
+        return;
+      }
     }
     if (count <= 0) {
       if (lastSelectionKey) {
