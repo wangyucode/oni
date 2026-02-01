@@ -22,6 +22,14 @@ page,
         overflow-y: scroll;
         overflow-x: hidden;
 
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
         .flex {
             display: flex;
         }
@@ -181,6 +189,10 @@ page,
             margin-right: 4PX;
         }
 
+        .mr-16 {
+            margin-right: 16PX;
+        }
+
         .my-4 {
             margin-top: 4PX;
             margin-bottom: 4PX;
@@ -208,8 +220,16 @@ page,
             height: 100%;
         }
 
+        .w-32 {
+            width: 32PX;
+        }
+
         .w-40 {
             width: 40PX;
+        }
+
+        .h-32 {
+            height: 32PX;
         }
 
         .h-40 {
@@ -299,6 +319,10 @@ page,
 
         .text-primary {
             color: #7F3D5E;
+        }
+
+        .bg-primary {
+            background-color: #7F3D5E;
         }
 
         .bg-white {

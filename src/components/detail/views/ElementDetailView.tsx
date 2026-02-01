@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Text, View } from "@tarojs/components";
-import { Collapse, InputNumber, Range } from "@nutui/nutui-react-taro";
+import { Collapse } from "@nutui/nutui-react-taro";
 import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { DetailLink, TransDetail } from "@/types/data";
@@ -10,6 +10,7 @@ import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } f
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
 import ModeSelectionEditor from "@/components/detail/ModeSelectionEditor";
+import SliderNumberInput from "@/components/ui/SliderNumberInput";
 import { DataContext } from "@/contexts/DataContext";
 import { getIconData } from "@/utils/utils";
 
@@ -135,20 +136,7 @@ export default function ElementDetailView({
 
       <View className="flex flex-col gap-6">
         <Text className="text-sm font-semibold">效率</Text>
-        <View className="flex gap-6 items-center">
-          <Range
-            min={0}
-            max={100}
-            step={1}
-            value={efficiency}
-            onChange={(val) => setEfficiency(Array.isArray(val) ? val[0] : val)}
-            maxDescription={null}
-            minDescription={null}
-            currentDescription={null}
-          />
-          <InputNumber min={0} max={100} step={1} value={efficiency} onChange={(val) => setEfficiency(Number(val))} />
-          <Text className="text-gray-600">%</Text>
-        </View>
+        <SliderNumberInput min={0} max={100} step={1} value={efficiency} onChange={setEfficiency} unit="%" />
       </View>
 
       {detail.modes && detail.modes.length > 0 && (

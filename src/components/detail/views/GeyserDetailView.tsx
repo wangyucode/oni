@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Text, View } from "@tarojs/components";
-import { Collapse, InputNumber, Range } from "@nutui/nutui-react-taro";
+import { Collapse } from "@nutui/nutui-react-taro";
 import { ArrowDown } from "@nutui/icons-react-taro";
 
 import { DetailLink, GeyserDetail } from "@/types/data";
@@ -10,6 +10,7 @@ import { createSelectionKey, SelectionsContext, useSelectionsActions } from "@/c
 import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
+import SliderNumberInput from "@/components/ui/SliderNumberInput";
 import { DataContext } from "@/contexts/DataContext";
 import { getIconData } from "@/utils/utils";
 
@@ -171,26 +172,14 @@ export default function GeyserDetailView({
           <Text className="text-sm font-semibold">平均产量</Text>
           <Text className="text-sm text-gray-600">{averageOutputText}</Text>
         </View>
-        <View className="flex gap-6 items-center">
-          <Range
-            min={minVal}
-            max={maxVal}
-            step={1}
-            value={currentValue}
-            onChange={(val) => setModeSelections(prev => ({ ...prev, "平均产量": `${Array.isArray(val) ? val[0] : val}${unit}` }))}
-            maxDescription={maxVal.toString()}
-            minDescription={minVal.toString()}
-            currentDescription={null}
-          />
-          <InputNumber
-            min={minVal}
-            max={maxVal}
-            step={1}
-            value={currentValue}
-            onChange={(val) => setModeSelections(prev => ({ ...prev, "平均产量": `${val}${unit}` }))}
-          />
-          <Text className="text-gray-600">{unit}</Text>
-        </View>
+        <SliderNumberInput
+          min={minVal}
+          max={maxVal}
+          step={1}
+          value={currentValue}
+          onChange={(val) => setModeSelections((prev) => ({ ...prev, "平均产量": `${val}${unit}` }))}
+          unit={unit}
+        />
       </View>
     </View>
   );
