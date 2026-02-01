@@ -25,6 +25,12 @@ export type Images = Record<
   }
 >;
 
+export type PhaseSets = {
+  solid: Set<string>;
+  liquid: Set<string>;
+  gas: Set<string>;
+};
+
 export type LinkDetail =
   | DupeDetail
   | BuildingDetail

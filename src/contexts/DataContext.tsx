@@ -1,10 +1,11 @@
 import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import Taro from "@tarojs/taro";
-import { API_BASE, Images, Menu, ORIGIN_BASE } from "@/types/data";
+import { API_BASE, Images, Menu, ORIGIN_BASE, PhaseSets } from "@/types/data";
 
 export interface DataContextType {
     data: Menu | null;
     iconMap: Map<string, IconData>;
+    phaseSets: PhaseSets;
     loading: boolean;
     error: Error | null;
     refresh: () => void;
@@ -15,9 +16,56 @@ export interface IconData {
     iconFilter?: string;
 }
 
+const EMPTY_PHASE_SETS: PhaseSets = {
+    solid: new Set(),
+    liquid: new Set(),
+    gas: new Set(),
+};
+
+function buildPhaseSets(menu: Menu | null): PhaseSets {
+    const solid = new Set<string>();
+    const liquid = new Set<string>();
+    const gas = new Set<string>();
+    if (!menu) return { solid, liquid, gas };
+
+    const visited = new WeakSet<Menu>();
+    const findPhaseMenu = (current: Menu): Menu | null => {
+        if (!current || visited.has(current)) return null;
+        visited.add(current);
+        if (current.title === "元素相变") return current;
+        const items = Array.isArray(current.items) ? current.items : [];
+        for (const item of items) {
+            if (item?.menu) {
+                const found = findPhaseMenu(item.menu);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
+    const phaseMenu = findPhaseMenu(menu);
+    if (!phaseMenu) return { solid, liquid, gas };
+
+    phaseMenu.items.forEach((item) => {
+        const childMenu = item?.menu;
+        const title = childMenu?.title || item?.name || "";
+        if (!childMenu) return;
+        if (title === "固体") {
+            childMenu.items?.forEach((child) => child?.name && solid.add(child.name));
+        } else if (title === "液体") {
+            childMenu.items?.forEach((child) => child?.name && liquid.add(child.name));
+        } else if (title === "气体") {
+            childMenu.items?.forEach((child) => child?.name && gas.add(child.name));
+        }
+    });
+
+    return { solid, liquid, gas };
+}
+
 export const DataContext = createContext<DataContextType>({
     data: null,
     iconMap: new Map(),
+    phaseSets: EMPTY_PHASE_SETS,
     loading: true,
     error: null,
     refresh: () => { },
@@ -90,8 +138,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return map;
     }, [images]);
 
+    const phaseSets = useMemo(() => buildPhaseSets(data), [data]);
+
     return (
-        <DataContext.Provider value={{ data, iconMap, loading, error, refresh: fetchData }}>
+        <DataContext.Provider value={{ data, iconMap, phaseSets, loading, error, refresh: fetchData }}>
             {children}
         </DataContext.Provider>
     )

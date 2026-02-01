@@ -32,6 +32,12 @@ export default function Log() {
                         <Text>• 新增数据库/百科功能</Text>
                     </>
                 } />
+                <Cell title="2.1" extra='2026-02-02' description={
+                    <>
+                        <Text>• 提高效率滑块的流畅度，并支持输入小数</Text>
+                        <Text>• 植物支持选择人工栽培或野外生长</Text>
+                    </>
+                } />
             </Cell.Group>
             {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-737af672508ba1fa' adIntervals={30} />}
         </View>

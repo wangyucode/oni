@@ -6,7 +6,7 @@ import { ArrowDown } from "@nutui/icons-react-taro";
 import { DetailLink, PlantDetail } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
 import { createSelectionKey, SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections, withPlantGrowthMode } from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
 import ModeSelectionEditor from "@/components/detail/ModeSelectionEditor";
@@ -30,10 +30,10 @@ export default function PlantDetailView({
   initialCount,
   initialModeSelections,
 }: PlantDetailViewProps) {
-  const plant = link.detail as PlantDetail;
+  const plant = useMemo(() => withPlantGrowthMode(link.detail as PlantDetail, true) as PlantDetail, [link.detail]);
   const { selections } = useContext(SelectionsContext);
   const { upsert, update } = useSelectionsActions();
-  const { iconMap } = useContext(DataContext);
+  const { iconMap, phaseSets } = useContext(DataContext);
   const iconData = getIconData(iconMap, link.name, link.icon);
 
   const [count, setCount] = useState<number>(mode === "edit" ? Math.max(0, Number(initialCount ?? 1) || 0) : 0);
@@ -64,8 +64,8 @@ export default function PlantDetailView({
   const normalizedModeSelections = useMemo(() => normalizeModeSelections(plant, modeSelections), [plant, modeSelections]);
 
   const { resources, resourceKinds } = useMemo(() => {
-    return calculateSelectionTotals(plant, count, normalizedModeSelections);
-  }, [count, plant, normalizedModeSelections]);
+    return calculateSelectionTotals(plant, count, normalizedModeSelections, 100, 0, 0, { phaseSets, isPlant: true });
+  }, [count, phaseSets, plant, normalizedModeSelections]);
 
   const resourceItems = useMemo<ResourceItem[]>(() => {
     return Object.entries(resources).map(([name, value]) => ({

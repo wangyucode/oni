@@ -2,10 +2,10 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer, u
 import Taro from "@tarojs/taro";
 import { debounce } from "@tarojs/runtime";
 
-import { Link, LinkDetail, Menu } from "@/types/data";
+import { Link, LinkDetail, Menu, PhaseSets } from "@/types/data";
 import { ResourceItem } from "@/components/ui/ResourceGrid";
 import { calculateSelectionTotals, ResourceUnitKind } from "@/components/selection/calc";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections } from "@/components/selection/modeSelection";
+import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections, withPlantGrowthMode } from "@/components/selection/modeSelection";
 import { DataContext } from "@/contexts/DataContext";
 import { CYCLE_SECONDS, HUNGER_OPTIONS, useUnit } from "@/contexts/UnitContext";
 
@@ -382,7 +382,11 @@ function selectionsReducer(state: SelectionsState, action: SelectionsAction): Se
   }
 }
 
-function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelDeltas: { calorieDelta: number; powerDelta: number }): SelectionsSummary {
+function buildSummary(
+  selections: SelectionEntryWithDetail[],
+  hungerLevelDeltas: { calorieDelta: number; powerDelta: number },
+  phaseSets: PhaseSets
+): SelectionsSummary {
   const resources: Record<string, number> = {};
   const resourceKinds: Record<string, ResourceUnitKind> = {};
   let totalPower = 0;
@@ -406,7 +410,16 @@ function buildSummary(selections: SelectionEntryWithDetail[], hungerLevelDeltas:
     const isBottomlessStomach = isDupe && trait === "无底洞之胃";
     const calorieDelta = isDupe ? hungerLevelDeltas.calorieDelta + (isBottomlessStomach ? -500 : 0) : 0;
     const powerDelta = isBionic ? hungerLevelDeltas.powerDelta : 0;
-    const totals = calculateSelectionTotals(selection.detail, selection.count, normalizedModeSelections, selection.efficiency, calorieDelta, powerDelta);
+    const isPlant = selection.category === "植物";
+    const totals = calculateSelectionTotals(
+      selection.detail,
+      selection.count,
+      normalizedModeSelections,
+      selection.efficiency,
+      calorieDelta,
+      powerDelta,
+      { phaseSets, isPlant }
+    );
     totalPower += totals.totalPower;
     totalHeat += totals.totalHeat;
     totalCalories += totals.totalCalories;
@@ -444,7 +457,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     currentProjectIndex: 0,
   });
   const hydratedRef = useRef(false);
-  const { data } = useContext(DataContext);
+  const { data, phaseSets } = useContext(DataContext);
   const [shouldInitDefaults, setShouldInitDefaults] = useState(false);
 
   const currentProject = state.projects[state.currentProjectIndex];
@@ -453,8 +466,9 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     if (!data) return [];
     return currentProject.selections
       .map((s) => {
-        const detail = findDetailByName(data, s.name);
-        if (!detail) return null;
+        const rawDetail = findDetailByName(data, s.name);
+        if (!rawDetail) return null;
+        const detail = s.category === "植物" ? withPlantGrowthMode(rawDetail, true) : rawDetail;
         const normalizedModeSelections = normalizeModeSelections(detail, s.modeSelections);
         return { ...s, detail, modeSelections: normalizedModeSelections };
       })
@@ -533,7 +547,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     [hungerLevel]
   );
 
-  const summary = useMemo(() => buildSummary(enrichedSelections, hungerLevelDeltas), [enrichedSelections, hungerLevelDeltas]);
+  const summary = useMemo(() => buildSummary(enrichedSelections, hungerLevelDeltas, phaseSets), [enrichedSelections, hungerLevelDeltas, phaseSets]);
   const groupedSelections = useMemo(() => buildGroupedSelections(currentProject.selections), [currentProject.selections]);
 
   const actions = useMemo<SelectionsActions>(

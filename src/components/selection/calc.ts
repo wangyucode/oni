@@ -1,6 +1,6 @@
-import { LinkDetail, Mode } from "@/types/data";
+import { LinkDetail, Mode, PhaseSets } from "@/types/data";
 import { CYCLE_SECONDS } from "@/contexts/UnitContext";
-import { ModeSelections, optionFactor, normalizeModeSelections } from "@/components/selection/modeSelection";
+import { GROWTH_MODE_NAME, GROWTH_WILD_OPTION, ModeSelections, isPlantDetail, normalizeModeSelections, optionFactor } from "@/components/selection/modeSelection";
 
 export type SelectionTotals = {
   resources: Record<string, number>;
@@ -9,6 +9,11 @@ export type SelectionTotals = {
   totalPower: number;
   totalHeat: number;
   totalCalories: number;
+};
+
+export type SelectionCalcOptions = {
+  phaseSets?: PhaseSets;
+  isPlant?: boolean;
 };
 
 export type ResourceUnitKind = "mass" | "count" | "kcal" | "growth";
@@ -90,7 +95,8 @@ export function calculateSelectionTotals(
   modeSelections: ModeSelections,
   efficiency: number = 100,
   calorieDelta: number = 0,
-  powerDelta: number = 0
+  powerDelta: number = 0,
+  options: SelectionCalcOptions = {}
 ): SelectionTotals {
   const detailAny = detail as any;
   const modes: Mode[] = Array.isArray(detailAny?.modes) ? detailAny.modes : [];
@@ -138,6 +144,27 @@ export function calculateSelectionTotals(
     resources[name] = (resources[name] || 0) + resourceValue;
     resourceKinds[name] = mergeResourceKind(resourceKinds[name], parsed.kind);
   });
+
+  const isPlant = options.isPlant ?? isPlantDetail(detail);
+  const isWildGrowth = normalizedSelections[GROWTH_MODE_NAME] === GROWTH_WILD_OPTION;
+  const phaseSets = options.phaseSets;
+  const hasPhaseSets = !!phaseSets && (phaseSets.solid.size > 0 || phaseSets.liquid.size > 0 || phaseSets.gas.size > 0);
+
+  if (isPlant && isWildGrowth && hasPhaseSets) {
+    Object.keys(resources).forEach((name) => {
+      const value = resources[name];
+      const isGas = phaseSets?.gas.has(name) ?? false;
+      if (isGas) return;
+      if (value < 0) {
+        delete resources[name];
+        delete resourceKinds[name];
+        return;
+      }
+      if (value > 0) {
+        resources[name] = value / 4;
+      }
+    });
+  }
 
   const totalPower = parseNumber(detailAny?.power) * count * effectiveTotalFactor * efficiencyFactor + powerDelta * count;
   const totalHeat = parseNumber(detailAny?.heat) * count * effectiveTotalFactor * efficiencyFactor;
