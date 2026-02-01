@@ -115,3 +115,11 @@
         align-items: center;
     }
 }
+
+.weui-picker {
+    &__action {
+        color: #7F3D5E;
+        font-weight: bold;
+        font-size: 14PX;
+    }
+}

@@ -1,8 +1,8 @@
 
 import { MouseEvent, useContext, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
-import { View, Text, AdCustom } from '@tarojs/components'
-import { Badge, Button, Collapse, Cell, Picker, PickerOption, PickerOptions, PickerOnChangeCallbackParameter, PickerValue } from '@nutui/nutui-react-taro'
+import { View, Text, AdCustom, Picker } from '@tarojs/components'
+import { Badge, Button, Collapse, Cell } from '@nutui/nutui-react-taro'
 import { Add, ArrowDown, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
 import SelectPopup from '@/components/ui/SelectPopup';
 import ResourceGrid from '@/components/ui/ResourceGrid';
@@ -26,13 +26,6 @@ function Index() {
   const { timeUnit, setTimeUnit, hungerLevel, setHungerLevel } = useUnit();
   const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
   const [isShowEditPopup, setIsShowEditPopup] = useState(false);
-  const [setting, setSetting] = useState({
-    isShowSettingsPicker: false,
-    title: '',
-    options: [] as PickerOptions[],
-    value: [] as PickerValue[],
-  });
-
   const { selections, groupedSelections, summary, projects, currentProjectIndex } = useSelections();
   const { clear, addProject, deleteProject, switchProject } = useSelectionsActions();
   const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
@@ -40,46 +33,10 @@ function Index() {
 
   const currentProject = projects[currentProjectIndex];
 
-  const onSettingConfirm = (selectedOptions: PickerOption[]) => {
-    const val = selectedOptions[0]?.value;
-    if (val === undefined) return;
-    if (setting.title === '饥饿/功率难度') {
-      setHungerLevel(val as HungerLevel);
-    } else if (setting.title === '时间单位') {
-      setTimeUnit(val as TimeUnit);
-    } else if (setting.title === '选择方案') {
-      const index = projects.findIndex(p => p.name === val);
-      if (index >= 0) switchProject(index);
-    }
-    setSetting({ ...setting, isShowSettingsPicker: false, value: [val] });
-  };
-
-  const showTimeUnitPicker = () => {
-    setSetting({
-      isShowSettingsPicker: true,
-      title: '时间单位',
-      options: [TIME_UNIT_OPTIONS],
-      value: [timeUnit],
-    });
-  };
-
-  const showHungerPicker = () => {
-    setSetting({
-      isShowSettingsPicker: true,
-      title: '饥饿/功率难度',
-      options: [HUNGER_OPTIONS.map(o => ({ label: o.label, value: o.label }))],
-      value: [hungerLevel],
-    });
-  };
-
-  const showProjectPicker = () => {
-    setSetting({
-      isShowSettingsPicker: true,
-      title: '选择方案',
-      options: [projects.map(p => ({ label: p.name, value: p.name }))],
-      value: [currentProject.name],
-    });
-  };
+  const projectOptions = projects.map(p => p.name);
+  const projectIndex = Math.max(0, projectOptions.findIndex(name => name === currentProject.name));
+  const timeUnitIndex = Math.max(0, TIME_UNIT_OPTIONS.findIndex(option => option.value === timeUnit));
+  const hungerIndex = Math.max(0, HUNGER_OPTIONS.findIndex(option => option.label === hungerLevel));
 
   function handleAddProject(e: MouseEvent) {
     addProject();
@@ -190,38 +147,64 @@ function Index() {
         </Collapse>
 
         <Cell.Group className="settings">
-          <Cell align="center" title="方案" clickable onClick={showProjectPicker} extra={
-            <View className='flex gap-4 items-center'>
-              <Text className='text-primary font-bold mr-4'>{currentProject.name}</Text>
-              <Button type="success" size='small' onClick={handleAddProject}><Plus size={16} color='#fff' /></Button>
-              <Button type="danger" size='small' onClick={handleDeleteProject}><Del size={16} color='#fff' /></Button>
-              <ArrowRight size={16} />
-            </View>
-          } />
-          <Cell align="center" title="时间单位" clickable onClick={showTimeUnitPicker} extra={
-            <>
-              <Text className='text-primary font-bold mr-4'>{timeUnit}</Text>
-              <ArrowRight size={16} />
-            </>
-          } />
-          <Cell align="center" title="饥饿/功率难度" clickable onClick={showHungerPicker} extra={
-            <>
-              <Text className='text-primary font-bold mr-4'>{hungerLevel}</Text>
-              <ArrowRight size={16} />
-            </>
-          } />  
-          
+          <Picker
+            mode="selector"
+            range={projectOptions}
+            value={projectIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              if (projects[nextIndex]) switchProject(nextIndex);
+            }}
+          >
+            <Cell align="center" title="方案" clickable extra={
+              <View className='flex gap-4 items-center'>
+                <Text className='text-primary font-bold mr-4'>{currentProject.name}</Text>
+                <Button type="success" size='small' onClick={handleAddProject}><Plus size={16} color='#fff' /></Button>
+                <Button type="danger" size='small' onClick={handleDeleteProject}><Del size={16} color='#fff' /></Button>
+                <ArrowRight size={16} />
+              </View>
+            } />
+          </Picker>
+          <Picker
+            mode="selector"
+            range={TIME_UNIT_OPTIONS}
+            rangeKey="label"
+            value={timeUnitIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              const nextUnit = TIME_UNIT_OPTIONS[nextIndex];
+              if (nextUnit?.value) setTimeUnit(nextUnit.value as TimeUnit);
+            }}
+          >
+            <Cell align="center" title="时间单位" clickable extra={
+              <>
+                <Text className='text-primary font-bold mr-4'>{timeUnit}</Text>
+                <ArrowRight size={16} />
+              </>
+            } />
+          </Picker>
+          <Picker
+            mode="selector"
+            range={HUNGER_OPTIONS.map(option => option.label)}
+            value={hungerIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              const nextOption = HUNGER_OPTIONS[nextIndex];
+              if (nextOption?.label) setHungerLevel(nextOption.label as HungerLevel);
+            }}
+          >
+            <Cell align="center" title="饥饿/功率难度" clickable extra={
+              <>
+                <Text className='text-primary font-bold mr-4'>{hungerLevel}</Text>
+                <ArrowRight size={16} />
+              </>
+            } />
+          </Picker>
         </Cell.Group>
       </View>
-      <Picker
-        visible={setting.isShowSettingsPicker}
-        title={setting.title}
-        options={setting.options}
-        value={setting.value}
-        onConfirm={onSettingConfirm}
-        onChange={(param: PickerOnChangeCallbackParameter) => setSetting({ ...setting, value: param.value })}
-        onCancel={() => setSetting({ ...setting, isShowSettingsPicker: false })}
-      />
       <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
       <EditPopup
         visible={isShowEditPopup}
