@@ -6,7 +6,14 @@ import { ArrowDown } from "@nutui/icons-react-taro";
 import { DetailLink, PlantDetail } from "@/types/data";
 import ResourceGrid, { ResourceItem } from "@/components/ui/ResourceGrid";
 import { createSelectionKey, SelectionsContext, useSelectionsActions } from "@/contexts/SelectionsContext";
-import { ModeSelections, buildDefaultModeSelections, normalizeModeSelections, withPlantGrowthMode } from "@/components/selection/modeSelection";
+import {
+  GROWTH_MODE_NAME,
+  GROWTH_WILD_OPTION,
+  ModeSelections,
+  buildDefaultModeSelections,
+  normalizeModeSelections,
+  withPlantGrowthMode,
+} from "@/components/selection/modeSelection";
 import { calculateSelectionTotals } from "@/components/selection/calc";
 import SelectionDetailHeader from "@/components/detail/SelectionDetailHeader";
 import ModeSelectionEditor from "@/components/detail/ModeSelectionEditor";
@@ -112,6 +119,19 @@ export default function PlantDetailView({
     upsert(payload);
   }, [category, count, editKey, lastSelectionKey, link.name, mode, modeSelections, plant, upsert, update]);
 
+  const lifeDisplay = useMemo(() => {
+    if (!plant.life) return null;
+    if (modeSelections[GROWTH_MODE_NAME] === GROWTH_WILD_OPTION) {
+      const match = plant.life.match(/^([\d.]+)(.*)$/);
+      if (match) {
+        const val = parseFloat(match[1]);
+        const unit = match[2];
+        return `${val * 4}${unit}`;
+      }
+    }
+    return plant.life;
+  }, [plant.life, modeSelections]);
+
   return (
     <View className="selection-detail-view">
       <SelectionDetailHeader
@@ -127,10 +147,10 @@ export default function PlantDetailView({
         </Collapse.Item>
       </Collapse>
 
-      {plant.life ? (
+      {lifeDisplay ? (
         <View className="flex gap-12">
           <Text className="text-sm font-semibold">生长</Text>
-          <Text className="text-gray-600">{plant.life}</Text>
+          <Text className="text-gray-600">{lifeDisplay}</Text>
         </View>
       ) : null}
 
