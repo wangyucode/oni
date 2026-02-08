@@ -153,9 +153,14 @@ export function calculateSelectionTotals(
   if (isPlant && isWildGrowth && hasPhaseSets) {
     Object.keys(resources).forEach((name) => {
       const value = resources[name];
+      if (value > 0 && (name.includes("种子") || name.includes("孢子"))) {
+        delete resources[name];
+        delete resourceKinds[name];
+        return;
+      }
       const isGas = phaseSets?.gas.has(name) ?? false;
       if (isGas) return;
-      if (value < 0) {
+      if (value < 0 && (phaseSets?.liquid.has(name) || phaseSets?.solid.has(name))) {
         delete resources[name];
         delete resourceKinds[name];
         return;
