@@ -38,7 +38,7 @@ export function parsePower(raw: string | undefined): number {
   return val;
 }
 
-export function parseResourceRate(raw: string | undefined): { valuePerSecond: number; kind: ResourceUnitKind } {
+export function parseResourceRate(raw: string | undefined, lifespanSeconds?: number): { valuePerSecond: number; kind: ResourceUnitKind } {
   if (!raw) return { valuePerSecond: 0, kind: "mass" };
 
   const s = String(raw).replace(/\s+/g, "");
@@ -85,6 +85,8 @@ export function parseResourceRate(raw: string | undefined): { valuePerSecond: nu
       denominatorSeconds = CYCLE_SECONDS;
     } else if (s.includes("/秒") || s.includes("每秒")) {
       denominatorSeconds = 1;
+    } else if (kind === "count" && lifespanSeconds && lifespanSeconds > 0) {
+      denominatorSeconds = lifespanSeconds;
     }
   }
 
@@ -115,6 +117,19 @@ export function calculateSelectionTotals(
   const resourceKinds: Record<string, ResourceUnitKind> = {};
   let totalFactor = 1;
 
+  let lifespanSeconds: number | undefined;
+  if (detailAny.life) {
+    const val = parseNumber(detailAny.life);
+    if (val > 0) {
+      const s = String(detailAny.life);
+      if (s.includes("秒")) {
+        lifespanSeconds = val;
+      } else {
+        lifespanSeconds = val * CYCLE_SECONDS;
+      }
+    }
+  }
+
   const efficiencyFactor = efficiency / 100;
   const normalizedSelections = normalizeModeSelections(detail, modeSelections);
 
@@ -123,7 +138,7 @@ export function calculateSelectionTotals(
     if (entries.length > 0) {
       const [name] = entries[0];
       const rawValue = normalizedSelections["平均产量"];
-      const parsed = parseResourceRate(rawValue);
+      const parsed = parseResourceRate(rawValue, lifespanSeconds);
       const resourceValue = count * parsed.valuePerSecond * efficiencyFactor;
       if (resourceValue) {
         resources[name] = resourceValue;
@@ -137,7 +152,7 @@ export function calculateSelectionTotals(
     mode.options.forEach((option) => {
       const factor = optionFactor(option, modeSelection);
       Object.entries(option.resources || {}).forEach(([name, rawValue]) => {
-        const parsed = parseResourceRate(rawValue);
+        const parsed = parseResourceRate(rawValue, lifespanSeconds);
         const resourceValue = count * parsed.valuePerSecond * factor * efficiencyFactor;
         if (!resourceValue) return;
         resources[name] = (resources[name] || 0) + resourceValue;
@@ -149,7 +164,7 @@ export function calculateSelectionTotals(
   const effectiveTotalFactor = totalFactor > 0 ? totalFactor : 1;
 
   Object.entries((detailAny?.resources || {}) as Record<string, string>).forEach(([name, rawValue]) => {
-    const parsed = parseResourceRate(rawValue);
+    const parsed = parseResourceRate(rawValue, lifespanSeconds);
     const resourceValue = count * parsed.valuePerSecond * effectiveTotalFactor * efficiencyFactor;
     if (!resourceValue) return;
     resources[name] = (resources[name] || 0) + resourceValue;
