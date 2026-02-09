@@ -27,6 +27,17 @@ export function parseNumber(raw: string | undefined): number {
   return Number.isFinite(value) ? value : 0;
 }
 
+export function parsePower(raw: string | undefined): number {
+  if (!raw) return 0;
+  const s = String(raw).replace(/\s+/g, "");
+  const val = parseNumber(s);
+  
+  if (/千瓦/i.test(s) || /kw/i.test(s)) {
+    return val * 1000;
+  }
+  return val;
+}
+
 export function parseResourceRate(raw: string | undefined): { valuePerSecond: number; kind: ResourceUnitKind } {
   if (!raw) return { valuePerSecond: 0, kind: "mass" };
 
@@ -171,7 +182,7 @@ export function calculateSelectionTotals(
     });
   }
 
-  const totalPower = parseNumber(detailAny?.power) * count * effectiveTotalFactor * efficiencyFactor + powerDelta * count;
+  const totalPower = parsePower(detailAny?.power) * count * effectiveTotalFactor * efficiencyFactor + powerDelta * count;
   const totalHeat = parseNumber(detailAny?.heat) * count * effectiveTotalFactor * efficiencyFactor;
   const totalCalories = parseNumber(detailAny?.calorie) * count * effectiveTotalFactor * efficiencyFactor + calorieDelta * count;
 
