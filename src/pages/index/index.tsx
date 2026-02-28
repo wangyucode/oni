@@ -1,261 +1,217 @@
 
-import { useContext, useEffect, useState } from 'react';
+import { MouseEvent, useContext, useState } from 'react';
 import Taro, { useShareAppMessage } from '@tarojs/taro';
-import { View, Text } from '@tarojs/components'
-import { Badge, Button, Cell, Collapse, Grid, Switch } from '@nutui/nutui-react-taro'
-
-import Icon from 'src/components/icons'
-import Select from 'src/components/Select';
-import { DataContext } from 'src/components/DataContext';
-import { useUnit } from 'src/components/UnitContext';
-import { SelectionsContext, SelectionsDispatchContext } from 'src/components/SelectionsContext';
-import { Item, Resources, sharedMessage } from 'src/components/data';
+import { View, Text, AdCustom, Picker } from '@tarojs/components'
+import { Badge, Button, Collapse, Cell } from '@nutui/nutui-react-taro'
+import { Add, ArrowDown, ArrowRight, Del, Plus } from '@nutui/icons-react-taro';
+import SelectPopup from '@/components/ui/SelectPopup';
+import ResourceGrid from '@/components/ui/ResourceGrid';
+import { HUNGER_OPTIONS, TIME_UNIT_OPTIONS, useUnit, HungerLevel, TimeUnit } from '@/contexts/UnitContext';
+import { useSelections, useSelectionsActions } from '@/contexts/SelectionsContext';
+import { sharedMessage } from '@/types/data';
+import FilteredImage from '@/components/ui/FilteredImage';
+import EditPopup from '@/components/ui/EditPopup';
+import { DataContext } from '@/contexts/DataContext';
+import { getIconData } from '@/utils/utils';
+import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
+import { convertCalories, convertHeat } from '@/components/detail/formatters';
 
 import './index.scss'
-import { Add } from '@nutui/icons-react-taro';
 
-const selectionCategories = ['复制人/仿生人', '建筑', '动物', '植物', '相变'];
 const resultCategories = ['资源', '食物', '电力', '热量'];
 
 function Index() {
 
   useShareAppMessage(() => sharedMessage);
-  const { plantNames, foodCalories } = useContext(DataContext);
-  const { unitType, toggleUnitType } = useUnit();
-  const [select, setSelect] = useState<string>('');
-  const [edit, setEdit] = useState<Item | undefined>(undefined);
-  const selections = useContext(SelectionsContext);
-  const dispatch = useContext(SelectionsDispatchContext);
-  const [resources, setResources] = useState<Resources>({});
-  const [totalCalories, setTotalCalories] = useState<number>(0);
-  const [totalPower, setTotalPower] = useState<number>(0);
-  const [totalHeat, setTotalHeat] = useState<number>(0);
+  const { timeUnit, setTimeUnit, hungerLevel, setHungerLevel } = useUnit();
+  const [isShowSelectPopup, setIsShowSelectPopup] = useState(false);
+  const [isShowEditPopup, setIsShowEditPopup] = useState(false);
+  const { selections, groupedSelections, summary, projects, currentProjectIndex } = useSelections();
+  const { clear, addProject, deleteProject, switchProject } = useSelectionsActions();
+  const { resourceItems, totalCalories, totalPower, totalHeat } = summary;
+  const { iconMap } = useContext(DataContext);
 
-  useEffect(() => {
-    const newResources: Resources = {};
-    const newFoodResources: Resources = {};
-    let newTotalPower = 0;
-    let newTotalHeat = 0;
+  const currentProject = projects[currentProjectIndex];
 
-    selections.forEach(selection => {
-      let totalFactor = 0;
-      // 模式资源计算（支持百分比）
-      selection.item.detail!.modes.forEach((mode, i) => {
-        const optionSelectionMap = selection.modes[i];
+  const projectOptions = projects.map(p => p.name);
+  const projectIndex = Math.max(0, projectOptions.findIndex(name => name === currentProject.name));
+  const timeUnitIndex = Math.max(0, TIME_UNIT_OPTIONS.findIndex(option => option.value === timeUnit));
+  const hungerIndex = Math.max(0, HUNGER_OPTIONS.findIndex(option => option.label === hungerLevel));
 
-        mode.options.forEach(option => {
-          const percentage = optionSelectionMap.get(option.name) || 0;
-          const factor = percentage / 100;
-          totalFactor += factor;
-          Object.entries(option.resources || {}).forEach(([name, value]) => {
-            const resourceValue = selection.count * value * factor;
-            if (!resourceValue) return;
-            newResources[name] = (newResources[name] || 0) + resourceValue;
-          });
-        });
-      });
-      // 基础资源计算
-      Object.entries(selection.item.detail!.resources).forEach(([name, value]) => {
-        const resourceValue = selection.count * value * totalFactor;
-        newResources[name] = (newResources[name] || 0) + resourceValue;
-      });
+  function handleAddProject(e: MouseEvent) {
+    addProject();
+    e.stopPropagation();
+  }
 
-      // 电力计算
-      if (selection.item.detail?.power) {
-        newTotalPower += selection.count * selection.item.detail.power * totalFactor;
-      }
-
-      // 热量计算
-      if (selection.item.detail?.heat) {
-        newTotalHeat += selection.count * selection.item.detail.heat * totalFactor;
-      }
-
-    });
-
-    // 处理小动物吃植物
-    Object.entries(newResources).forEach(([name, value]) => {
-      if (plantNames.includes(name)) {
-        const selection = selections.find(s => s.item.name === name);
-        if (selection) {
-          Object.entries(selection.item.detail!.resources).forEach(([n, v]) => {
-            newResources[n] = (newResources[n] || 0) + v * value;
-          });
-          delete newResources[name];
+  function handleDeleteProject(e: MouseEvent) {
+    Taro.showModal({
+      title: '删除方案',
+      content: `确定要删除方案 "${currentProject.name}" 吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          deleteProject(currentProjectIndex);
         }
       }
     });
-
-    setResources(newResources);
-    setTotalPower(newTotalPower);
-    setTotalHeat(newTotalHeat);
-
-
-    // 处理食物
-    Object.entries(newResources).forEach(([name, value]) => {
-      // 筛选食物资源
-      const foodKeywords = Object.keys(foodCalories);
-      if (foodKeywords.some(keyword => name.includes(keyword)) && value > 0) {
-        newFoodResources[name] = (newFoodResources[name] || 0) + value;
-      }
-    });
-
-    // 计算总卡路里
-    const newTotalCalories = Object.entries(newFoodResources)
-      .reduce((sum, [name, value]) => {
-        const caloriePerGram = foodCalories[name] || 0;
-        return sum + (value * caloriePerGram);
-      }, 0);
-
-    // 计算复制人消耗卡路里 (每个复制人每秒消耗 1000/600 卡路里)
-    const dupeCount = selections
-      .filter(s => s.item.name === '复制人')
-      .reduce((total, s) => total + s.count, 0);
-    const caloriesConsumed = dupeCount * (1000 / 600);
-    const netCalories = newTotalCalories - caloriesConsumed;
-
-    setTotalCalories(netCalories);
-  }, [selections])
-
-  function handleAdd(category: string) {
-    setSelect(category);
+    e.stopPropagation();
   }
 
-  function onClose() {
-    setSelect('');
-    setEdit(undefined);
+  function handleAdd() {
+    setIsShowSelectPopup(true);
   }
 
-  function handleItemClick(item: Item) {
-    setSelect('');
-    setEdit({ ...item });
+  function onPopupClose() {
+    setIsShowSelectPopup(false);
   }
 
-  function reset() {
-    dispatch({ type: 'replace', payload: [] });
-    Taro.removeStorage({ key: 'selections' });
+  function onEditPopupClose() {
+    setIsShowEditPopup(false);
   }
 
-  function getTips(category: string) {
-    if (category === '建筑') {
-      return '建筑效率实际通常无法达到100%，实际产量通常略低于理论值';
-    } else if (category === '动物') {
-      return '动物资源消耗和产出按精养数量计算；除帕库鱼和树鼠选择产蛋外，其它动物选择产肉，产量包括散养';
-    } else if (category === '植物') {
-      return '植物无法立即被收获，实际产量通常略低于理论值';
-    } else if (category === '复制人/仿生人') {
-      return '物质转化包含呼吸/上厕所/粘渣/润滑，未包含洗澡';
-    } else if (category === '相变') {
-      return '包括所有物质的相态转化，包括挥发、液化、凝固、熔化、凝结、升华';
-    } else {
-      return '';
-    }
+  function reset(e: MouseEvent) {
+    clear();
+    e.stopPropagation();
   }
 
-  // 单位转换函数
-  const convertResourceValue = (value: number, name: string): { convertedValue: number, unit: string } => {
-    if (unitType === 'g/s') {
-      const isPlant = plantNames.includes(name);
-      const unit = isPlant ? '棵/s' : 'g/s';
-      if (isPlant) return { convertedValue: value / 1000, unit };
-      return { convertedValue: value, unit };
-    } else {
-      // 转换为kg/周期: 1周期=600秒，1000g=1kg
-      const convertedValue = value * 600 / 1000;
-      const unit = plantNames.includes(name) ? '棵/周期' : 'kg/周期';
-      return { convertedValue, unit };
-    }
-  };
+  const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories, timeUnit);
+  const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat, timeUnit);
+  // 强制刷新，小程序端的 NutUI Collapse 在展开时会缓存内容高度；
+  const resourceCollapseKey = process.env.TARO_ENV === 'weapp' ? resourceItems.length.toString() : 'resource';
+  const selectionCollapseKey = process.env.TARO_ENV === 'weapp' ? groupedSelections.length.toString() : 'selection';
 
-  const convertCalories = (calories: number): { convertedValue: number, unit: string } => {
-    if (unitType === 'g/s') {
-      return { convertedValue: calories, unit: '千卡/秒' };
-    } else {
-      return { convertedValue: calories * 600, unit: '千卡/周期' };
-    }
-  };
-
-  const convertHeat = (heat: number): { convertedValue: number, unit: string } => {
-    if (unitType === 'g/s') {
-      return { convertedValue: heat / 1000, unit: '千复制热/秒' };
-    } else {
-      return { convertedValue: heat * 600 / 1000, unit: '千复制热/周期' };
-    }
-  };
-
-  const { convertedValue: convertedCalories, unit: caloriesUnit } = convertCalories(totalCalories);
-  const { convertedValue: convertedHeat, unit: heatUnit } = convertHeat(totalHeat);
+  function renderIcon(name: string) {
+    const iconData = getIconData(iconMap, name);
+    if (!iconData?.icon) return null;
+    return (
+      <FilteredImage
+        src={iconData.icon}
+        iconFilter={iconData.iconFilter}
+        style={{ width: 48, height: 48 }}
+        mode="aspectFit"
+      />
+    );
+  }
 
   return (
-    <View className={`root index ${select || edit ? 'select-open' : ''}`}>
-      <Collapse className='selection' defaultActiveName={selectionCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
-        {selectionCategories.map(category =>
-          <Collapse.Item title={category} name={category} key={category} >
-            <Text className='tips'>{getTips(category)}</Text>
-            <View className='avatar-container'>
-              {selections.filter(s => s.category === category).map(({ count, item }) =>
-                <Badge value={count} key={item.name} max={999}>
-                  <Icon
-                    name={item.name}
-                    width={48}
-                    height={48}
-                    onClick={() => handleItemClick(item)}
-                  />
-                </Badge>)}
-              <Button className='add' onClick={() => handleAdd(category)}><Add width={24} height={24} color='#7f3d5e' /></Button>
-            </View>
-          </Collapse.Item>)}
-      </Collapse>
-      <View className='result'>
-        <Collapse defaultActiveName={resultCategories} expandIcon={<Icon width={12} height={16} name='rightArrow' />} rotate={90}>
-          <Collapse.Item title="资源" name='资源'>
-            <Grid className='resource-grid' columns={Object.keys(resources).length >= 5 ? 5 : Object.keys(resources).length}>
-              {Object.entries(resources).map(([name, value]) => {
-                const { convertedValue, unit } = convertResourceValue(value, name);
-                const valueStr = convertedValue < 0 ? Math.floor(convertedValue) : '+' + Math.floor(convertedValue);
-                return (
-                  <Grid.Item key={name}>
-                    <Icon name={name} width={48} height={48} />
-                    <Text className='resource-name'>{name}</Text>
-                    <Text className={`value ${convertedValue < 0 ? "consume" : "produce"}`}>
-                      {`${valueStr} ${unit}`}
-                    </Text>
-                  </Grid.Item>
-                )
-              })}
-            </Grid>
+    <View className='page index'>
+      <View className='flex flex-col flex-1 gap-8'>
+        <Collapse defaultActiveName={resultCategories} expandIcon={<ArrowDown className="text-white"/>}>
+          <Collapse.Item title="资源" name='资源' key={resourceCollapseKey}>
+            <ResourceGrid items={resourceItems}/>
           </Collapse.Item>
           <Collapse.Item title="食物" name="食物">
-            <View className="power-heat-container">
-              <Text className={`value ${convertedCalories < 0 ? "consume" : "produce"}`}>
+            <View className="text-center">
+              <Text className={`text-sm font-bold ${convertedCalories < 0 ? "consume" : "produce"}`}>
                 {`${convertedCalories < 0 ? Math.floor(convertedCalories) : '+' + Math.floor(convertedCalories)} ${caloriesUnit}`}
               </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="电力" name="电力">
-            <View className="power-heat-container">
-              <Text className={`value ${totalPower < 0 ? "consume" : "produce"}`}>
-                {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.floor(totalPower)} W`}
+            <View className="text-center">
+              <Text className={`text-sm font-bold ${totalPower < 0 ? "consume" : "produce"}`}>
+                {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.floor(totalPower)} 瓦`}
               </Text>
             </View>
           </Collapse.Item>
           <Collapse.Item title="热量" name="热量">
-            <View className="power-heat-container">
-              <Text className={`value ${convertedHeat < 0 ? "consume" : "produce"}`}>
+            <View className="text-center">
+              <Text className={`text-sm font-bold ${convertedHeat < 0 ? "consume" : "produce"}`}>
                 {`${convertedHeat < 0 ? Math.floor(convertedHeat) : '+' + Math.floor(convertedHeat)} ${heatUnit}`}
               </Text>
             </View>
           </Collapse.Item>
         </Collapse>
-        <Cell className='unit-cell' title="切换显示单位" radius={0} extra={
-          <>
-            <Text className='unit-text'>{unitType === 'g/s' ? 'g/s' : 'kg/周期'}</Text>
-            <Switch checked={unitType === 'kg/周期'} onChange={toggleUnitType} />
-          </>
-        } />
-        <Button className='reset' size="large" onClick={reset}>清空选择</Button>
-      </View>
 
-      {select || edit ? <Select select={select} onClose={onClose} edit={edit} /> : null}
+        {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-1f8971b0756777eb' adIntervals={30}/>}
+
+        <Collapse
+          className='flex flex-col'
+          defaultActiveName={['选择']}
+          expandIcon={<ArrowDown className="text-white"/>}>
+          <Collapse.Item title="选择" name="选择" key={selectionCollapseKey} extra={<Button className='rounded-4 text-white' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
+            <View className='flex flex-wrap gap-8 mt-8'>
+              {groupedSelections.map((selection) =>
+                <View
+                  key={selection.key}
+                  onClick={() => {
+                    setIsShowEditPopup(true);
+                  }}
+                >
+                  <Badge value={selection.count} max={999}>
+                    {renderIcon(selection.name)}
+                  </Badge>
+                </View>)}
+              <Button className='w-48 h-48 rounded-4 border border-primary ml-4 p-0' onClick={handleAdd}><Add width={24} height={24} color='#7f3d5e' /></Button>
+            </View>
+          </Collapse.Item>
+        </Collapse>
+
+        <Cell.Group className="settings">
+          <Picker
+            mode="selector"
+            range={projectOptions}
+            value={projectIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              if (projects[nextIndex]) switchProject(nextIndex);
+            }}
+          >
+            <Cell align="center" title="方案" clickable extra={
+              <View className='flex gap-4 items-center'>
+                <Text className='text-primary font-bold mr-4'>{currentProject.name}</Text>
+                <Button type="success" size='small' onClick={handleAddProject}><Plus size={16} color='#fff' /></Button>
+                <Button type="danger" size='small' onClick={handleDeleteProject}><Del size={16} color='#fff' /></Button>
+                <ArrowRight size={16} />
+              </View>
+            } />
+          </Picker>
+          <Picker
+            mode="selector"
+            range={TIME_UNIT_OPTIONS}
+            rangeKey="label"
+            value={timeUnitIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              const nextUnit = TIME_UNIT_OPTIONS[nextIndex];
+              if (nextUnit?.value) setTimeUnit(nextUnit.value as TimeUnit);
+            }}
+          >
+            <Cell align="center" title="时间单位" clickable extra={
+              <>
+                <Text className='text-primary font-bold mr-4'>{timeUnit}</Text>
+                <ArrowRight size={16} />
+              </>
+            } />
+          </Picker>
+          <Picker
+            mode="selector"
+            range={HUNGER_OPTIONS.map(option => option.label)}
+            value={hungerIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              const nextOption = HUNGER_OPTIONS[nextIndex];
+              if (nextOption?.label) setHungerLevel(nextOption.label as HungerLevel);
+            }}
+          >
+            <Cell align="center" title="饥饿/功率难度" clickable extra={
+              <>
+                <Text className='text-primary font-bold mr-4'>{hungerLevel}</Text>
+                <ArrowRight size={16} />
+              </>
+            } />
+          </Picker>
+        </Cell.Group>
+      </View>
+      <SelectPopup visible={isShowSelectPopup} onClose={onPopupClose} />
+      <EditPopup
+        visible={isShowEditPopup}
+        selections={selections}
+        onClose={onEditPopupClose}
+      />
+      <GlobalSvgFilters />
     </View>
   )
 }

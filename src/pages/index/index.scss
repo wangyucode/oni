@@ -1,154 +1,125 @@
-// 根样式
-.root {
-  &.select-open {
-    overflow: hidden;
-  }
+.page.index {
 
-  &.index {
-    @media (min-width: 768px) {
-      // 大屏幕时改为row布局
-      flex-direction: row;
-      align-items: flex-start;
-    }
-  }
+    --nutui-inputnumber-button-width: 32PX;
+    --nutui-inputnumber-button-height: 32PX;
 
-  // 折叠面板样式
-  .nut-collapse-item-header {
-    background-color: #7F3D5E;
-    border-bottom: 1px solid #000;
-    padding: 8px 16px;
-
-    .nut-collapse-item-title {
-      font-size: 12px;
-      color: #fff;
-      font-weight: bold;
-    }
-  }
-
-  .nut-collapse {
-    border: #000 solid 1px;
-    width: 100%;
-
-    .nut-collapse-item-content-text {
-      padding: 8px;
+    .consume {
+        color: #FF0F23;
     }
 
-    .tips {
-      font-size: 12px;
+    .produce {
+        color: #64b578;
     }
 
-    .avatar-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
+    .active-bg-primary:active {
+        background-color: #BF7FA8;
     }
 
-    .nut-badge {
-      .nut-image {
-        border-radius: 4px;
+    .active-bg-gray-200:active {
+        background-color: #f0e6ee;
+    }
 
-        &:active {
-          background-color: #BF7FA8 !important;
+    .nut-button:active {
+        background-color: #BF7FA8;
+        color: #fff;
+    }
+
+    .nut-grid-item {
+        border: 1PX solid #ddd;
+    }
+
+
+    .nut-collapse-item-header {
+        background-color: #7F3D5E;
+        border-bottom: 1PX solid #000;
+        padding: 8PX 16PX;
+    }
+
+    .nut-collapse-item-header .nut-collapse-item-title {
+        font-size: 14PX;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .nut-collapse {
+        border: #000 solid 1PX;
+        width: 100%;
+    }
+
+    .nut-collapse .nut-collapse-item-content-text {
+        padding: 8PX;
+    }
+
+    .nut-badge .nut-image {
+        border-radius: 4PX;
+    }
+
+    .nut-badge .nut-image:active {
+        background-color: #BF7FA8 !important;
+    }
+
+    .nut-badge .nut-image img {
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
+
+    .resource-grid {
+        width: 100%;
+    }
+
+    .resource-grid .nut-grid-item-content {
+        row-gap: 2PX;
+        padding: 2PX;
+    }
+
+    .resource-grid img {
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
+
+    .selection-detail-view {
+        display: flex;
+        flex-direction: column;
+        row-gap: 12PX;
+        padding: 8PX;
+    }
+
+    .selection-detail-view .nut-collapse {
+        background: transparent;
+    }
+
+    .popup-root {
+        min-height: 0;
+        height: 50%;
+
+        .nut-grid-item:active {
+            background-color: #BF7FA8;
         }
 
-        img {
-          left: 50%;
-          transform: translateX(-50%) translateY(-50%);
+        .nut-popup-title-left:active {
+            background-color: #BF7FA8;
         }
-      }
+
+        .nut-popup-title-right:active {
+            background-color: #BF7FA8;
+        }
     }
-  }
 
-  // 选择区域样式
-  .selection {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-
-    .add {
-      height: 48PX;
-      width: 48PX;
-      border-color: #7F3D5E;
-      border-radius: 4px;
-      margin-left: 4PX;
-
-      .nut-icon {
+    .menu-grid-icon {
+        width: 50%;
+        height: 50%;
+        min-height: 50%;
+        min-width: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
-      }
     }
-  }
+}
 
-  // 结果区域样式
-  .result {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 8PX;
-
-    // 资源网格
-    .resource-grid {
-      width: 100%;
-
-      .nut-grid-item-content {
-        row-gap: 2PX;
-      }
-
-      .resource-name {
-        font-size: 0.6rem;
-      }
-
-      img {
-        left: 50%;
-        transform: translateX(-50%) translateY(-50%);
-      }
-    }
-
-    // 电力热量容器
-    .power-heat-container {
-      text-align: center;
-
-      .value {
-        font-size: 0.7rem;
-        font-weight: bold;
-      }
-    }
-
-    .reset {
-      background-color: #7F3D5E;
-      color: #fff;
-      border-color: #000;
-      border-radius: 4PX;
-    }
-
-    .unit-cell {
-      box-shadow: none;
-      border: 1PX solid #000;
-
-      .nut-cell-title {
-        font-weight: bold;
-      }
-
-      .unit-text {
+.weui-picker {
+    &__action {
         color: #7F3D5E;
         font-weight: bold;
-        margin-right: 2px;
-      }
+        font-size: 14PX;
     }
-  }
-
-  // 数值样式
-  .value {
-    font-size: 0.6rem;
-
-    &.consume {
-      color: #FF0F23;
-    }
-
-    &.produce {
-      color: #64b578;
-    }
-  }
 }

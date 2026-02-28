@@ -1,5 +1,6 @@
 import { defineConfig, type UserConfigExport } from "@tarojs/cli";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
+import path from "path";
 import devConfig from "./dev";
 import prodConfig from "./prod";
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
@@ -10,9 +11,12 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
     designWidth: 375,
     deviceRatio: {
       375: 2,
-      // 640: 2.34 / 2,
-      // 750: 1,
-      // 828: 1.81 / 2,
+      640: 2.34 / 2,
+      750: 1,
+      828: 1.81 / 2,
+    },
+    alias: {
+      "@": path.resolve(__dirname, "..", "src"),
     },
     sourceRoot: "src",
     outputRoot: `dist/${process.env.TARO_ENV}`,
@@ -53,6 +57,11 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin("tsconfig-paths").use(TsconfigPathsPlugin);
+        chain.merge({
+          ignoreWarnings: [
+            /You don't need `webpackExports`/,
+          ],
+        });
       },
     },
     h5: {
@@ -82,17 +91,14 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin("tsconfig-paths").use(TsconfigPathsPlugin);
+        chain.merge({
+          ignoreWarnings: [
+            /You don't need `webpackExports`/,
+          ],
+        });
       },
       htmlPluginOption: {
         favicon: "src/icon.png",
-      },
-    },
-    rn: {
-      appName: "taroDemo",
-      postcss: {
-        cssModules: {
-          enable: false, // 默认为 false，如需使用 css modules 功能，则设为 true
-        },
       },
     },
   };

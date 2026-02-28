@@ -1,8 +1,15 @@
-.log {
-    gap: 4px;
-
+.page.log {
     .nut-cell-description {
         display: flex;
         flex-direction: column;
+    }
+
+    .nut-cell-extra {
+        flex: 0 0 auto;
+    }
+
+    .nut-cell-title{
+        font-size: 16PX;
+        font-weight: bold;
     }
 }

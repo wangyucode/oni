@@ -10,24 +10,407 @@ page,
     background-size: cover;
     background-position: top left;
     overflow: hidden !important;
-}
 
-.root {
-    display: flex;
-    height: 100%;
-    flex-direction: column; // 默认小屏幕使用column布局
-    gap: 16PX;
-    padding: 16PX;
-    box-sizing: border-box;
-    max-height: 100vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
+    .page{
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        gap: 16PX;
+        padding: 16PX;
+        box-sizing: border-box;
+        max-height: 100vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
 
-// 按钮通用样式
-.nut-button {
-    &:active {
-        background-color: #BF7FA8;
-        color: #fff;
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .inline {
+            display: inline;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .items-start {
+            align-items: flex-start;
+        }
+
+        .items-end {
+            align-items: flex-end;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-end {
+            justify-content: flex-end;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .flex-none {
+            flex: 0 0 auto;
+        }
+
+        .gap-4 {
+            gap: 4PX;
+        }
+
+        .gap-6 {
+            gap: 6PX;
+        }
+
+        .gap-8 {
+            gap: 8PX;
+        }
+
+        .gap-10 {
+            gap: 10PX;
+        }
+
+        .gap-12 {
+            gap: 12PX;
+        }
+
+        .gap-16 {
+            gap: 16PX;
+        }
+
+        .p-0 {
+            padding: 0;
+        }
+
+        .p-4 {
+            padding: 4PX;
+        }
+
+        .p-8 {
+            padding: 8PX;
+        }
+
+        .p-12 {
+            padding: 12PX;
+        }
+
+        .p-16 {
+            padding: 16PX;
+        }
+
+        .px-8 {
+            padding-left: 8PX;
+            padding-right: 8PX;
+        }
+
+        .px-10 {
+            padding-left: 10PX;
+            padding-right: 10PX;
+        }
+
+        .px-12 {
+            padding-left: 12PX;
+            padding-right: 12PX;
+        }
+
+        .px-13 {
+            padding-left: 13PX;
+            padding-right: 13PX;
+        }
+
+        .px-16 {
+            padding-left: 16PX;
+            padding-right: 16PX;
+        }
+
+        .py-0 {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .py-4 {
+            padding-top: 4PX;
+            padding-bottom: 4PX;
+        }
+
+        .py-8 {
+            padding-top: 8PX;
+            padding-bottom: 8PX;
+        }
+
+        .py-12 {
+            padding-top: 12PX;
+            padding-bottom: 12PX;
+        }
+
+        .py-13 {
+            padding-top: 13PX;
+            padding-bottom: 13PX;
+        }
+
+        .py-16 {
+            padding-top: 16PX;
+            padding-bottom: 16PX;
+        }
+
+        .mt-8 {
+            margin-top: 8PX;
+        }
+
+        .ml-4 {
+            margin-left: 4PX;
+        }
+
+        .mr-4 {
+            margin-right: 4PX;
+        }
+
+        .mr-16 {
+            margin-right: 16PX;
+        }
+
+        .my-4 {
+            margin-top: 4PX;
+            margin-bottom: 4PX;
+        }
+
+        .mx-2 {
+            margin-left: 2PX;
+            margin-right: 2PX;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .w-fit {
+            width: fit-content;
+        }
+
+        .w-auto {
+            width: auto;
+        }
+
+
+        .h-full {
+            height: 100%;
+        }
+
+        .w-32 {
+            width: 32PX;
+        }
+
+        .w-40 {
+            width: 40PX;
+        }
+
+        .h-32 {
+            height: 32PX;
+        }
+
+        .h-40 {
+            height: 40PX;
+        }
+
+        .h-42 {
+            height: 42PX;
+        }
+
+        .w-48 {
+            width: 48PX;
+        }
+
+
+        .h-48 {
+            height: 48PX;
+        }
+
+        .w-64 {
+            width: 64PX;
+        }
+
+        .h-64 {
+            height: 64PX;
+        }
+
+        .text-xs {
+            font-size: 12PX;
+        }
+
+        .text-sm {
+            font-size: 14PX;
+        }
+
+        .text-md {
+            font-size: 16PX;
+        }
+
+        .text-lg {
+            font-size: 18PX;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-white {
+            color: #fff;
+        }
+
+        .text-black {
+            color: #000;
+        }
+
+        .text-ink {
+            color: #2b1f27;
+        }
+
+        .text-gray {
+            color: #333;
+        }
+
+        .text-gray-500 {
+            color: #555;
+        }
+
+        .text-gray-600 {
+            color: #666;
+        }
+
+        .text-muted {
+            color: #6e5a66;
+        }
+
+        .text-primary {
+            color: #7F3D5E;
+        }
+
+        .bg-primary {
+            background-color: #7F3D5E;
+        }
+
+        .bg-white {
+            background-color: #fff;
+        }
+
+        .bg-gray-50 {
+            background-color: #f7f7f7;
+        }
+
+        .bg-gray-100 {
+            background-color: #f8f5f7;
+        }
+
+        .bg-gray-200 {
+            background-color: #f0e6ee;
+        }
+
+        .bg-transparent {
+            background-color: transparent;
+        }
+
+        .border {
+            border: 1PX solid #000;
+        }
+
+        .border-0 {
+            border: none;
+        }
+
+        .border-gray {
+            border-color: #ddd;
+        }
+
+        .border-black {
+            border-color: #000;
+        }
+
+        .border-primary {
+            border-color: #7F3D5E;
+        }
+
+        .rounded-4 {
+            border-radius: 4PX;
+        }
+
+        .rounded-6 {
+            border-radius: 6PX;
+        }
+
+        .rounded-8 {
+            border-radius: 8PX;
+        }
+
+        .rounded-10 {
+            border-radius: 10PX;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+
+        .overflow-y-scroll {
+            overflow-y: scroll;
+        }
+
+        .truncate{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .shadow-none {
+            box-shadow: none;
+        }
+
+        .break-all {
+            word-break: break-all;
+        }
+
+        .max-w-55 {
+            max-width: 55%;
+        }
+
+        
     }
 }

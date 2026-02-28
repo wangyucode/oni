@@ -1,0 +1,58 @@
+.page.wiki {
+  background-color: transparent;
+
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    line-height: normal;
+
+    .section {
+      --nutui-divider-margin: 4px 0;
+      display: flex;
+      gap: 8PX;
+
+      &.layout {
+        &-col {
+          flex-direction: column;
+        }
+
+        &-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    }
+
+    .large-link, .small-link {
+      cursor: pointer;
+
+      &:active {
+        background-color: #BF7FA8;
+      }
+    }
+
+    .conversion-panel {
+      padding-bottom: 8PX;
+      border-bottom: 1PX solid #ddd;
+
+      .conversion-item {
+        &:active {
+          background-color: #BF7FA8;
+        }
+      }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8PX;
+    }
+
+
+    .loading {
+      --nutui-loading-icon-size: 48PX
+    }
+  }
+
+
+}
