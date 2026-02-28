@@ -103,8 +103,8 @@ importers:
         specifier: ^8.12.0
         version: 8.57.1
       eslint-config-taro:
-        specifier: 4.1.9
-        version: 4.1.9(@babel/core@7.27.7)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.8.3)
+        specifier: 4.1.11
+        version: 4.1.11(@babel/core@7.27.7)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.8.3)
       eslint-plugin-import:
         specifier: ^2.12.0
         version: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)
@@ -168,8 +168,8 @@ packages:
     resolution: {integrity: sha512-BU2f9tlKQ5CAthiMIgpzAh4eDTLWo1mqi9jqE2OxMG0E/OM199VJt2q8BztTxpnSW0i1ymdwLXRJnYzvDM5r2w==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/eslint-parser@7.28.5':
-    resolution: {integrity: sha512-fcdRcWahONYo+JRnJg1/AekOacGvKx12Gu0qXJXFi2WBqQA1i7+O5PaxRB7kxE/Op94dExnCiiar6T09pvdHpA==}
+  '@babel/eslint-parser@7.28.6':
+    resolution: {integrity: sha512-QGmsKi2PBO/MHSQk+AAgA9R6OHQr+VqnniFE0eMWZcVcfBZoA2dKn2hUsl3Csg/Plt9opRUWdY7//VXsrIlEiA==}
     engines: {node: ^10.13.0 || ^12.13.0 || >=14.0.0}
     peerDependencies:
       '@babel/core': ^7.11.0
@@ -3493,8 +3493,8 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
-  eslint-config-taro@4.1.9:
-    resolution: {integrity: sha512-vPtiWIIb4P2RxuGpTQvRiWNrxuKZvhVl/eSHCyxa6IXo26bTOLcg3Hv5imaDi8NRshqLT0jqcf85dWWBYxBxpw==}
+  eslint-config-taro@4.1.11:
+    resolution: {integrity: sha512-SXV7qJZ2D3hfSjn4lNOe54UUS+ilWaemZIUaggOfffSH+I/FxA2Wf0ujUMUBkHPwesvdgNbhjzvqdg92adUsXA==}
     engines: {node: '>= 18'}
     peerDependencies:
       eslint: ^8
@@ -7288,7 +7288,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/eslint-parser@7.28.5(@babel/core@7.27.7)(eslint@8.57.1)':
+  '@babel/eslint-parser@7.28.6(@babel/core@7.27.7)(eslint@8.57.1)':
     dependencies:
       '@babel/core': 7.27.7
       '@nicolo-ribaudo/eslint-scope-5-internals': 5.1.1-v1
@@ -11188,9 +11188,9 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-taro@4.1.9(@babel/core@7.27.7)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.8.3):
+  eslint-config-taro@4.1.11(@babel/core@7.27.7)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.8.3):
     dependencies:
-      '@babel/eslint-parser': 7.28.5(@babel/core@7.27.7)(eslint@8.57.1)
+      '@babel/eslint-parser': 7.28.6(@babel/core@7.27.7)(eslint@8.57.1)
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
