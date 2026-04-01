@@ -83,10 +83,11 @@ export default function BuildingDetailView({
   const { convertedValue: convertedHeat, unit: heatUnit } = useMemo(() => convertHeat(totalHeat, timeUnit), [timeUnit, totalHeat]);
   const resourceCollapseKey = process.env.TARO_ENV === "weapp" ? resourceItems.length.toString() : "resource";
 
-  const lastSelectionKey = useMemo(() => {
-    const matches = selections.filter((item) => item.name === link.name && item.category === category);
-    return matches.length ? matches[matches.length - 1].key : "";
-  }, [category, link.name, selections]);
+  const currentSelectionKey = useMemo(() => {
+    const nextKey = createSelectionKey(link.name, building, modeSelections);
+    const match = selections.find((item) => item.key === nextKey && item.category === category);
+    return match ? match.key : "";
+  }, [building, category, link.name, modeSelections, selections]);
 
   useEffect(() => {
     const payload = {
@@ -97,27 +98,26 @@ export default function BuildingDetailView({
       category,
       efficiency,
     };
-    const nextKey = createSelectionKey(link.name, building, modeSelections);
+
     if (mode === "edit") {
-      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      const fromKey = editKeyRef.current || editKey || currentSelectionKey;
       if (fromKey) {
         update(fromKey, payload);
+        const nextKey = createSelectionKey(link.name, building, modeSelections);
         editKeyRef.current = nextKey;
-        return;
-      }
-    }
-    if (count <= 0) {
-      if (lastSelectionKey) {
-        update(lastSelectionKey, payload);
       }
       return;
     }
-    if (lastSelectionKey) {
-      update(lastSelectionKey, payload);
-      return;
+
+    // Add mode: only update or upsert if count > 0
+    if (count > 0) {
+      if (currentSelectionKey) {
+        update(currentSelectionKey, payload);
+      } else {
+        upsert(payload);
+      }
     }
-    upsert(payload);
-  }, [building, category, count, editKey, efficiency, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
+  }, [building, category, count, editKey, efficiency, currentSelectionKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">

@@ -117,10 +117,11 @@ export default function GeyserDetailView({
     }).join(', ');
   }, [resources, timeUnit]);
 
-  const lastSelectionKey = useMemo(() => {
-    const matches = selections.filter((item) => item.name === link.name && item.category === category);
-    return matches.length ? matches[matches.length - 1].key : "";
-  }, [category, link.name, selections]);
+  const currentSelectionKey = useMemo(() => {
+    const nextKey = createSelectionKey(link.name, geyser, modeSelections);
+    const match = selections.find((item) => item.key === nextKey && item.category === category);
+    return match ? match.key : "";
+  }, [category, link.name, modeSelections, geyser, selections]);
 
   useEffect(() => {
     const payload = {
@@ -130,27 +131,24 @@ export default function GeyserDetailView({
       modeSelections,
       category,
     };
-    const nextKey = createSelectionKey(link.name, geyser, modeSelections);
+
     if (mode === "edit") {
-      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      const fromKey = editKeyRef.current || editKey || currentSelectionKey;
       if (fromKey) {
         update(fromKey, payload);
-        editKeyRef.current = nextKey;
-        return;
-      }
-    }
-    if (count <= 0) {
-      if (lastSelectionKey) {
-        update(lastSelectionKey, payload);
+        editKeyRef.current = createSelectionKey(link.name, geyser, modeSelections);
       }
       return;
     }
-    if (lastSelectionKey) {
-      update(lastSelectionKey, payload);
-      return;
+
+    if (count > 0) {
+      if (currentSelectionKey) {
+        update(currentSelectionKey, payload);
+      } else {
+        upsert(payload);
+      }
     }
-    upsert(payload);
-  }, [category, count, editKey, geyser, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
+  }, [category, count, currentSelectionKey, editKey, geyser, link.name, mode, modeSelections, upsert, update]);
 
   return (
     <View className="selection-detail-view">

@@ -84,10 +84,11 @@ export default function PlantDetailView({
   }, [resources, resourceKinds]);
   const resourceCollapseKey = process.env.TARO_ENV === "weapp" ? resourceItems.length.toString() : "resource";
 
-  const lastSelectionKey = useMemo(() => {
-    const matches = selections.filter((item) => item.name === link.name && item.category === category);
-    return matches.length ? matches[matches.length - 1].key : "";
-  }, [category, link.name, selections]);
+  const currentSelectionKey = useMemo(() => {
+    const nextKey = createSelectionKey(link.name, plant, modeSelections);
+    const match = selections.find((item) => item.key === nextKey && item.category === category);
+    return match ? match.key : "";
+  }, [category, link.name, modeSelections, plant, selections]);
 
   useEffect(() => {
     const payload = {
@@ -97,27 +98,24 @@ export default function PlantDetailView({
       modeSelections,
       category,
     };
-    const nextKey = createSelectionKey(link.name, plant, modeSelections);
+
     if (mode === "edit") {
-      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      const fromKey = editKeyRef.current || editKey || currentSelectionKey;
       if (fromKey) {
         update(fromKey, payload);
-        editKeyRef.current = nextKey;
-        return;
-      }
-    }
-    if (count <= 0) {
-      if (lastSelectionKey) {
-        update(lastSelectionKey, payload);
+        editKeyRef.current = createSelectionKey(link.name, plant, modeSelections);
       }
       return;
     }
-    if (lastSelectionKey) {
-      update(lastSelectionKey, payload);
-      return;
+
+    if (count > 0) {
+      if (currentSelectionKey) {
+        update(currentSelectionKey, payload);
+      } else {
+        upsert(payload);
+      }
     }
-    upsert(payload);
-  }, [category, count, editKey, lastSelectionKey, link.name, mode, modeSelections, plant, upsert, update]);
+  }, [category, count, currentSelectionKey, editKey, link.name, mode, modeSelections, plant, upsert, update]);
 
   const lifeDisplay = useMemo(() => {
     if (!plant.life) return null;
