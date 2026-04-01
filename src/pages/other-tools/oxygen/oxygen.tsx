@@ -3,12 +3,15 @@ import { View, Text, Picker } from '@tarojs/components';
 import { Cell, Collapse, InputNumber, Radio, RadioGroup } from '@nutui/nutui-react-taro';
 import { ArrowDown } from '@nutui/icons-react-taro';
 import BackButton from '@/components/ui/BackButton';
+import FilteredImage from '@/components/ui/FilteredImage';
 import { DataContext } from '@/contexts/DataContext';
 import { CYCLE_SECONDS, useUnit } from '@/contexts/UnitContext';
 import { BuildingDetail, Link, Menu } from '@/types/data';
 import { buildDefaultModeSelections } from '@/components/selection/modeSelection';
 import { calculateSelectionTotals } from '@/components/selection/calc';
+import { getIconData } from '@/utils/utils';
 import './oxygen.scss';
+import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
 
 type SourceChoice = {
   type: 'external' | 'building';
@@ -17,9 +20,9 @@ type SourceChoice = {
 
 type Profile = {
   name: string;
+  icon?: string;
   inputs: Record<string, number>;
   outputs: Record<string, number>;
-  power: number;
 };
 
 type MethodProfile = Profile & {
@@ -38,6 +41,7 @@ type MaterialSummary = {
   totalDemand: number;
   internalSupply: number;
   externalGap: number;
+  surplus: number;
 };
 
 function addAmount(map: Record<string, number>, key: string, value: number) {
@@ -83,9 +87,9 @@ function toProfile(link: Link): Profile {
   });
   return {
     name: link.name,
+    icon: link.icon,
     inputs,
     outputs,
-    power: totals.totalPower,
   };
 }
 
@@ -110,8 +114,21 @@ function formatMass(valuePerSecond: number, timeUnit: '秒' | '周期') {
 }
 
 export default function Oxygen() {
-  const { data, loading, error } = useContext(DataContext);
+  const { data, iconMap, loading, error } = useContext(DataContext);
   const { timeUnit } = useUnit();
+
+  const renderIcon = (name: string, icon?: string, size = 24) => {
+    const iconData = getIconData(iconMap, name, icon);
+    if (!iconData?.icon) return null;
+    return (
+      <FilteredImage
+        src={iconData.icon}
+        iconFilter={iconData.iconFilter}
+        style={{ width: size, height: size }}
+        mode='aspectFit'
+      />
+    );
+  };
   const [dupeCount, setDupeCount] = useState<number>(8);
   const [selectedMethod, setSelectedMethod] = useState<string>('');
   const [sourceChoices, setSourceChoices] = useState<Record<string, SourceChoice>>({});
@@ -168,7 +185,6 @@ export default function Oxygen() {
     const buildingCounts: Record<string, number> = {};
     const linkSteps: LinkStep[] = [];
     const warnings: string[] = [];
-    let totalPower = 0;
 
     if (!selectedMethodProfile || oxygenNeed <= 0) {
       return {
@@ -180,13 +196,11 @@ export default function Oxygen() {
         buildingCounts,
         linkSteps,
         warnings,
-        totalPower,
       };
     }
 
     const rootCount = oxygenNeed / selectedMethodProfile.oxygenRate;
     addAmount(buildingCounts, selectedMethodProfile.name, rootCount);
-    totalPower += selectedMethodProfile.power * rootCount;
 
     Object.entries(selectedMethodProfile.outputs).forEach(([name, amount]) => {
       const value = amount * rootCount;
@@ -234,7 +248,6 @@ export default function Oxygen() {
 
       const producerCount = amount / outputRate;
       addAmount(buildingCounts, producer.name, producerCount);
-      totalPower += producer.power * producerCount;
       linkSteps.push({
         material,
         producer: producer.name,
@@ -275,7 +288,6 @@ export default function Oxygen() {
       buildingCounts,
       linkSteps,
       warnings: Array.from(new Set(warnings)),
-      totalPower,
     };
   }, [oxygenNeed, producerByMaterial, selectedMethodProfile, sourceChoices]);
 
@@ -284,6 +296,7 @@ export default function Oxygen() {
       ...Object.keys(result.totalDemand),
       ...Object.keys(result.internalSupplyUsed),
       ...Object.keys(result.externalInputs),
+      ...Object.keys(result.supplyPool),
     ]);
     return Array.from(keys)
       .map((name) => ({
@@ -291,17 +304,13 @@ export default function Oxygen() {
         totalDemand: result.totalDemand[name] || 0,
         internalSupply: result.internalSupplyUsed[name] || 0,
         externalGap: result.externalInputs[name] || 0,
+        surplus: result.supplyPool[name] || 0,
       }))
-      .filter((item) => item.totalDemand > 1e-9 || item.externalGap > 1e-9)
-      .sort((a, b) => b.totalDemand - a.totalDemand);
-  }, [result.externalInputs, result.internalSupplyUsed, result.totalDemand]);
+      .filter((item) => item.totalDemand > 1e-9 || item.externalGap > 1e-9 || item.surplus > 1e-9)
+      .sort((a, b) => b.totalDemand - a.totalDemand || b.surplus - a.surplus);
+  }, [result.externalInputs, result.internalSupplyUsed, result.totalDemand, result.supplyPool]);
 
-  const byproducts = useMemo(() => {
-    return Object.entries(result.supplyPool)
-      .filter(([name, value]) => value > 1e-9 && name !== '氧气')
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
-  }, [result.supplyPool]);
+  const demandMaterials = useMemo(() => materialSummaries.filter((item) => item.totalDemand > 1e-9), [materialSummaries]);
 
   const setMaterialSourceType = (material: string, type: 'external' | 'building') => {
     setSourceChoices((prev) => {
@@ -317,23 +326,6 @@ export default function Oxygen() {
   const setMaterialProducer = (material: string, producerName: string) => {
     setSourceChoices((prev) => ({ ...prev, [material]: { type: 'building', producerName } }));
   };
-
-  const directInputRows = useMemo(() => {
-    if (!selectedMethodProfile || oxygenNeed <= 0) return [];
-    const count = oxygenNeed / selectedMethodProfile.oxygenRate;
-    return Object.entries(selectedMethodProfile.inputs)
-      .map(([name, amount]) => ({ name, amount: amount * count }))
-      .sort((a, b) => b.amount - a.amount);
-  }, [oxygenNeed, selectedMethodProfile]);
-
-  const directOutputRows = useMemo(() => {
-    if (!selectedMethodProfile || oxygenNeed <= 0) return [];
-    const count = oxygenNeed / selectedMethodProfile.oxygenRate;
-    return Object.entries(selectedMethodProfile.outputs)
-      .filter(([name]) => name !== '氧气')
-      .map(([name, amount]) => ({ name, amount: amount * count }))
-      .sort((a, b) => b.amount - a.amount);
-  }, [oxygenNeed, selectedMethodProfile]);
 
   return (
     <View className='page oxygen p-8'>
@@ -352,7 +344,7 @@ export default function Oxygen() {
             }}
           />
         </View>
-        <Text className='text-sm text-gray-600'>总耗氧：{formatMass(oxygenNeed, timeUnit)}</Text>
+        <Text className='text-sm text-gray-600'>总耗氧：- {formatMass(oxygenNeed, timeUnit)}</Text>
       </View>
 
       <View className='tool-card p-12 flex flex-col gap-8'>
@@ -369,50 +361,29 @@ export default function Oxygen() {
             }}
           >
             <View className='flex flex-col gap-6'>
-              {methodProfiles.map((method) => (
-                <Radio key={method.name} value={method.name}>
-                  {method.name}（{formatMass(method.oxygenRate, timeUnit)}）
-                </Radio>
-              ))}
+              {methodProfiles.map((method) => {
+                const count = oxygenNeed / method.oxygenRate;
+                return (
+                  <Radio key={method.name} value={method.name}>
+                    <View className='flex items-center gap-4'>
+                      {renderIcon(method.name, method.icon)}
+                      <Text>
+                        {method.name}（+{formatMass(method.oxygenRate, timeUnit)}）× {formatNumber(count)} 台
+                      </Text>
+                    </View>
+                  </Radio>
+                );
+              })}
             </View>
           </RadioGroup>
         )}
       </View>
 
       {selectedMethodProfile && oxygenNeed > 0 && (
-        <View className='tool-card p-12 flex flex-col gap-8'>
-          <Text className='text-md font-semibold'>直接材料</Text>
-          <Text className='text-sm text-gray-600'>
-            目标产氧 {formatMass(oxygenNeed, timeUnit)}，{selectedMethodProfile.name} 规模 {formatNumber(oxygenNeed / selectedMethodProfile.oxygenRate)}
-          </Text>
-          {directInputRows.length > 0 && (
-            <View className='flex flex-col gap-4'>
-              {directInputRows.map((item) => (
-                <View key={`in-${item.name}`} className='flex justify-between'>
-                  <Text className='text-sm'>{item.name}</Text>
-                  <Text className='text-sm text-danger'>{formatMass(item.amount, timeUnit)}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-          {directOutputRows.length > 0 && (
-            <View className='flex flex-col gap-4'>
-              {directOutputRows.map((item) => (
-                <View key={`out-${item.name}`} className='flex justify-between'>
-                  <Text className='text-sm'>{item.name}</Text>
-                  <Text className='text-sm text-success'>+{formatMass(item.amount, timeUnit)}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-      )}
-
-      {selectedMethodProfile && oxygenNeed > 0 && (
         <View className='tool-card p-12 flex flex-col gap-10'>
-          <Text className='text-md font-semibold'>来源展开</Text>
-          {materialSummaries.length === 0 && <Text className='text-sm text-muted'>当前无额外输入需求</Text>}
-          {materialSummaries.map((row) => {
+          <Text className='text-md font-semibold'>材料来源</Text>
+          {demandMaterials.length === 0 && <Text className='text-sm text-muted'>当前无额外输入需求</Text>}
+          {demandMaterials.map((row) => {
             const producers = producerByMaterial[row.name] || [];
             const sourceModeOptions = producers.length > 0 ? ['外部输入', '建筑生产'] : ['外部输入'];
             const currentChoice = sourceChoices[row.name];
@@ -424,7 +395,10 @@ export default function Oxygen() {
             return (
               <View key={row.name} className='material-item p-8 flex flex-col gap-6'>
                 <View className='flex justify-between items-center'>
-                  <Text className='text-sm font-semibold'>{row.name}</Text>
+                  <View className='flex items-center gap-4'>
+                    {renderIcon(row.name, undefined, 20)}
+                    <Text className='text-sm font-semibold'>{row.name}</Text>
+                  </View>
                   <Text className='text-sm text-danger'>缺口 {formatMass(row.externalGap, timeUnit)}</Text>
                 </View>
                 <View className='text-xs text-gray-600'>
@@ -454,7 +428,10 @@ export default function Oxygen() {
                         if (nextName) setMaterialProducer(row.name, nextName);
                       }}
                     >
-                      <View className='picker-chip'>{producerValue}</View>
+                      <View className='picker-chip flex items-center gap-4'>
+                        {renderIcon(producerValue, undefined, 16)}
+                        <Text>{producerValue}</Text>
+                      </View>
                     </Picker>
                   )}
                 </View>
@@ -466,33 +443,24 @@ export default function Oxygen() {
 
       {selectedMethodProfile && oxygenNeed > 0 && (
         <View className='tool-card p-12 flex flex-col gap-8'>
-          <Text className='text-md font-semibold'>结果汇总</Text>
-          <Cell.Group>
-            <Cell title='净水总需求' extra={formatMass(result.externalInputs['水'] || 0, timeUnit)} />
-            <Cell title='总电力' extra={`${formatNumber(result.totalPower)} 瓦`} />
-            <Cell
-              title='副产物'
-              extra={byproducts.length > 0 ? byproducts.map(([name, value]) => `${name} ${formatMass(value, timeUnit)}`).join('；') : '无'}
-            />
-          </Cell.Group>
-        </View>
-      )}
-
-      {selectedMethodProfile && oxygenNeed > 0 && (
-        <View className='tool-card p-12 flex flex-col gap-8'>
           <Text className='text-md font-semibold'>明细表</Text>
           <View className='table-head'>
             <Text className='text-xs font-semibold'>材料</Text>
             <Text className='text-xs font-semibold'>总需求</Text>
             <Text className='text-xs font-semibold'>内部供给</Text>
             <Text className='text-xs font-semibold'>外部缺口</Text>
+            <Text className='text-xs font-semibold'>剩余</Text>
           </View>
           {materialSummaries.map((row) => (
             <View key={`summary-${row.name}`} className='table-row'>
-              <Text className='text-xs'>{row.name}</Text>
+              <View className='flex items-center gap-2'>
+                {renderIcon(row.name, undefined, 14)}
+                <Text className='text-xs'>{row.name}</Text>
+              </View>
               <Text className='text-xs'>{formatMass(row.totalDemand, timeUnit)}</Text>
               <Text className='text-xs text-success'>{formatMass(row.internalSupply, timeUnit)}</Text>
               <Text className='text-xs text-danger'>{formatMass(row.externalGap, timeUnit)}</Text>
+              <Text className='text-xs text-gray-600'>{row.surplus > 1e-9 ? formatMass(row.surplus, timeUnit) : '-'}</Text>
             </View>
           ))}
           {materialSummaries.length === 0 && <Text className='text-sm text-muted text-center'>无</Text>}
@@ -505,18 +473,28 @@ export default function Oxygen() {
           <Collapse defaultActiveName={['步骤']} expandIcon={<ArrowDown className='text-white' />}>
             <Collapse.Item title='展开链路' name='步骤'>
               <View className='flex flex-col gap-4'>
-                <Text className='text-xs'>主方式：{selectedMethodProfile.name} × {formatNumber(oxygenNeed / selectedMethodProfile.oxygenRate)} </Text>
+                <View className='flex items-center gap-2'>
+                  <Text className='text-xs'>主方式：</Text>
+                  {renderIcon(selectedMethodProfile.name, selectedMethodProfile.icon, 16)}
+                  <Text className='text-xs'>{selectedMethodProfile.name} × {formatNumber(oxygenNeed / selectedMethodProfile.oxygenRate)} </Text>
+                </View>
                 {result.linkSteps.map((step, index) => (
-                  <Text key={`${step.material}-${step.producer}-${index}`} className='text-xs'>
-                    {`${'　'.repeat(Math.min(step.depth, 6))}${step.material} ← ${step.producer} × ${formatNumber(step.buildingCount)}`}
-                  </Text>
+                  <View key={`${step.material}-${step.producer}-${index}`} className='flex items-center gap-2'>
+                    <Text className='text-xs'>{'　'.repeat(Math.min(step.depth, 6))}</Text>
+                    {renderIcon(step.material, undefined, 14)}
+                    <Text className='text-xs'>{step.material} ← </Text>
+                    {renderIcon(step.producer, undefined, 14)}
+                    <Text className='text-xs'>{step.producer} × {formatNumber(step.buildingCount)}</Text>
+                  </View>
                 ))}
                 {Object.entries(result.buildingCounts)
                   .sort((a, b) => b[1] - a[1])
                   .map(([name, count]) => (
-                    <Text key={`building-${name}`} className='text-xs text-gray-600'>
-                      {`建筑统计：${name} × ${formatNumber(count)} 台`}
-                    </Text>
+                    <View key={`building-${name}`} className='flex items-center gap-2'>
+                      <Text className='text-xs text-gray-600'>建筑统计：</Text>
+                      {renderIcon(name, undefined, 14)}
+                      <Text className='text-xs text-gray-600'>{`${name} × ${formatNumber(count)} 台`}</Text>
+                    </View>
                   ))}
               </View>
             </Collapse.Item>
@@ -532,6 +510,8 @@ export default function Oxygen() {
           ))}
         </View>
       )}
+      
+      <GlobalSvgFilters />
     </View>
   );
 }
