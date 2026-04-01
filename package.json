@@ -46,7 +46,7 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@tarojs/cli": "4.1.11",
     "@tarojs/taro-loader": "4.1.11",
-    "@tarojs/webpack5-runner": "4.1.9",
+    "@tarojs/webpack5-runner": "4.1.11",
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.0",
     "@types/webpack-env": "^1.13.6",
