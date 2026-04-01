@@ -6,7 +6,7 @@ import BackButton from '@/components/ui/BackButton';
 import FilteredImage from '@/components/ui/FilteredImage';
 import { DataContext } from '@/contexts/DataContext';
 import { CYCLE_SECONDS, useUnit } from '@/contexts/UnitContext';
-import { BuildingDetail, Link, Menu } from '@/types/data';
+import { BuildingDetail, Link, LinkDetail, Menu } from '@/types/data';
 import { buildDefaultModeSelections } from '@/components/selection/modeSelection';
 import { calculateSelectionTotals } from '@/components/selection/calc';
 import { getIconData } from '@/utils/utils';
@@ -14,7 +14,7 @@ import './oxygen.scss';
 import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
 
 type SourceChoice = {
-  type: 'external' | 'building';
+  type: 'external' | 'building' | 'animal' | 'plant';
   producerName?: string;
 };
 
@@ -23,6 +23,7 @@ type Profile = {
   icon?: string;
   inputs: Record<string, number>;
   outputs: Record<string, number>;
+  category: string;
 };
 
 type MethodProfile = Profile & {
@@ -75,10 +76,11 @@ function collectLinks(menu: Menu | null): Link[] {
   return result;
 }
 
-function toProfile(link: Link): Profile {
-  const detail = link.detail as BuildingDetail;
+function toProfile(link: Link, category: string): Profile {
+  const detail = link.detail as LinkDetail;
+  const isPlant = category === '植物';
   const modeSelections = buildDefaultModeSelections(detail);
-  const totals = calculateSelectionTotals(detail, 1, modeSelections);
+  const totals = calculateSelectionTotals(detail, 1, modeSelections, 100, 0, 0, { isPlant });
   const inputs: Record<string, number> = {};
   const outputs: Record<string, number> = {};
   Object.entries(totals.resources).forEach(([name, value]) => {
@@ -90,6 +92,7 @@ function toProfile(link: Link): Profile {
     icon: link.icon,
     inputs,
     outputs,
+    category,
   };
 }
 
@@ -134,13 +137,15 @@ export default function Oxygen() {
   const [sourceChoices, setSourceChoices] = useState<Record<string, SourceChoice>>({});
 
   const buildingMenu = useMemo(() => findChildMenu(data, '建筑'), [data]);
+  const animalMenu = useMemo(() => findChildMenu(data, '小动物'), [data]);
+  const plantMenu = useMemo(() => findChildMenu(data, '植物'), [data]);
   const oxygenMenu = useMemo(() => findChildMenu(buildingMenu, '氧气'), [buildingMenu]);
 
   const methodProfiles = useMemo<MethodProfile[]>(() => {
     const links = collectLinks(oxygenMenu);
     return links
       .map((link) => {
-        const profile = toProfile(link);
+        const profile = toProfile(link, '建筑');
         return {
           ...profile,
           oxygenRate: profile.outputs['氧气'] || 0,
@@ -150,14 +155,16 @@ export default function Oxygen() {
       .sort((a, b) => b.oxygenRate - a.oxygenRate);
   }, [oxygenMenu]);
 
-  const allBuildingProfiles = useMemo<Profile[]>(() => {
-    const links = collectLinks(buildingMenu);
-    return links.map(toProfile);
-  }, [buildingMenu]);
+  const allSourceProfiles = useMemo<Profile[]>(() => {
+    const bLinks = collectLinks(buildingMenu).map((l) => toProfile(l, '建筑'));
+    const aLinks = collectLinks(animalMenu).map((l) => toProfile(l, '小动物'));
+    const pLinks = collectLinks(plantMenu).map((l) => toProfile(l, '植物'));
+    return [...bLinks, ...aLinks, ...pLinks];
+  }, [buildingMenu, animalMenu, plantMenu]);
 
   const producerByMaterial = useMemo<Record<string, Profile[]>>(() => {
     const map: Record<string, Profile[]> = {};
-    allBuildingProfiles.forEach((profile) => {
+    allSourceProfiles.forEach((profile) => {
       Object.entries(profile.outputs).forEach(([material, amount]) => {
         if (amount <= 0) return;
         map[material] = map[material] || [];
@@ -166,7 +173,7 @@ export default function Oxygen() {
     });
     Object.values(map).forEach((profiles) => profiles.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN')));
     return map;
-  }, [allBuildingProfiles]);
+  }, [allSourceProfiles]);
 
   const activeMethodName = selectedMethod || methodProfiles[0]?.name || '';
   const selectedMethodProfile = useMemo(() => {
@@ -312,14 +319,20 @@ export default function Oxygen() {
 
   const demandMaterials = useMemo(() => materialSummaries.filter((item) => item.totalDemand > 1e-9), [materialSummaries]);
 
-  const setMaterialSourceType = (material: string, type: 'external' | 'building') => {
+  const setMaterialSourceType = (material: string, type: SourceChoice['type']) => {
     setSourceChoices((prev) => {
       if (type === 'external') return { ...prev, [material]: { type: 'external' } };
-      const producers = producerByMaterial[material] || [];
+      const categoryMap: Record<string, string> = {
+        building: '建筑',
+        animal: '小动物',
+        plant: '植物',
+      };
+      const category = categoryMap[type];
+      const producers = (producerByMaterial[material] || []).filter((p) => p.category === category);
       if (!producers.length) return { ...prev, [material]: { type: 'external' } };
       const old = prev[material];
       const currentName = old?.producerName && producers.some((item) => item.name === old.producerName) ? old.producerName : producers[0].name;
-      return { ...prev, [material]: { type: 'building', producerName: currentName } };
+      return { ...prev, [material]: { type, producerName: currentName } };
     });
   };
 
@@ -385,13 +398,32 @@ export default function Oxygen() {
           {demandMaterials.length === 0 && <Text className='text-sm text-muted'>当前无额外输入需求</Text>}
           {demandMaterials.map((row) => {
             const producers = producerByMaterial[row.name] || [];
-            const sourceModeOptions = producers.length > 0 ? ['外部输入', '建筑生产'] : ['外部输入'];
+            const hasBuildings = producers.some((p) => p.category === '建筑');
+            const hasAnimals = producers.some((p) => p.category === '小动物');
+            const hasPlants = producers.some((p) => p.category === '植物');
+
+            const sourceModeOptions = ['外部输入'];
+            if (hasBuildings) sourceModeOptions.push('建筑生产');
+            if (hasAnimals) sourceModeOptions.push('动物产出');
+            if (hasPlants) sourceModeOptions.push('植物产出');
+
             const currentChoice = sourceChoices[row.name];
-            const modeValue = currentChoice?.type === 'building' && producers.length > 0 ? '建筑生产' : '外部输入';
-            const producerNames = producers.map((item) => item.name);
-            const producerValue = currentChoice?.producerName && producerNames.includes(currentChoice.producerName)
-              ? currentChoice.producerName
-              : producerNames[0];
+            let modeValue = '外部输入';
+            if (currentChoice?.type === 'building' && hasBuildings) modeValue = '建筑生产';
+            else if (currentChoice?.type === 'animal' && hasAnimals) modeValue = '动物产出';
+            else if (currentChoice?.type === 'plant' && hasPlants) modeValue = '植物产出';
+
+            const categoryMap: Record<string, string> = {
+              建筑生产: '建筑',
+              动物产出: '小动物',
+              植物产出: '植物',
+            };
+            const currentCategory = categoryMap[modeValue];
+            const currentProducers = producers.filter((p) => p.category === currentCategory);
+            const producerNames = currentProducers.map((item) => item.name);
+            const producerValue =
+              currentChoice?.producerName && producerNames.includes(currentChoice.producerName) ? currentChoice.producerName : producerNames[0];
+
             return (
               <View key={row.name} className='material-item p-8 flex flex-col gap-6'>
                 <View className='flex justify-between items-center'>
@@ -412,12 +444,18 @@ export default function Oxygen() {
                     onChange={(e) => {
                       const index = Number(e.detail.value);
                       const mode = sourceModeOptions[index] || '外部输入';
-                      setMaterialSourceType(row.name, mode === '建筑生产' ? 'building' : 'external');
+                      const modeTypeMap: Record<string, SourceChoice['type']> = {
+                        '外部输入': 'external',
+                        '建筑生产': 'building',
+                        '动物产出': 'animal',
+                        '植物产出': 'plant',
+                      };
+                      setMaterialSourceType(row.name, modeTypeMap[mode] || 'external');
                     }}
                   >
                     <View className='picker-chip'>{modeValue}</View>
                   </Picker>
-                  {modeValue === '建筑生产' && producerNames.length > 0 && (
+                  {modeValue !== '外部输入' && producerNames.length > 0 && (
                     <Picker
                       mode='selector'
                       range={producerNames}
@@ -470,11 +508,8 @@ export default function Oxygen() {
       {selectedMethodProfile && oxygenNeed > 0 && (
         <View className='tool-card p-12 flex flex-col gap-8'>
           <Text className='text-md font-semibold'>链路视图</Text>
-          <Collapse defaultActiveName={['步骤']} expandIcon={<ArrowDown className='text-white' />}>
-            <Collapse.Item title='展开链路' name='步骤'>
-              <View className='flex flex-col gap-4'>
+          <View className='flex flex-col gap-4'>
                 <View className='flex items-center gap-2'>
-                  <Text className='text-xs'>主方式：</Text>
                   {renderIcon(selectedMethodProfile.name, selectedMethodProfile.icon, 16)}
                   <Text className='text-xs'>{selectedMethodProfile.name} × {formatNumber(oxygenNeed / selectedMethodProfile.oxygenRate)} </Text>
                 </View>
@@ -487,18 +522,7 @@ export default function Oxygen() {
                     <Text className='text-xs'>{step.producer} × {formatNumber(step.buildingCount)}</Text>
                   </View>
                 ))}
-                {Object.entries(result.buildingCounts)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([name, count]) => (
-                    <View key={`building-${name}`} className='flex items-center gap-2'>
-                      <Text className='text-xs text-gray-600'>建筑统计：</Text>
-                      {renderIcon(name, undefined, 14)}
-                      <Text className='text-xs text-gray-600'>{`${name} × ${formatNumber(count)} 台`}</Text>
-                    </View>
-                  ))}
               </View>
-            </Collapse.Item>
-          </Collapse>
         </View>
       )}
 
