@@ -32,13 +32,13 @@ export default defineAppConfig({
         pagePath: "pages/index/index",
         iconPath: "components/ui/icons/refine-1.png",
         selectedIconPath: "components/ui/icons/refine.png",
-        text: "计算器",
+        text: "产物计算",
       },
       {
         pagePath: "pages/other-tools/other-tools",
-        iconPath: "components/ui/icons/home-1.png",
-        selectedIconPath: "components/ui/icons/home.png",
-        text: "其它工具",
+        iconPath: "components/ui/icons/input-1.png",
+        selectedIconPath: "components/ui/icons/input.png",
+        text: "需求计算",
       },
       {
         pagePath: "pages/about/about",

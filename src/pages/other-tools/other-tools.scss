@@ -1,4 +1,17 @@
 .page.other-tools {
   min-height: 100vh;
-  background-color: #3e4357;
+
+  .large-link-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .large-link {
+    cursor: pointer;
+
+    &:active {
+      background-color: #bf7fa8;
+    }
+  }
 }
