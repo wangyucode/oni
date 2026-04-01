@@ -1,3 +1,3 @@
 export default definePageConfig({
-  navigationBarTitleText: '制氧计算',
+  navigationBarTitleText: '制氧需求',
 });
