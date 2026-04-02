@@ -1,4 +1,44 @@
 .page.food {
   min-height: 100vh;
-  background-color: #3e4357;
+
+  --nutui-inputnumber-button-width: 32PX;
+  --nutui-inputnumber-button-height: 32PX;
+
+  .tool-card {
+    border: 1PX solid #000;
+    border-radius: 6PX;
+    background-color: #fff;
+  }
+
+  .text-danger {
+    color: #ff0f23;
+  }
+
+  .text-success {
+    color: #64b578;
+  }
+
+  .material-item {
+    border: 1PX solid #ddd;
+    border-radius: 4PX;
+    background-color: #faf9fb;
+  }
+
+  .picker-chip {
+    border: 1PX solid #c6b3bf;
+    border-radius: 4PX;
+    padding: 4PX 8PX;
+    font-size: 12PX;
+    color: #2b1f27;
+    background-color: #fff;
+  }
+
+  .table-row.simple {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8PX;
+    align-items: center;
+    padding: 4PX 8PX;
+    border-bottom: 1PX solid #f0f0f0;
+  }
 }
