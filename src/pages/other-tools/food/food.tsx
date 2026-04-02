@@ -20,6 +20,7 @@ type MaterialRate = {
 
 type Recipe = {
   name: string;
+  fullName: string;
   machine: string;
   output: MaterialRate;
   inputs: Record<string, MaterialRate>;
@@ -33,11 +34,17 @@ type SourceProfile = {
   outputs: Record<string, MaterialRate>;
 };
 
-type ChainStep = {
-  material: string;
-  producer: string;
+type ProducerOption = {
+  name: string;
   count: number;
   type: 'recipe' | 'source';
+  inputs: Record<string, MaterialRate>;
+};
+
+type ChainStep = {
+  material: string;
+  neededRate: MaterialRate;
+  producers: ProducerOption[];
 };
 
 type ExternalNeed = {
@@ -181,6 +188,7 @@ export default function Food() {
           });
           result.push({
             name: output.name,
+            fullName: option?.name || output.name,
             machine: link.name,
             output: { value: output.parsed.valuePerSecond, kind: output.parsed.kind },
             inputs,
@@ -264,7 +272,7 @@ export default function Food() {
     if (selectedMachine === '自然产出') {
       return Array.from(new Set(sourceProfiles.flatMap((profile) => Object.entries(profile.outputs).filter(([, rate]) => rate.kind === 'kcal').map(([name]) => name)))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
     }
-    return Array.from(new Set(recipes.filter((recipe) => recipe.machine === selectedMachine).map((recipe) => recipe.name))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    return Array.from(new Set(recipes.filter((recipe) => recipe.machine === selectedMachine).map((recipe) => recipe.fullName))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
   }, [recipes, selectedMachine, sourceProfiles]);
 
   useEffect(() => {
@@ -300,8 +308,9 @@ export default function Food() {
     const steps: ChainStep[] = [];
     const warnings: string[] = [];
     const externalMap: Record<string, ExternalNeed> = {};
+    const resolvedMaterials = new Set<string>();
 
-    const resolveMaterial = (material: string, rate: MaterialRate, trail: string[], preferredMachine?: string) => {
+    const resolveMaterial = (material: string, rate: MaterialRate, trail: string[], preferredMachine?: string, preferredRecipeFullName?: string) => {
       if (!Number.isFinite(rate.value) || rate.value <= 1e-9) return;
       if (trail.includes(material)) {
         warnings.push(`检测到循环依赖：${[...trail, material].join(' → ')}`);
@@ -309,50 +318,83 @@ export default function Food() {
         return;
       }
 
-      if (rate.kind === 'kcal') {
-        const candidates = foodToRecipes[material] || [];
-        if (candidates.length > 0) {
-          const recipe = candidates.find((item) => item.machine === preferredMachine) || candidates[0];
-          if (!recipe || recipe.output.value <= 1e-9) {
-            addExternal(externalMap, material, rate.value, rate.kind);
-            return;
-          }
-          const machineCount = rate.value / recipe.output.value;
-          steps.push({ material, producer: recipe.machine, count: machineCount, type: 'recipe' });
-          Object.entries(recipe.inputs).forEach(([name, inputRate]) => {
-            resolveMaterial(name, { value: inputRate.value * machineCount, kind: inputRate.kind }, [...trail, material]);
-          });
-          return;
+      if (resolvedMaterials.has(material)) return;
+      resolvedMaterials.add(material);
+
+      const producerOptions: ProducerOption[] = [];
+
+      // 1. Check recipes
+      const candidates = foodToRecipes[material] || [];
+      candidates.forEach((recipe) => {
+        if (recipe.output.value <= 1e-9) return;
+        const count = rate.value / recipe.output.value;
+        producerOptions.push({
+          name: recipe.machine,
+          count,
+          type: 'recipe',
+          inputs: Object.fromEntries(Object.entries(recipe.inputs).map(([name, inputRate]) => [name, { value: inputRate.value * count, kind: inputRate.kind }])),
+        });
+      });
+
+      // 2. Check source profiles
+      const producers = producerByMaterial[material] || [];
+      producers.forEach((profile) => {
+        const outputRate = profile.outputs[material];
+        if (!outputRate || outputRate.value <= 1e-9) return;
+        const count = rate.value / outputRate.value;
+        producerOptions.push({
+          name: profile.name,
+          count,
+          type: 'source',
+          inputs: Object.fromEntries(Object.entries(profile.inputs).map(([name, inputRate]) => [name, { value: inputRate.value * count, kind: inputRate.kind }])),
+        });
+      });
+
+      if (producerOptions.length === 0) {
+        addExternal(externalMap, material, rate.value, rate.kind);
+        return;
+      }
+
+      let finalOptions = producerOptions;
+      if (preferredRecipeFullName && trail.length === 1) { // trail.length === 1 means it's the target food
+        const recipe = candidates.find(c => c.fullName === preferredRecipeFullName);
+        if (recipe) {
+          const count = rate.value / recipe.output.value;
+          finalOptions = [{
+            name: recipe.machine,
+            count,
+            type: 'recipe',
+            inputs: Object.fromEntries(Object.entries(recipe.inputs).map(([name, inputRate]) => [name, { value: inputRate.value * count, kind: inputRate.kind }])),
+          }];
         }
       }
 
-      const producers = producerByMaterial[material] || [];
-      const available = producers.filter((profile) => {
-        const output = profile.outputs[material];
-        return output && output.value > 1e-9;
-      });
-      if (available.length === 0) {
-        addExternal(externalMap, material, rate.value, rate.kind);
-        return;
-      }
-      const producer = available.sort((a, b) => (b.outputs[material]?.value || 0) - (a.outputs[material]?.value || 0))[0];
-      const outputRate = producer.outputs[material];
-      if (!outputRate || outputRate.value <= 1e-9) {
-        addExternal(externalMap, material, rate.value, rate.kind);
-        return;
-      }
-      const count = rate.value / outputRate.value;
-      steps.push({ material, producer: producer.name, count, type: 'source' });
-      Object.entries(producer.inputs).forEach(([name, inputRate]) => {
-        resolveMaterial(name, { value: inputRate.value * count, kind: inputRate.kind }, [...trail, material]);
+      steps.push({ material, neededRate: rate, producers: finalOptions });
+
+      const bestProducer = preferredRecipeFullName
+        ? finalOptions[0]
+        : finalOptions.sort((a, b) => b.count - a.count)[0];
+
+      Object.entries(bestProducer.inputs).forEach(([name, inputRate]) => {
+        resolveMaterial(name, inputRate, [...trail, material]);
       });
     };
 
-    resolveMaterial(selectedFood, { value: targetRate, kind: 'kcal' }, ['目标食物'], selectedMachine === '自然产出' ? undefined : selectedMachine);
+    let targetMaterial = selectedFood;
+    let preferredRecipeFullName: string | undefined;
+    if (selectedMachine !== '自然产出') {
+      const recipe = recipes.find((r) => r.fullName === selectedFood && r.machine === selectedMachine);
+      if (recipe) {
+        targetMaterial = recipe.name;
+        preferredRecipeFullName = recipe.fullName;
+      }
+    }
+
+    resolveMaterial(targetMaterial, { value: targetRate, kind: 'kcal' }, ['目标食物'], selectedMachine === '自然产出' ? undefined : selectedMachine, preferredRecipeFullName);
 
     const externalNeeds = Object.values(externalMap).filter((item) => item.value > 1e-9).sort((a, b) => b.value - a.value);
-    return { calorieNeed, targetRate, externalNeeds, steps, warnings };
-  }, [bottomlessCount, dupeCount, foodToRecipes, hungerLevel, producerByMaterial, selectedFood, selectedMachine]);
+    return { calorieNeed, targetRate, externalNeeds, steps, warnings, targetMaterial };
+  }, [bottomlessCount, dupeCount, foodToRecipes, hungerLevel, producerByMaterial, selectedFood, selectedMachine, recipes]);
 
   return (
     <View className='page food p-8'>
@@ -502,8 +544,8 @@ export default function Food() {
             <View className='table-row simple'>
               <Text className='text-xs'>目标食物</Text>
               <View className='flex items-center gap-4 justify-end'>
-                {renderIcon(selectedFood, undefined, 14)}
-                <Text className='text-xs'>{selectedFood}</Text>
+                {renderIcon(result.targetMaterial, undefined, 14)}
+                <Text className='text-xs'>{result.targetMaterial}</Text>
               </View>
             </View>
             <View className='table-row simple'>
@@ -511,20 +553,41 @@ export default function Food() {
               <Text className='text-xs'>{formatRate(result.targetRate, 'kcal')}</Text>
             </View>
 
-            <Text className='text-sm font-semibold mt-8'>生产链</Text>
+            <Text className='text-sm font-semibold mt-8'>生产链选项</Text>
             {result.steps.length === 0 && <Text className='text-xs'>无内部链路，全部按外部输入处理</Text>}
-            {result.steps.map((step, index) => (
-              <View key={`${step.material}-${step.producer}-${index}`} className='table-row simple'>
-                <View className='flex items-center gap-4'>
-                  {renderIcon(step.material, undefined, 14)}
-                  <Text className='text-xs'>{step.material}</Text>
+            <View className='flex flex-col gap-12'>
+              {result.steps.map((step) => (
+                <View key={step.material} className='producer-card p-12 border border-gray rounded-8 bg-gray-100'>
+                  <View className='flex items-center gap-4 mb-8 border-b border-gray pb-4'>
+                    {renderIcon(step.material, undefined, 18)}
+                    <Text className='text-sm font-bold'>{step.material}</Text>
+                    <View style={{ flex: 1 }} />
+                    <Text className='text-xs text-gray'>需求: {formatRate(step.neededRate.value, step.neededRate.kind)}</Text>
+                  </View>
+                  <View className='flex flex-col gap-8'>
+                    {step.producers.map((producer, pIndex) => (
+                      <View key={`${producer.name}-${pIndex}`} className='flex flex-col gap-4 p-8 bg-white rounded-4'>
+                        <View className='flex items-center gap-4'>
+                          {renderIcon(producer.name, undefined, 14)}
+                          <Text className='text-xs font-semibold'>{producer.name}</Text>
+                          <Text className='text-xs text-primary'>× {formatNumber(producer.count)}</Text>
+                        </View>
+                        {Object.keys(producer.inputs).length > 0 && (
+                          <View className='flex flex-wrap gap-x-8 gap-y-4 mt-4'>
+                            {Object.entries(producer.inputs).map(([inputName, inputRate]) => (
+                              <View key={inputName} className='flex items-center gap-2'>
+                                {renderIcon(inputName, undefined, 12)}
+                                <Text className='text-xs'>{inputName}: {formatRate(inputRate.value, inputRate.kind)}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    ))}
+                  </View>
                 </View>
-                <View className='flex items-center gap-4 justify-end'>
-                  {renderIcon(step.producer, undefined, 14)}
-                  <Text className='text-xs'>{step.producer} × {formatNumber(step.count)}</Text>
-                </View>
-              </View>
-            ))}
+              ))}
+            </View>
 
             <Text className='text-sm font-semibold mt-8'>外部输入</Text>
             {result.externalNeeds.length === 0 && <Text className='text-xs text-success'>无外部缺口</Text>}
