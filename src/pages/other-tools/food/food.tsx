@@ -1,46 +1,69 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { View, Text, Picker } from '@tarojs/components';
-import { Button, InputNumber } from '@nutui/nutui-react-taro';
+import { Picker, Text, View } from '@tarojs/components';
+import { InputNumber, Radio, RadioGroup } from '@nutui/nutui-react-taro';
+import { ArrowRight } from '@nutui/icons-react-taro';
 import BackButton from '@/components/ui/BackButton';
 import FilteredImage from '@/components/ui/FilteredImage';
 import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
 import { DataContext } from '@/contexts/DataContext';
 import { CYCLE_SECONDS, HUNGER_OPTIONS, HungerLevel, useUnit } from '@/contexts/UnitContext';
-import { buildDefaultModeSelections } from '@/components/selection/modeSelection';
-import { calculateSelectionTotals, ResourceUnitKind } from '@/components/selection/calc';
-import { Link, LinkDetail, Menu } from '@/types/data';
+import { calculateSelectionTotals, parseResourceRate, ResourceUnitKind } from '@/components/selection/calc';
+import { buildDefaultModeSelections, GROWTH_CULTIVATED_OPTION, GROWTH_MODE_NAME, GROWTH_WILD_OPTION, withPlantGrowthMode } from '@/components/selection/modeSelection';
+import { CreatureDetail, Link, LinkDetail, Menu, PlantDetail } from '@/types/data';
 import { getIconData } from '@/utils/utils';
 import './food.scss';
 
-type Profile = {
+type MaterialRate = {
+  value: number;
+  kind: ResourceUnitKind;
+};
+
+type Recipe = {
+  name: string;
+  machine: string;
+  output: MaterialRate;
+  inputs: Record<string, MaterialRate>;
+};
+
+type SourceProfile = {
   name: string;
   icon?: string;
-  category: '建筑' | '小动物' | '植物';
-  inputs: Record<string, number>;
-  outputs: Record<string, number>;
-  inputKinds: Record<string, ResourceUnitKind>;
-  outputKinds: Record<string, ResourceUnitKind>;
-  recipeLabel?: string;
+  category: '植物' | '小动物';
+  inputs: Record<string, MaterialRate>;
+  outputs: Record<string, MaterialRate>;
 };
 
-type FoodRow = {
-  id: string;
-  recipeLabel: string;
-  share: number;
-};
-
-type RecipeStep = {
+type ChainStep = {
   material: string;
   producer: string;
   count: number;
-  depth: number;
+  type: 'recipe' | 'source';
 };
 
-const FOOD_BUILDING_KEYWORDS = ['电烤炉', '油炸锅', '敲蛋桌', '燃气灶', '食物压制器', '熏炉'];
+type ExternalNeed = {
+  material: string;
+  value: number;
+  kind: ResourceUnitKind;
+};
 
-function addAmount(map: Record<string, number>, key: string, value: number) {
-  if (!Number.isFinite(value) || value === 0) return;
-  map[key] = (map[key] || 0) + value;
+function addRate(map: Record<string, MaterialRate>, key: string, value: number, kind: ResourceUnitKind) {
+  if (!Number.isFinite(value) || Math.abs(value) <= 1e-9) return;
+  const current = map[key];
+  if (!current) {
+    map[key] = { value, kind };
+    return;
+  }
+  current.value += value;
+}
+
+function addExternal(map: Record<string, ExternalNeed>, material: string, value: number, kind: ResourceUnitKind) {
+  if (!Number.isFinite(value) || Math.abs(value) <= 1e-9) return;
+  const current = map[material];
+  if (!current) {
+    map[material] = { material, value, kind };
+    return;
+  }
+  current.value += value;
 }
 
 function findChildMenu(menu: Menu | null, name: string): Menu | null {
@@ -54,100 +77,19 @@ function findChildMenu(menu: Menu | null, name: string): Menu | null {
 
 function collectLinks(menu: Menu | null): Link[] {
   if (!menu) return [];
-  const result: Link[] = [];
+  const links: Link[] = [];
   const visited = new WeakSet<Menu>();
   const dfs = (current: Menu) => {
     if (!current || visited.has(current)) return;
     visited.add(current);
     const items = Array.isArray(current.items) ? current.items : [];
     for (const item of items) {
-      if (item?.detail) result.push(item);
+      if (item?.detail) links.push(item);
       if (item?.menu) dfs(item.menu);
     }
   };
   dfs(menu);
-  return result;
-}
-
-import { getEffectiveModes, buildDefaultModeSelection, normalizeModeSelections } from '@/components/selection/modeSelection';
-
-function toProfiles(link: Link, category: '建筑' | '小动物' | '植物'): Profile[] {
-  const detail = link.detail as LinkDetail;
-  const isPlant = category === '植物';
-
-  const modes = getEffectiveModes(detail);
-  if (!modes || modes.length === 0) {
-    return [toProfileWithModes(link, category, {})];
-  }
-
-  // 为每个模式的每个选项生成一个 profile
-  // 这样可以覆盖所有可能的配方
-  const profiles: Profile[] = [];
-  const seenLabels = new Set<string>();
-
-  modes.forEach(mode => {
-    mode.options.forEach(option => {
-      const modeSelections: Record<string, string> = {};
-      modes.forEach(m => {
-        modeSelections[m.name] = m.name === mode.name ? option.name : buildDefaultModeSelection(m);
-      });
-      const profile = toProfileWithModes(link, category, modeSelections);
-      if (profile.recipeLabel && !seenLabels.has(profile.recipeLabel)) {
-        profiles.push(profile);
-        seenLabels.add(profile.recipeLabel);
-      }
-    });
-  });
-
-  return profiles;
-}
-
-function toProfileWithModes(link: Link, category: '建筑' | '小动物' | '植物', modeSelections: Record<string, string>): Profile {
-  const detail = link.detail as LinkDetail;
-  const isPlant = category === '植物';
-  const normalizedSelections = normalizeModeSelections(detail, modeSelections);
-  const totals = calculateSelectionTotals(detail, 1, normalizedSelections, 100, 0, 0, { isPlant });
-
-  const inputs: Record<string, number> = {};
-  const outputs: Record<string, number> = {};
-  const inputKinds: Record<string, ResourceUnitKind> = {};
-  const outputKinds: Record<string, ResourceUnitKind> = {};
-
-  Object.entries(totals.resources).forEach(([name, value]) => {
-    const kind = totals.resourceKinds[name] || 'mass';
-    if (value < 0) {
-      addAmount(inputs, name, -value);
-      inputKinds[name] = kind;
-    }
-    if (value > 0) {
-      addAmount(outputs, name, value);
-      outputKinds[name] = kind;
-    }
-  });
-
-  // 生成配方标签
-  let recipeLabel = '';
-  const outputKcal = Object.entries(outputKinds).find(([_, kind]) => kind === 'kcal');
-  if (outputKcal) {
-    const foodName = outputKcal[0];
-    const inputNames = Object.keys(inputs);
-    if (inputNames.length > 0) {
-      recipeLabel = `${inputNames.join(' + ')} = ${foodName}`;
-    } else {
-      recipeLabel = `${foodName} (${link.name})`;
-    }
-  }
-
-  return {
-    name: link.name,
-    icon: link.icon,
-    category,
-    inputs,
-    outputs,
-    inputKinds,
-    outputKinds,
-    recipeLabel,
-  };
+  return links;
 }
 
 function formatNumber(value: number) {
@@ -162,323 +104,262 @@ function formatNumber(value: number) {
   return trimmed === '-0' ? '0' : trimmed;
 }
 
-function formatMass(valuePerSecond: number, timeUnit: '秒' | '周期') {
-  const value = timeUnit === '周期' ? valuePerSecond * CYCLE_SECONDS : valuePerSecond;
-  const abs = Math.abs(value);
-  if (abs >= 1000000) return `${formatNumber(value / 1000000)} 吨/${timeUnit}`;
-  if (abs >= 1000) return `${formatNumber(value / 1000)} 千克/${timeUnit}`;
-  return `${formatNumber(value)} 克/${timeUnit}`;
+function formatRate(valuePerSecond: number, kind: ResourceUnitKind) {
+  const valuePerCycle = valuePerSecond * CYCLE_SECONDS;
+  if (kind === 'kcal') return `${formatNumber(valuePerCycle)} 千卡/周期`;
+  if (kind === 'count') return `${formatNumber(valuePerCycle)} 单位/周期`;
+  if (kind === 'growth') return `${formatNumber(valuePerCycle)} 生长进度/周期`;
+  const abs = Math.abs(valuePerCycle);
+  if (abs >= 1000000) return `${formatNumber(valuePerCycle / 1000000)} 吨/周期`;
+  if (abs >= 1000) return `${formatNumber(valuePerCycle / 1000)} 千克/周期`;
+  return `${formatNumber(valuePerCycle)} 克/周期`;
 }
 
-function formatCount(valuePerSecond: number, timeUnit: '秒' | '周期') {
-  const value = timeUnit === '周期' ? valuePerSecond * CYCLE_SECONDS : valuePerSecond;
-  return `${formatNumber(value)} 单位/${timeUnit}`;
+function getDeltaCalories(level: HungerLevel) {
+  const option = HUNGER_OPTIONS.find((item) => item.label === level);
+  return option?.calorieDelta || 0;
 }
 
-function formatCalories(valuePerSecond: number, timeUnit: '秒' | '周期') {
-  const value = timeUnit === '周期' ? valuePerSecond * CYCLE_SECONDS : valuePerSecond;
-  return `${formatNumber(value)} 千卡/${timeUnit}`;
+function buildCreatureSelections(detail: CreatureDetail, creatureMode: 'wild' | 'domesticated') {
+  const modeSelections = buildDefaultModeSelections(detail);
+  const modes = Array.isArray(detail.modes) ? detail.modes : [];
+  modes.forEach((mode) => {
+    if (mode.name !== '额外蛋是否孵化') return;
+    const wildOption = mode.options.find((option) => option.name.includes('孵化所有蛋'))?.name || mode.options[0]?.name;
+    const domesticOption = mode.options.find((option) => option.name.includes('获取额外蛋'))?.name || mode.options[0]?.name;
+    modeSelections[mode.name] = creatureMode === 'wild' ? String(wildOption || '') : String(domesticOption || '');
+  });
+  return modeSelections;
 }
 
-function createRow(recipeLabel: string): FoodRow {
-  return {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    recipeLabel,
-    share: 100,
-  };
+function buildPlantSelections(detail: PlantDetail, wildPlant: boolean) {
+  const withGrowth = withPlantGrowthMode(detail, true);
+  const modeSelections = buildDefaultModeSelections(withGrowth);
+  modeSelections[GROWTH_MODE_NAME] = wildPlant ? GROWTH_WILD_OPTION : GROWTH_CULTIVATED_OPTION;
+  return { withGrowth, modeSelections };
 }
 
 export default function Food() {
   const { data, iconMap, loading, error } = useContext(DataContext);
-  const { timeUnit, hungerLevel } = useUnit();
-  const [dupeCount, setDupeCount] = useState<number>(8);
-  const [selectedHunger, setSelectedHunger] = useState(hungerLevel);
-  const [foodRows, setFoodRows] = useState<FoodRow[]>([]);
+  const { hungerLevel, setHungerLevel } = useUnit();
+  const [dupeCount, setDupeCount] = useState(8);
+  const [bottomlessCount, setBottomlessCount] = useState(0);
+  const [wildPlant, setWildPlant] = useState(false);
+  const [creatureMode, setCreatureMode] = useState<'wild' | 'domesticated'>('domesticated');
+  const [selectedMachine, setSelectedMachine] = useState('');
+  const [selectedFood, setSelectedFood] = useState('');
 
   const renderIcon = (name: string, icon?: string, size = 20) => {
     const iconData = getIconData(iconMap, name, icon);
     if (!iconData?.icon) return null;
-    return (
-      <FilteredImage
-        src={iconData.icon}
-        iconFilter={iconData.iconFilter}
-        style={{ width: size, height: size }}
-        mode='aspectFit'
-      />
-    );
+    return <FilteredImage src={iconData.icon} iconFilter={iconData.iconFilter} style={{ width: size, height: size }} mode='aspectFit' />;
   };
 
   const buildingMenu = useMemo(() => findChildMenu(data, '建筑'), [data]);
-  const animalMenu = useMemo(() => findChildMenu(data, '小动物'), [data]);
   const plantMenu = useMemo(() => findChildMenu(data, '植物'), [data]);
+  const creatureMenu = useMemo(() => findChildMenu(data, '小动物'), [data]);
+  const foodBuildingMenu = useMemo(() => findChildMenu(buildingMenu, '食物'), [buildingMenu]);
 
-  const buildingProfiles = useMemo(
-    () => collectLinks(buildingMenu).flatMap((link) => toProfiles(link, '建筑')),
-    [buildingMenu]
-  );
-
-  const sourceProfiles = useMemo(() => {
-    const animalProfiles = collectLinks(animalMenu).flatMap((link) => toProfiles(link, '小动物'));
-    const plantProfiles = collectLinks(plantMenu).flatMap((link) => toProfiles(link, '植物'));
-    return [...animalProfiles, ...plantProfiles];
-  }, [animalMenu, plantMenu]);
-
-  const recipeProfiles = useMemo(() => {
-    const allProfiles = [...buildingProfiles, ...sourceProfiles];
-    return allProfiles
-      .filter((profile) => {
-        if (FOOD_BUILDING_KEYWORDS.some((keyword) => profile.name.includes(keyword))) return true;
-        return Object.entries(profile.outputKinds).some(([material, kind]) => kind === 'kcal' && (profile.outputs[material] || 0) > 0);
-      })
-      .sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
-  }, [buildingProfiles, sourceProfiles]);
-
-  const foodOptions = useMemo(() => {
-    const options: { label: string; material: string }[] = [];
-    recipeProfiles.forEach((recipe) => {
-      Object.entries(recipe.outputKinds).forEach(([material, kind]) => {
-        if (kind !== 'kcal' || (recipe.outputs[material] || 0) <= 0) return;
-        if (recipe.recipeLabel) {
-          options.push({ label: recipe.recipeLabel, material });
-        }
+  const recipes = useMemo<Recipe[]>(() => {
+    const links = collectLinks(foodBuildingMenu);
+    const result: Recipe[] = [];
+    links.forEach((link) => {
+      const detail = link.detail as LinkDetail;
+      const modes = Array.isArray((detail as any).modes) ? ((detail as any).modes as any[]) : [];
+      modes.forEach((mode) => {
+        const options = Array.isArray(mode?.options) ? mode.options : [];
+        options.forEach((option) => {
+          const resources = (option?.resources || {}) as Record<string, string>;
+          const outputs = Object.entries(resources).map(([name, raw]) => ({ name, parsed: parseResourceRate(raw) })).filter((entry) => entry.parsed.valuePerSecond > 0 && entry.parsed.kind === 'kcal');
+          if (outputs.length === 0) return;
+          const output = outputs[0];
+          const inputs: Record<string, MaterialRate> = {};
+          Object.entries(resources).forEach(([name, raw]) => {
+            const parsed = parseResourceRate(raw);
+            if (parsed.valuePerSecond >= 0) return;
+            inputs[name] = { value: Math.abs(parsed.valuePerSecond), kind: parsed.kind };
+          });
+          result.push({
+            name: output.name,
+            machine: link.name,
+            output: { value: output.parsed.valuePerSecond, kind: output.parsed.kind },
+            inputs,
+          });
+        });
       });
     });
-    return options.sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'));
-  }, [recipeProfiles]);
+    return result;
+  }, [foodBuildingMenu]);
 
-  useEffect(() => {
-    if (!foodOptions.length) {
-      setFoodRows([]);
-      return;
-    }
-    setFoodRows((prev) => {
-      const valid = prev.filter((row) => foodOptions.some((option) => option.label === row.recipeLabel));
-      if (valid.length > 0) return valid;
-      return [createRow(foodOptions[0].label)];
-    });
-  }, [foodOptions]);
-
-  const recipeByMaterial = useMemo(() => {
-    const map: Record<string, Profile[]> = {};
-    recipeProfiles.forEach((recipe) => {
-      Object.entries(recipe.outputs).forEach(([material, value]) => {
-        if (value <= 0) return;
-        map[material] = map[material] || [];
-        map[material].push(recipe);
+  const sourceProfiles = useMemo<SourceProfile[]>(() => {
+    const profiles: SourceProfile[] = [];
+    collectLinks(plantMenu).forEach((link) => {
+      const detail = link.detail as PlantDetail;
+      const { withGrowth, modeSelections } = buildPlantSelections(detail, wildPlant);
+      const totals = calculateSelectionTotals(withGrowth, 1, modeSelections, 100, 0, 0, { isPlant: true });
+      const inputs: Record<string, MaterialRate> = {};
+      const outputs: Record<string, MaterialRate> = {};
+      Object.entries(totals.resources).forEach(([name, value]) => {
+        const kind = totals.resourceKinds[name] || 'mass';
+        if (value < 0) addRate(inputs, name, -value, kind);
+        if (value > 0) addRate(outputs, name, value, kind);
       });
+      if (Object.keys(outputs).length === 0) return;
+      profiles.push({ name: link.name, icon: link.icon, category: '植物', inputs, outputs });
     });
+
+    collectLinks(creatureMenu).forEach((link) => {
+      const detail = link.detail as CreatureDetail;
+      const modeSelections = buildCreatureSelections(detail, creatureMode);
+      const totals = calculateSelectionTotals(detail, 1, modeSelections);
+      const inputs: Record<string, MaterialRate> = {};
+      const outputs: Record<string, MaterialRate> = {};
+      Object.entries(totals.resources).forEach(([name, value]) => {
+        const kind = totals.resourceKinds[name] || 'mass';
+        if (value < 0) addRate(inputs, name, -value, kind);
+        if (value > 0) addRate(outputs, name, value, kind);
+      });
+      if (Object.keys(outputs).length === 0) return;
+      profiles.push({ name: link.name, icon: link.icon, category: '小动物', inputs, outputs });
+    });
+    return profiles;
+  }, [creatureMenu, creatureMode, plantMenu, wildPlant]);
+
+  const foodToRecipes = useMemo(() => {
+    const map: Record<string, Recipe[]> = {};
+    recipes.forEach((recipe) => {
+      map[recipe.name] = map[recipe.name] || [];
+      map[recipe.name].push(recipe);
+    });
+    Object.values(map).forEach((list) => list.sort((a, b) => b.output.value - a.output.value));
     return map;
-  }, [recipeProfiles]);
+  }, [recipes]);
 
-  const sourceByMaterial = useMemo(() => {
-    const map: Record<string, Profile[]> = {};
+  const producerByMaterial = useMemo(() => {
+    const map: Record<string, SourceProfile[]> = {};
     sourceProfiles.forEach((profile) => {
-      Object.entries(profile.outputs).forEach(([material, value]) => {
-        if (value <= 0) return;
-        const kind = profile.outputKinds[material] || 'mass';
-        if (kind === 'kcal') return;
+      Object.entries(profile.outputs).forEach(([material, rate]) => {
+        if (rate.value <= 1e-9) return;
         map[material] = map[material] || [];
         map[material].push(profile);
       });
     });
+    Object.values(map).forEach((list) => list.sort((a, b) => {
+      const aRate = Object.values(a.outputs)[0]?.value || 0;
+      const bRate = Object.values(b.outputs)[0]?.value || 0;
+      return bRate - aRate;
+    }));
     return map;
   }, [sourceProfiles]);
 
-  const hungerOptions = useMemo(() => HUNGER_OPTIONS.map((item) => item.label as HungerLevel), []);
-  const hungerInfo = useMemo(
-    () => HUNGER_OPTIONS.find((item) => item.label === selectedHunger) || HUNGER_OPTIONS[2],
-    [selectedHunger]
-  );
+  const machineOptions = useMemo(() => {
+    const crafted = Array.from(new Set(recipes.map((recipe) => recipe.machine))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    const naturalFoods = Array.from(new Set(sourceProfiles.flatMap((profile) => Object.entries(profile.outputs).filter(([, rate]) => rate.kind === 'kcal').map(([name]) => name)))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    if (naturalFoods.length > 0) return [...crafted, '自然产出'];
+    return crafted;
+  }, [recipes, sourceProfiles]);
 
-  const calorieNeedPerDupeCycle = useMemo(() => Math.max(0, 1000 - hungerInfo.calorieDelta), [hungerInfo.calorieDelta]);
-  const totalCalorieNeedPerCycle = useMemo(() => Math.max(0, dupeCount) * calorieNeedPerDupeCycle, [calorieNeedPerDupeCycle, dupeCount]);
-  const totalCalorieNeedPerSecond = useMemo(() => totalCalorieNeedPerCycle / CYCLE_SECONDS, [totalCalorieNeedPerCycle]);
+  const foodOptions = useMemo(() => {
+    if (!selectedMachine) return [];
+    if (selectedMachine === '自然产出') {
+      return Array.from(new Set(sourceProfiles.flatMap((profile) => Object.entries(profile.outputs).filter(([, rate]) => rate.kind === 'kcal').map(([name]) => name)))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    }
+    return Array.from(new Set(recipes.filter((recipe) => recipe.machine === selectedMachine).map((recipe) => recipe.name))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  }, [recipes, selectedMachine, sourceProfiles]);
 
-  const normalizedFoodRows = useMemo(() => {
-    const validRows = foodRows.filter((row) => row.recipeLabel);
-    if (!validRows.length) return [];
-    const totalShare = validRows.reduce((sum, row) => sum + Math.max(0, row.share), 0);
-    const fallbackShare = 100 / validRows.length;
-    return validRows.map((row) => {
-      const normalized = totalShare > 0 ? (Math.max(0, row.share) / totalShare) * 100 : fallbackShare;
-      return { ...row, normalizedShare: normalized };
-    });
-  }, [foodRows]);
+  useEffect(() => {
+    if (bottomlessCount > dupeCount) setBottomlessCount(dupeCount);
+  }, [bottomlessCount, dupeCount]);
 
-  const ratioTotal = useMemo(() => foodRows.reduce((sum, row) => sum + Math.max(0, row.share), 0), [foodRows]);
-  const ratioHint = useMemo(() => {
-    if (!normalizedFoodRows.length) return '';
-    if (Math.abs(ratioTotal - 100) <= 0.01) return '';
-    return `当前占比之和为 ${formatNumber(ratioTotal)}%，已自动归一化到 100%`;
-  }, [normalizedFoodRows, ratioTotal]);
+  useEffect(() => {
+    if (!machineOptions.length) {
+      setSelectedMachine('');
+      return;
+    }
+    if (!machineOptions.includes(selectedMachine)) setSelectedMachine(machineOptions[0]);
+  }, [machineOptions, selectedMachine]);
+
+  useEffect(() => {
+    if (!foodOptions.length) {
+      setSelectedFood('');
+      return;
+    }
+    if (!foodOptions.includes(selectedFood)) setSelectedFood(foodOptions[0]);
+  }, [foodOptions, selectedFood]);
+
+  const hungerIndex = useMemo(() => Math.max(0, HUNGER_OPTIONS.findIndex((option) => option.label === hungerLevel)), [hungerLevel]);
+  const machineIndex = useMemo(() => Math.max(0, machineOptions.findIndex((name) => name === selectedMachine)), [machineOptions, selectedMachine]);
+  const foodIndex = useMemo(() => Math.max(0, foodOptions.findIndex((name) => name === selectedFood)), [foodOptions, selectedFood]);
 
   const result = useMemo(() => {
-    const foodDemand: Record<string, number> = {};
-    const materialDemand: Record<string, number> = {};
-    const materialKinds: Record<string, ResourceUnitKind> = {};
-    const recipeCounts: Record<string, number> = {};
-    const recipeSteps: RecipeStep[] = [];
-    const sourceAnimalCounts: Record<string, { theoretical: number; rounded: number }> = {};
-    const sourcePlantCounts: Record<string, { theoretical: number; rounded: number }> = {};
-    const gaps: string[] = [];
+    if (!selectedFood) return null;
+    const deltaCalories = getDeltaCalories(hungerLevel);
+    const baseNeedPerDupe = Math.max(0, 1000 + deltaCalories);
+    const calorieNeed = Math.max(0, dupeCount * baseNeedPerDupe + bottomlessCount * 500);
+    const targetRate = calorieNeed / CYCLE_SECONDS;
+    const steps: ChainStep[] = [];
+    const warnings: string[] = [];
+    const externalMap: Record<string, ExternalNeed> = {};
 
-    if (totalCalorieNeedPerSecond <= 0 || normalizedFoodRows.length === 0) {
-      return {
-        foodDemand,
-        materialDemand,
-        materialKinds,
-        recipeCounts,
-        recipeSteps,
-        sourceAnimalCounts,
-        sourcePlantCounts,
-        gaps,
-      };
-    }
-
-    const resolveMaterial = (material: string, amount: number, kind: ResourceUnitKind, trail: string[], preferredRecipeLabel?: string) => {
-      if (!Number.isFinite(amount) || amount <= 1e-9) return;
-      addAmount(materialDemand, material, amount);
-      materialKinds[material] = kind;
-
+    const resolveMaterial = (material: string, rate: MaterialRate, trail: string[], preferredMachine?: string) => {
+      if (!Number.isFinite(rate.value) || rate.value <= 1e-9) return;
       if (trail.includes(material)) {
-        gaps.push(`检测到循环配方：${[...trail, material].join(' → ')}，已停止展开`);
+        warnings.push(`检测到循环依赖：${[...trail, material].join(' → ')}`);
+        addExternal(externalMap, material, rate.value, rate.kind);
         return;
       }
 
-      const producers = recipeByMaterial[material] || [];
-      let producer = preferredRecipeLabel ? producers.find(p => p.recipeLabel === preferredRecipeLabel) : undefined;
-      if (!producer) {
-        producer = producers
-          .filter((item) => (item.outputs[material] || 0) > 0)
-          .sort((a, b) => (b.outputs[material] || 0) - (a.outputs[material] || 0))[0];
+      if (rate.kind === 'kcal') {
+        const candidates = foodToRecipes[material] || [];
+        if (candidates.length > 0) {
+          const recipe = candidates.find((item) => item.machine === preferredMachine) || candidates[0];
+          if (!recipe || recipe.output.value <= 1e-9) {
+            addExternal(externalMap, material, rate.value, rate.kind);
+            return;
+          }
+          const machineCount = rate.value / recipe.output.value;
+          steps.push({ material, producer: recipe.machine, count: machineCount, type: 'recipe' });
+          Object.entries(recipe.inputs).forEach(([name, inputRate]) => {
+            resolveMaterial(name, { value: inputRate.value * machineCount, kind: inputRate.kind }, [...trail, material]);
+          });
+          return;
+        }
       }
-      if (!producer) return;
 
-      const outputRate = producer.outputs[material] || 0;
-      if (outputRate <= 0) return;
-      const count = amount / outputRate;
-      addAmount(recipeCounts, producer.name, count);
-      recipeSteps.push({
-        material,
-        producer: producer.name,
-        count,
-        depth: trail.length,
+      const producers = producerByMaterial[material] || [];
+      const available = producers.filter((profile) => {
+        const output = profile.outputs[material];
+        return output && output.value > 1e-9;
       });
-
-      Object.entries(producer.inputs).forEach(([inputMaterial, inputNeed]) => {
-        const inputKind = producer.inputKinds[inputMaterial] || 'mass';
-        resolveMaterial(inputMaterial, inputNeed * count, inputKind, [...trail, material]);
+      if (available.length === 0) {
+        addExternal(externalMap, material, rate.value, rate.kind);
+        return;
+      }
+      const producer = available.sort((a, b) => (b.outputs[material]?.value || 0) - (a.outputs[material]?.value || 0))[0];
+      const outputRate = producer.outputs[material];
+      if (!outputRate || outputRate.value <= 1e-9) {
+        addExternal(externalMap, material, rate.value, rate.kind);
+        return;
+      }
+      const count = rate.value / outputRate.value;
+      steps.push({ material, producer: producer.name, count, type: 'source' });
+      Object.entries(producer.inputs).forEach(([name, inputRate]) => {
+        resolveMaterial(name, { value: inputRate.value * count, kind: inputRate.kind }, [...trail, material]);
       });
     };
 
-    normalizedFoodRows.forEach((row) => {
-      const option = foodOptions.find(opt => opt.label === row.recipeLabel);
-      if (!option) return;
-      const need = totalCalorieNeedPerSecond * (row.normalizedShare / 100);
-      addAmount(foodDemand, option.material, need);
-      resolveMaterial(option.material, need, 'kcal', ['目标食物'], row.recipeLabel);
-    });
+    resolveMaterial(selectedFood, { value: targetRate, kind: 'kcal' }, ['目标食物'], selectedMachine === '自然产出' ? undefined : selectedMachine);
 
-    Object.entries(materialDemand).forEach(([material, demand]) => {
-      const kind = materialKinds[material] || 'mass';
-      const producers = sourceByMaterial[material] || [];
-      const source = producers
-        .filter((item) => (item.outputs[material] || 0) > 0)
-        .sort((a, b) => (b.outputs[material] || 0) - (a.outputs[material] || 0))[0];
-      if (!source) {
-        if ((recipeByMaterial[material] || []).length === 0 && kind !== 'kcal') gaps.push(`${material} 缺少动物/植物来源，请补充外部输入`);
-        return;
-      }
-      const outputRate = source.outputs[material] || 0;
-      if (outputRate <= 0) {
-        gaps.push(`${source.name} 对 ${material} 的产量无效`);
-        return;
-      }
-      const theoretical = demand / outputRate;
-      const rounded = Math.ceil(theoretical);
-      const targetMap = source.category === '小动物' ? sourceAnimalCounts : sourcePlantCounts;
-      const current = targetMap[source.name] || { theoretical: 0, rounded: 0 };
-      targetMap[source.name] = {
-        theoretical: current.theoretical + theoretical,
-        rounded: current.rounded + rounded,
-      };
-    });
-
-    return {
-      foodDemand,
-      materialDemand,
-      materialKinds,
-      recipeCounts,
-      recipeSteps,
-      sourceAnimalCounts,
-      sourcePlantCounts,
-      gaps: Array.from(new Set(gaps)),
-    };
-  }, [normalizedFoodRows, recipeByMaterial, sourceByMaterial, totalCalorieNeedPerSecond, foodOptions]);
-
-  const foodNeedRows = useMemo(() => {
-    return Object.entries(result.foodDemand)
-      .map(([foodName, value]) => ({ foodName, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [result.foodDemand]);
-
-  const recipeCountRows = useMemo(() => {
-    return Object.entries(result.recipeCounts)
-      .map(([name, value]) => ({ name, value, rounded: Math.ceil(value) }))
-      .sort((a, b) => b.value - a.value);
-  }, [result.recipeCounts]);
-
-  const sourceAnimalRows = useMemo(() => {
-    return Object.entries(result.sourceAnimalCounts)
-      .map(([name, value]) => ({ name, ...value }))
-      .sort((a, b) => b.theoretical - a.theoretical);
-  }, [result.sourceAnimalCounts]);
-
-  const sourcePlantRows = useMemo(() => {
-    return Object.entries(result.sourcePlantCounts)
-      .map(([name, value]) => ({ name, ...value }))
-      .sort((a, b) => b.theoretical - a.theoretical);
-  }, [result.sourcePlantCounts]);
-
-  const materialDemandRows = useMemo(() => {
-    return Object.entries(result.materialDemand)
-      .map(([name, value]) => ({
-        name,
-        value,
-        kind: result.materialKinds[name] || 'mass',
-      }))
-      .sort((a, b) => b.value - a.value);
-  }, [result.materialDemand, result.materialKinds]);
-
-  const addFoodRow = () => {
-    if (!foodOptions.length) return;
-    setFoodRows((prev) => [...prev, createRow(foodOptions[0].label)]);
-  };
-
-  const removeFoodRow = (id: string) => {
-    setFoodRows((prev) => {
-      if (prev.length <= 1) return prev;
-      return prev.filter((row) => row.id !== id);
-    });
-  };
-
-  const updateFoodRow = (id: string, patch: Partial<FoodRow>) => {
-    setFoodRows((prev) => prev.map((row) => (row.id === id ? { ...row, ...patch } : row)));
-  };
-
-  const formatByKind = (valuePerSecond: number, kind: ResourceUnitKind) => {
-    if (kind === 'kcal') return formatCalories(valuePerSecond, timeUnit);
-    if (kind === 'count') return formatCount(valuePerSecond, timeUnit);
-    return formatMass(valuePerSecond, timeUnit);
-  };
+    const externalNeeds = Object.values(externalMap).filter((item) => item.value > 1e-9).sort((a, b) => b.value - a.value);
+    return { calorieNeed, targetRate, externalNeeds, steps, warnings };
+  }, [bottomlessCount, dupeCount, foodToRecipes, hungerLevel, producerByMaterial, selectedFood, selectedMachine]);
 
   return (
     <View className='page food p-8'>
       {process.env.TARO_ENV === 'h5' && <BackButton />}
-
       <View className='tool-card p-12 flex flex-col gap-8'>
         <View className='flex items-center gap-8'>
-          <Text className='text-md font-semibold'>复制人数量</Text>
+          <Text className='text-sm font-semibold'>复制人数量</Text>
           <View style={{ flex: 1 }} />
           <InputNumber
             value={dupeCount}
@@ -486,178 +367,188 @@ export default function Food() {
             step={1}
             onChange={(value) => {
               const next = Number(value);
-              setDupeCount(Number.isFinite(next) ? Math.max(0, next) : 0);
+              setDupeCount(Number.isFinite(next) ? Math.max(0, Math.round(next)) : 0);
             }}
           />
         </View>
         <View className='flex items-center gap-8'>
-          <Text className='text-sm'>饥饿难度</Text>
+          <Text className='text-sm font-semibold'>无底胃人数</Text>
+          <View style={{ flex: 1 }} />
+          <InputNumber
+            value={bottomlessCount}
+            min={0}
+            max={dupeCount}
+            step={1}
+            onChange={(value) => {
+              const next = Number(value);
+              const normalized = Number.isFinite(next) ? Math.max(0, Math.round(next)) : 0;
+              setBottomlessCount(Math.min(normalized, dupeCount));
+            }}
+          />
+        </View>
+        <View className='flex items-center gap-8'>
+          <Text className='text-sm font-semibold'>游戏难度</Text>
+          <View style={{ flex: 1 }} />
           <Picker
             mode='selector'
-            range={hungerOptions}
-            value={Math.max(0, hungerOptions.indexOf(selectedHunger))}
-            onChange={(e) => {
-              const index = Number(e.detail.value);
-              const next = hungerOptions[index];
-              if (next) setSelectedHunger(next);
+            range={HUNGER_OPTIONS.map(option => option.label)}
+            value={hungerIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              const nextOption = HUNGER_OPTIONS[nextIndex];
+              if (nextOption?.label) setHungerLevel(nextOption.label as HungerLevel);
             }}
           >
-            <View className='picker-chip'>{selectedHunger}</View>
+            <View className='flex items-center justify-center gap-4 border border-gray px-8 py-4 rounded-4'>
+              <Text className='text-primary font-bold text-xs'>{hungerLevel}</Text>
+              <ArrowRight size={12} />
+            </View>
           </Picker>
         </View>
-        <Text className='text-sm text-gray-600'>单人每周期需求：{formatNumber(calorieNeedPerDupeCycle)} 千卡</Text>
-        <Text className='text-sm text-danger'>总目标：{formatNumber(totalCalorieNeedPerCycle)} 千卡/周期</Text>
       </View>
 
-      <View className='tool-card p-12 flex flex-col gap-8'>
-        <Text className='text-md font-semibold'>目标食物与占比</Text>
-        {loading && <Text className='text-sm text-muted'>加载中...</Text>}
-        {!loading && error && <Text className='text-sm text-danger'>数据加载失败：{error.message}</Text>}
-        {!loading && !error && foodOptions.length === 0 && <Text className='text-sm text-muted'>未找到可用食物配方</Text>}
-        {foodRows.map((row) => {
-          const material = foodOptions.find(opt => opt.label === row.recipeLabel)?.material || '';
-          return (
-            <View key={row.id} className='material-item p-8 flex flex-col gap-6'>
-              <View className='flex items-center gap-6'>
-                <Text className='text-sm'>食物</Text>
-                <Picker
-                  mode='selector'
-                  range={foodOptions.map((item) => item.label)}
-                  value={Math.max(0, foodOptions.findIndex((item) => item.label === row.recipeLabel))}
-                  onChange={(e) => {
-                    const index = Number(e.detail.value);
-                    const next = foodOptions[index]?.label;
-                    if (next) updateFoodRow(row.id, { recipeLabel: next });
-                  }}
-                >
-                  <View className='picker-chip flex items-center gap-4'>
-                    {renderIcon(material, undefined, 16)}
-                    <Text>{row.recipeLabel || '请选择'}</Text>
-                  </View>
-                </Picker>
-                <View style={{ flex: 1 }} />
-                <Button size='small' type='primary' fill='none' onClick={() => removeFoodRow(row.id)}>删除</Button>
-              </View>
-              <View className='flex items-center gap-8'>
-                <Text className='text-sm'>占比(%)</Text>
-                <InputNumber
-                  value={row.share}
-                  min={0}
-                  step={1}
-                  onChange={(value) => {
-                    const next = Number(value);
-                    updateFoodRow(row.id, { share: Number.isFinite(next) ? Math.max(0, next) : 0 });
-                  }}
-                />
-                <Text className='text-xs text-gray-600'>
-                  归一化后：{formatNumber(normalizedFoodRows.find((item) => item.id === row.id)?.normalizedShare || 0)}%
-                </Text>
-              </View>
-            </View>
-          );
-        })}
+      <View className='tool-card mt-8 p-12 flex flex-col gap-8'>
         <View className='flex items-center gap-8'>
-          <Button size='small' type='primary' onClick={addFoodRow}>添加食物</Button>
-          {ratioHint && <Text className='text-xs text-danger'>{ratioHint}</Text>}
+          <Text className='text-sm font-semibold'>制作机器</Text>
+          <View style={{ flex: 1 }} />
+          <Picker
+            mode='selector'
+            range={machineOptions}
+            value={machineIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              const nextMachine = machineOptions[nextIndex];
+              if (nextMachine) setSelectedMachine(nextMachine);
+            }}
+          >
+            <View className='flex items-center justify-center gap-4 border border-gray px-8 py-4 rounded-4'>
+              {selectedMachine ? renderIcon(selectedMachine, undefined, 14) : null}
+              <Text className='text-primary font-bold text-xs'>{selectedMachine || '-'}</Text>
+              <ArrowRight size={12} />
+            </View>
+          </Picker>
+        </View>
+        <View className='flex items-center gap-8'>
+          <Text className='text-sm font-semibold'>目标食物</Text>
+          <View style={{ flex: 1 }} />
+          <Picker
+            mode='selector'
+            range={foodOptions}
+            value={foodIndex}
+            onChange={(event) => {
+              const nextIndex = Number(event.detail.value);
+              if (Number.isNaN(nextIndex)) return;
+              const nextFood = foodOptions[nextIndex];
+              if (nextFood) setSelectedFood(nextFood);
+            }}
+          >
+            <View className='flex items-center justify-center gap-4 border border-gray px-8 py-4 rounded-4'>
+              {selectedFood ? renderIcon(selectedFood, undefined, 14) : null}
+              <Text className='text-primary font-bold text-xs'>{selectedFood || '-'}</Text>
+              <ArrowRight size={12} />
+            </View>
+          </Picker>
         </View>
       </View>
 
-      <View className='tool-card p-12 flex flex-col gap-8'>
-        <Text className='text-md font-semibold'>总览</Text>
-        <Text className='text-sm'>目标总卡路里：{formatNumber(totalCalorieNeedPerCycle)} 千卡/周期</Text>
-        <View className='flex flex-col gap-4'>
-          {foodNeedRows.map((item) => (
-            <View key={`food-${item.foodName}`} className='table-row simple'>
-              <View className='flex items-center gap-4'>
-                {renderIcon(item.foodName, undefined, 14)}
-                <Text className='text-xs'>{item.foodName}</Text>
+      <View className='tool-card mt-8 p-12 flex flex-col gap-8'>
+        <Text className='text-sm font-semibold'>生产配置</Text>
+        <View className='flex items-center gap-8'>
+          <Text className='text-xs'>植物生长</Text>
+          <RadioGroup
+            value={wildPlant ? '野生' : '人工'}
+            onChange={(value) => {
+              setWildPlant(String(value) === '野生');
+            }}
+          >
+            <View className='flex gap-8'>
+              <Radio value='人工'>人工</Radio>
+              <Radio value='野生'>野生</Radio>
+            </View>
+          </RadioGroup>
+        </View>
+        <View className='flex items-center gap-8'>
+          <Text className='text-xs'>动物模式</Text>
+          <RadioGroup
+            value={creatureMode}
+            onChange={(value) => {
+              const mode = String(value) === 'wild' ? 'wild' : 'domesticated';
+              setCreatureMode(mode);
+            }}
+          >
+            <View className='flex gap-8'>
+              <Radio value='domesticated'>精养</Radio>
+              <Radio value='wild'>野生</Radio>
+            </View>
+          </RadioGroup>
+        </View>
+      </View>
+
+
+
+      <View className='tool-card mt-8 p-12 flex flex-col gap-8'>
+        {loading && <Text className='text-sm'>数据加载中...</Text>}
+        {!loading && error && <Text className='text-sm text-danger'>数据加载失败：{error.message}</Text>}
+        {!loading && !error && !selectedFood && <Text className='text-sm'>暂无可计算食物</Text>}
+        {!loading && !error && result && (
+          <>
+            <Text className='text-sm font-semibold'>每日需求</Text>
+            <View className='table-row simple'>
+              <Text className='text-xs'>总卡路里</Text>
+              <Text className='text-xs'>{formatNumber(result.calorieNeed)} 千卡/周期</Text>
+            </View>
+            <View className='table-row simple'>
+              <Text className='text-xs'>目标食物</Text>
+              <View className='flex items-center gap-4 justify-end'>
+                {renderIcon(selectedFood, undefined, 14)}
+                <Text className='text-xs'>{selectedFood}</Text>
               </View>
-              <Text className='text-xs'>{formatCalories(item.value, timeUnit)}</Text>
             </View>
-          ))}
-          {foodNeedRows.length === 0 && <Text className='text-sm text-muted'>无</Text>}
-        </View>
-        <Text className='text-sm font-semibold'>食物建筑规模</Text>
-        <View className='flex flex-col gap-4'>
-          {recipeCountRows.map((item) => (
-            <View key={`recipe-${item.name}`} className='table-row simple'>
-              <View className='flex items-center gap-4'>
-                {renderIcon(item.name, undefined, 14)}
-                <Text className='text-xs'>{item.name}</Text>
+            <View className='table-row simple'>
+              <Text className='text-xs'>目标产出</Text>
+              <Text className='text-xs'>{formatRate(result.targetRate, 'kcal')}</Text>
+            </View>
+
+            <Text className='text-sm font-semibold mt-8'>生产链</Text>
+            {result.steps.length === 0 && <Text className='text-xs'>无内部链路，全部按外部输入处理</Text>}
+            {result.steps.map((step, index) => (
+              <View key={`${step.material}-${step.producer}-${index}`} className='table-row simple'>
+                <View className='flex items-center gap-4'>
+                  {renderIcon(step.material, undefined, 14)}
+                  <Text className='text-xs'>{step.material}</Text>
+                </View>
+                <View className='flex items-center gap-4 justify-end'>
+                  {renderIcon(step.producer, undefined, 14)}
+                  <Text className='text-xs'>{step.producer} × {formatNumber(step.count)}</Text>
+                </View>
               </View>
-              <Text className='text-xs'>理论 {formatNumber(item.value)} / 向上取整 {item.rounded}</Text>
-            </View>
-          ))}
-          {recipeCountRows.length === 0 && <Text className='text-sm text-muted'>无</Text>}
-        </View>
-      </View>
+            ))}
 
-      <View className='tool-card p-12 flex flex-col gap-8'>
-        <Text className='text-md font-semibold'>养殖建议</Text>
-        <Text className='text-sm font-semibold'>动物</Text>
-        <View className='flex flex-col gap-4'>
-          {sourceAnimalRows.map((item) => (
-            <View key={`animal-${item.name}`} className='table-row simple'>
-              <View className='flex items-center gap-4'>
-                {renderIcon(item.name, undefined, 14)}
-                <Text className='text-xs'>{item.name}</Text>
+            <Text className='text-sm font-semibold mt-8'>外部输入</Text>
+            {result.externalNeeds.length === 0 && <Text className='text-xs text-success'>无外部缺口</Text>}
+            {result.externalNeeds.map((row) => (
+              <View key={`external-${row.material}`} className='table-row simple'>
+                <View className='flex items-center gap-4'>
+                  {renderIcon(row.material, undefined, 14)}
+                  <Text className='text-xs'>{row.material}</Text>
+                </View>
+                <Text className='text-xs text-danger'>{formatRate(row.value, row.kind)}</Text>
               </View>
-              <Text className='text-xs'>理论 {formatNumber(item.theoretical)} / 向上取整 {item.rounded}</Text>
-            </View>
-          ))}
-          {sourceAnimalRows.length === 0 && <Text className='text-sm text-muted'>暂无</Text>}
-        </View>
-        <Text className='text-sm font-semibold'>植物</Text>
-        <View className='flex flex-col gap-4'>
-          {sourcePlantRows.map((item) => (
-            <View key={`plant-${item.name}`} className='table-row simple'>
-              <View className='flex items-center gap-4'>
-                {renderIcon(item.name, undefined, 14)}
-                <Text className='text-xs'>{item.name}</Text>
+            ))}
+
+            {result.warnings.length > 0 && (
+              <View className='flex flex-col gap-4 mt-8'>
+                <Text className='text-sm font-semibold'>提示</Text>
+                {result.warnings.map((warning, index) => (
+                  <Text key={`warning-${index}`} className='text-xs text-danger'>{warning}</Text>
+                ))}
               </View>
-              <Text className='text-xs'>理论 {formatNumber(item.theoretical)} / 向上取整 {item.rounded}</Text>
-            </View>
-          ))}
-          {sourcePlantRows.length === 0 && <Text className='text-sm text-muted'>暂无</Text>}
-        </View>
+            )}
+          </>
+        )}
       </View>
-
-      <View className='tool-card p-12 flex flex-col gap-8'>
-        <Text className='text-md font-semibold'>配方缺口</Text>
-        {result.gaps.map((gap, index) => (
-          <Text key={`gap-${index}`} className='text-sm text-danger'>{gap}</Text>
-        ))}
-        {result.gaps.length === 0 && <Text className='text-sm text-success'>未发现缺口</Text>}
-      </View>
-
-      <View className='tool-card p-12 flex flex-col gap-8'>
-        <Text className='text-md font-semibold'>材料需求明细</Text>
-        {materialDemandRows.map((row) => (
-          <View key={`material-${row.name}`} className='table-row simple'>
-            <View className='flex items-center gap-4'>
-              {renderIcon(row.name, undefined, 14)}
-              <Text className='text-xs'>{row.name}</Text>
-            </View>
-            <Text className='text-xs'>{formatByKind(row.value, row.kind)}</Text>
-          </View>
-        ))}
-        {materialDemandRows.length === 0 && <Text className='text-sm text-muted'>无</Text>}
-      </View>
-
-      <View className='tool-card p-12 flex flex-col gap-8'>
-        <Text className='text-md font-semibold'>配方链路</Text>
-        {result.recipeSteps.map((step, index) => (
-          <View key={`step-${index}-${step.material}-${step.producer}`} className='flex items-center gap-4'>
-            <Text className='text-xs'>{'　'.repeat(Math.min(step.depth, 6))}</Text>
-            {renderIcon(step.material, undefined, 14)}
-            <Text className='text-xs'>{step.material} ← </Text>
-            {renderIcon(step.producer, undefined, 14)}
-            <Text className='text-xs'>{step.producer} × {formatNumber(step.count)}</Text>
-          </View>
-        ))}
-        {result.recipeSteps.length === 0 && <Text className='text-sm text-muted'>无</Text>}
-      </View>
-
       <GlobalSvgFilters />
     </View>
   );

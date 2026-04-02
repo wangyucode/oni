@@ -1,12 +1,11 @@
 import { useContext, useMemo, useState } from 'react';
 import { View, Text, Picker } from '@tarojs/components';
-import { Cell, Collapse, InputNumber, Radio, RadioGroup } from '@nutui/nutui-react-taro';
-import { ArrowDown } from '@nutui/icons-react-taro';
+import { InputNumber, Radio, RadioGroup } from '@nutui/nutui-react-taro';
 import BackButton from '@/components/ui/BackButton';
 import FilteredImage from '@/components/ui/FilteredImage';
 import { DataContext } from '@/contexts/DataContext';
 import { CYCLE_SECONDS, useUnit } from '@/contexts/UnitContext';
-import { BuildingDetail, Link, LinkDetail, Menu } from '@/types/data';
+import { Link, LinkDetail, Menu } from '@/types/data';
 import { buildDefaultModeSelections } from '@/components/selection/modeSelection';
 import { calculateSelectionTotals } from '@/components/selection/calc';
 import { getIconData } from '@/utils/utils';

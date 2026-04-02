@@ -31,7 +31,9 @@ export default function SliderNumberInput({ value, min, max, step = 1, onChange,
   }, [clampedValue, isEditing]);
 
   const emitChange = (next: number) => {
-    const clamped = clampValue(next, min, max);
+    const normalizedStep = step > 0 ? step : 1;
+    const stepped = Math.round(next / normalizedStep) * normalizedStep;
+    const clamped = clampValue(stepped, min, max);
     onChange(clamped);
   };
 
@@ -67,7 +69,7 @@ export default function SliderNumberInput({ value, min, max, step = 1, onChange,
       </View>
       <Button
         className="rounded-6 p-0 bg-gray-100 active-bg-gray-200 w-32 h-32 flex items-center justify-center"
-        onClick={() => emitChange(clampedValue - 1)}
+        onClick={() => emitChange(clampedValue - step)}
       >
         <Minus />
       </Button>
@@ -81,7 +83,7 @@ export default function SliderNumberInput({ value, min, max, step = 1, onChange,
       />
       <Button
         className="rounded-6 p-0 bg-gray-100 active-bg-gray-200 w-32 h-32 flex items-center justify-center"
-        onClick={() => emitChange(clampedValue + 1)}
+        onClick={() => emitChange(clampedValue + step)}
       >
         <Plus/>
       </Button>
