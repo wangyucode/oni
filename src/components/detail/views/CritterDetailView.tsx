@@ -111,7 +111,7 @@ export default function CritterDetailView({
   }, [category, count, critter, currentSelectionKey, editKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -119,29 +119,29 @@ export default function CritterDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
 
-      <View className="flex justify-between flex-wrap gap-8">
+      <View className='flex justify-between flex-wrap gap-8'>
         {critter.life ? (
-          <View className="flex gap-4">
-            <Text className="text-sm font-semibold">寿命:</Text>
-            <Text className="text-gray-600">{critter.life}</Text>
+          <View className='flex gap-4'>
+            <Text className='text-sm font-semibold'>寿命:</Text>
+            <Text className='text-gray-600'>{critter.life}</Text>
           </View>
         ) : null}
         {critter.spawn ? (
-          <View className="flex gap-4">
-            <Text className="text-sm font-semibold">野生产卵周期:</Text>
-            <Text className="text-gray-600">{critter.spawn}周期</Text>
+          <View className='flex gap-4'>
+            <Text className='text-sm font-semibold'>野生产卵周期:</Text>
+            <Text className='text-gray-600'>{critter.spawn}周期</Text>
           </View>
         ) : null}
         {critter.drop && Object.keys(critter.drop).length > 0 ? (
-          <View className="flex gap-4">
-            <Text className="text-sm font-semibold">死亡掉落:</Text>
-            <Text className="text-gray-600">
+          <View className='flex gap-4'>
+            <Text className='text-sm font-semibold'>死亡掉落:</Text>
+            <Text className='text-gray-600'>
               {Object.entries(critter.drop).map(([name, value]) => `${name}-${value}`).join(', ')}
             </Text>
           </View>
@@ -149,8 +149,8 @@ export default function CritterDetailView({
       </View>
 
       {critter.modes?.length > 0 && (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">模式</Text>
+        <View className='flex flex-col gap-6'>
+          <Text className='text-sm font-semibold'>模式</Text>
           <ModeSelectionEditor detail={critter} modes={critter.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}

@@ -120,7 +120,7 @@ export default function BuildingDetailView({
   }, [building, category, count, editKey, efficiency, currentSelectionKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -128,29 +128,29 @@ export default function BuildingDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
-      <View className="flex flex-col gap-6">
-        <Text className="text-sm font-semibold">效率</Text>
-        <SliderNumberInput min={0} max={100} step={1} value={efficiency} onChange={setEfficiency} unit="%" />
+      <View className='flex flex-col gap-6'>
+        <Text className='text-sm font-semibold'>效率</Text>
+        <SliderNumberInput min={0} max={100} step={1} value={efficiency} onChange={setEfficiency} unit='%' />
       </View>
-      <View className="flex justify-between">
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">电力</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
+      <View className='flex justify-between'>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>电力</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">热量</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>热量</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
         </View>
       </View>
 
       {building.modes && building.modes.length > 0 && (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">模式</Text>
+        <View className='flex flex-col gap-6'>
+          <Text className='text-sm font-semibold'>模式</Text>
           <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}

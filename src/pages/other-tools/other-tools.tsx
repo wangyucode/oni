@@ -23,7 +23,7 @@ export default function OtherTools() {
             className='large-link bg-white p-8 flex flex-col items-center border border-gray rounded-4 gap-8'
             onClick={() => handleItemClick(tool.url)}
           >
-            <FilteredImage src={tool.icon} className='h-64 w-64' mode="aspectFit" />
+            <FilteredImage src={tool.icon} className='h-64 w-64' mode='aspectFit' />
             <Text className='text-md'>{tool.name}</Text>
           </View>
         ))}

@@ -10,10 +10,10 @@ import Body from '@/components/wiki/widgets/Body';
 import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
 import { Page } from '@/types/data';
 
-import './wiki.scss';
 import Video from '@/components/wiki/widgets/Video';
 import Grid from '@/components/wiki/widgets/Grid';
 import SmallLink from '@/components/wiki/widgets/SmallLink';
+import './wiki.scss';
 
 export default function Wiki() {
   const breadcrumbRef = useRef<WikiBreadcrumbRef>(null);
@@ -74,7 +74,7 @@ export default function Wiki() {
           <Loading className='loading' />
         )}
         
-        {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-ff208853f5f6f304' adIntervals={30}/>}
+        {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-ff208853f5f6f304' adIntervals={30} />}
       </View>
       <GlobalSvgFilters />
     </View>

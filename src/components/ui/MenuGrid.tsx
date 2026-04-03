@@ -35,8 +35,8 @@ export default function MenuGrid<TItem extends MenuGridItem = MenuGridItem>({
               <FilteredImage
                 src={iconData.icon}
                 iconFilter={iconData.iconFilter}
-                className="menu-grid-icon"
-                mode="aspectFit"
+                className='menu-grid-icon'
+                mode='aspectFit'
               />
             );
           })()}

@@ -133,7 +133,7 @@ export default function DupeDetailView({
   }, [category, count, currentSelectionKey, dupe, editKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -141,29 +141,29 @@ export default function DupeDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
 
       {isBionic && dupe.power ? (
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">电力</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>电力</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
       ) : null}
 
       {isDupe && dupe.calorie ? (
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">卡路里</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>卡路里</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
         </View>
       ) : null}
 
       {dupe.modes?.length > 0 && (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">模式</Text>
+        <View className='flex flex-col gap-6'>
+          <Text className='text-sm font-semibold'>模式</Text>
           <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}

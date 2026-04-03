@@ -124,7 +124,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
 
   if (sortedResources.length === 0) {
     return (
-      <View className="py-8 text-center text-muted">
+      <View className='py-8 text-center text-muted'>
         <Text>无</Text>
       </View>
     );
@@ -132,7 +132,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
 
   return (
     <Grid
-      className="resource-grid"
+      className='resource-grid'
       gap={0}
       columns={calculateGridColumns(sortedResources.length, 4)}
     >
@@ -146,7 +146,7 @@ export default function ResourceGrid({ items }: ResourceGridProps) {
         const type = convertedValue < 0 ? "consume" : "produce";
         return (
           <Grid.Item key={name}>
-            {iconSrc && <FilteredImage src={iconSrc} iconFilter={iconFilter} style={{ width: 48, height: 48 }} mode="aspectFit" />}
+            {iconSrc && <FilteredImage src={iconSrc} iconFilter={iconFilter} style={{ width: 48, height: 48 }} mode='aspectFit' />}
             <Text className='text-xs'>{name}</Text>
             <Text className={`text-sm font-bold ${type}`}>
               {valueStr}

@@ -9,8 +9,8 @@ import { Link, LinkDetail, Menu } from '@/types/data';
 import { buildDefaultModeSelections } from '@/components/selection/modeSelection';
 import { calculateSelectionTotals } from '@/components/selection/calc';
 import { getIconData } from '@/utils/utils';
-import './oxygen.scss';
 import GlobalSvgFilters from '@/components/ui/GlobalSvgFilters';
+import './oxygen.scss';
 
 type SourceChoice = {
   type: 'external' | 'building' | 'animal' | 'plant';

@@ -42,20 +42,20 @@ function buildSummary(entry: SelectionEntryWithDetail): string {
 export default function SelectionsView({ selections, iconMap, onSelect, onRemove }: SelectionsViewProps) {
   if (!selections.length) {
     return (
-      <View className="p-16 text-center text-muted">
+      <View className='p-16 text-center text-muted'>
         <Text>暂无选择，先添加再编辑。</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex flex-col gap-8">
+    <View className='flex flex-col gap-8'>
       {selections.map((entry) => {
         const iconData = getIconData(iconMap, entry.name);
         const summary = buildSummary(entry);
         return (
           <View
-            className="flex items-center gap-12 p-8 px-10 rounded-10 bg-gray-100 active-bg-gray-200"
+            className='flex items-center gap-12 p-8 px-10 rounded-10 bg-gray-100 active-bg-gray-200'
             key={entry.key}
             onClick={() => onSelect(entry)}
           >
@@ -63,37 +63,37 @@ export default function SelectionsView({ selections, iconMap, onSelect, onRemove
                 <FilteredImage
                   src={iconData.icon}
                   iconFilter={iconData.iconFilter}
-                  className="w-40 h-40"
-                  mode="aspectFit"
+                  className='w-40 h-40'
+                  mode='aspectFit'
                 />
               )}
-            <View className="flex flex-col gap-4 flex-1">
-              <View className="flex items-center gap-8">
-                <Text className="text-sm font-semibold text-ink">{entry.name}</Text>
-                <Text className="text-md font-semibold text-primary">x{entry.count}</Text>
-                <View className="flex-1" />
+            <View className='flex flex-col gap-4 flex-1'>
+              <View className='flex items-center gap-8'>
+                <Text className='text-sm font-semibold text-ink'>{entry.name}</Text>
+                <Text className='text-md font-semibold text-primary'>x{entry.count}</Text>
+                <View className='flex-1' />
                 <Button
-                  type="info"
-                  size="small"
+                  type='info'
+                  size='small'
                   onClick={() => {
                     onSelect(entry);
                   }}
                 >
-                  <Edit size={16} color="#fff" />
+                  <Edit size={16} color='#fff' />
                 </Button>
                 <Button
-                  type="danger"
-                  size="small"
+                  type='danger'
+                  size='small'
                   onClick={(e) => {
                     e.stopPropagation();
                     onRemove(entry.key);
                   }}
                 >
-                  <Del size={16} color="#fff" />
+                  <Del size={16} color='#fff' />
                 </Button>
 
               </View>
-              <Text className="text-xs text-muted truncate">{summary}</Text>
+              <Text className='text-xs text-muted truncate'>{summary}</Text>
             </View>
 
           </View>

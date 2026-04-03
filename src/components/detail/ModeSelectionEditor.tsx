@@ -19,12 +19,12 @@ export default function ModeSelectionEditor({
   const normalized = normalizeModeSelections(detail, modeSelections);
 
   return (
-    <Collapse defaultActiveName={modes.map((_, i) => String(i))} expandIcon={<ArrowDown className="text-white"/>}>
+    <Collapse defaultActiveName={modes.map((_, i) => String(i))} expandIcon={<ArrowDown className='text-white' />}>
       {modes.map((mode, modeIndex) => (
         <Collapse.Item title={mode.name} name={String(modeIndex)} key={`${mode.name}-${modeIndex}`}>
             <RadioGroup
-              className="flex-wrap"
-              direction="horizontal"
+              className='flex-wrap'
+              direction='horizontal'
               value={normalized[mode.name] || mode.options[0]?.name || ""}
               onChange={(value) => {
                 const selected = String(value);

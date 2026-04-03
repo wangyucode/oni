@@ -13,7 +13,8 @@
     "build:weapp": "taro build --type weapp",
     "build:h5": "taro build --type h5",
     "dev:weapp": "taro build --type weapp --watch",
-    "dev:h5": "taro build --type h5 --watch"
+    "dev:h5": "taro build --type h5 --watch",
+    "lint": "eslint src --ext .ts,.tsx"
   },
   "browserslist": [
     "last 3 versions",

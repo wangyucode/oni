@@ -87,7 +87,7 @@ function Index() {
         src={iconData.icon}
         iconFilter={iconData.iconFilter}
         style={{ width: 48, height: 48 }}
-        mode="aspectFit"
+        mode='aspectFit'
       />
     );
   }
@@ -95,26 +95,26 @@ function Index() {
   return (
     <View className='page index'>
       <View className='flex flex-col flex-1 gap-8'>
-        <Collapse defaultActiveName={resultCategories} expandIcon={<ArrowDown className="text-white"/>}>
-          <Collapse.Item title="资源" name='资源' key={resourceCollapseKey}>
-            <ResourceGrid items={resourceItems}/>
+        <Collapse defaultActiveName={resultCategories} expandIcon={<ArrowDown className='text-white' />}>
+          <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
+            <ResourceGrid items={resourceItems} />
           </Collapse.Item>
-          <Collapse.Item title="食物" name="食物">
-            <View className="text-center">
+          <Collapse.Item title='食物' name='食物'>
+            <View className='text-center'>
               <Text className={`text-sm font-bold ${convertedCalories < 0 ? "consume" : "produce"}`}>
                 {`${convertedCalories < 0 ? Math.floor(convertedCalories) : '+' + Math.floor(convertedCalories)} ${caloriesUnit}`}
               </Text>
             </View>
           </Collapse.Item>
-          <Collapse.Item title="电力" name="电力">
-            <View className="text-center">
+          <Collapse.Item title='电力' name='电力'>
+            <View className='text-center'>
               <Text className={`text-sm font-bold ${totalPower < 0 ? "consume" : "produce"}`}>
                 {`${totalPower < 0 ? Math.floor(totalPower) : '+' + Math.floor(totalPower)} 瓦`}
               </Text>
             </View>
           </Collapse.Item>
-          <Collapse.Item title="热量" name="热量">
-            <View className="text-center">
+          <Collapse.Item title='热量' name='热量'>
+            <View className='text-center'>
               <Text className={`text-sm font-bold ${convertedHeat < 0 ? "consume" : "produce"}`}>
                 {`${convertedHeat < 0 ? Math.floor(convertedHeat) : '+' + Math.floor(convertedHeat)} ${heatUnit}`}
               </Text>
@@ -122,13 +122,14 @@ function Index() {
           </Collapse.Item>
         </Collapse>
 
-        {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-1f8971b0756777eb' adIntervals={30}/>}
+        {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-1f8971b0756777eb' adIntervals={30} />}
 
         <Collapse
           className='flex flex-col'
           defaultActiveName={['选择']}
-          expandIcon={<ArrowDown className="text-white"/>}>
-          <Collapse.Item title="选择" name="选择" key={selectionCollapseKey} extra={<Button className='rounded-4 text-white' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
+          expandIcon={<ArrowDown className='text-white' />}
+        >
+          <Collapse.Item title='选择' name='选择' key={selectionCollapseKey} extra={<Button className='rounded-4 text-white' fill='outline' color='#fff' onClick={reset}>清空</Button>}>
             <View className='flex flex-wrap gap-8 mt-8'>
               {groupedSelections.map((selection) =>
                 <View
@@ -146,9 +147,9 @@ function Index() {
           </Collapse.Item>
         </Collapse>
 
-        <Cell.Group className="settings">
+        <Cell.Group className='settings'>
           <Picker
-            mode="selector"
+            mode='selector'
             range={projectOptions}
             value={projectIndex}
             onChange={(event) => {
@@ -157,19 +158,20 @@ function Index() {
               if (projects[nextIndex]) switchProject(nextIndex);
             }}
           >
-            <Cell align="center" title="方案" clickable extra={
+            <Cell align='center' title='方案' clickable extra={
               <View className='flex gap-4 items-center'>
                 <Text className='text-primary font-bold mr-4'>{currentProject.name}</Text>
-                <Button type="success" size='small' onClick={handleAddProject}><Plus size={16} color='#fff' /></Button>
-                <Button type="danger" size='small' onClick={handleDeleteProject}><Del size={16} color='#fff' /></Button>
+                <Button type='success' size='small' onClick={handleAddProject}><Plus size={16} color='#fff' /></Button>
+                <Button type='danger' size='small' onClick={handleDeleteProject}><Del size={16} color='#fff' /></Button>
                 <ArrowRight size={16} />
               </View>
-            } />
+            }
+            />
           </Picker>
           <Picker
-            mode="selector"
+            mode='selector'
             range={TIME_UNIT_OPTIONS}
-            rangeKey="label"
+            rangeKey='label'
             value={timeUnitIndex}
             onChange={(event) => {
               const nextIndex = Number(event.detail.value);
@@ -178,15 +180,16 @@ function Index() {
               if (nextUnit?.value) setTimeUnit(nextUnit.value as TimeUnit);
             }}
           >
-            <Cell align="center" title="时间单位" clickable extra={
+            <Cell align='center' title='时间单位' clickable extra={
               <>
                 <Text className='text-primary font-bold mr-4'>{timeUnit}</Text>
                 <ArrowRight size={16} />
               </>
-            } />
+            }
+            />
           </Picker>
           <Picker
-            mode="selector"
+            mode='selector'
             range={HUNGER_OPTIONS.map(option => option.label)}
             value={hungerIndex}
             onChange={(event) => {
@@ -196,12 +199,13 @@ function Index() {
               if (nextOption?.label) setHungerLevel(nextOption.label as HungerLevel);
             }}
           >
-            <Cell align="center" title="饥饿/功率难度" clickable extra={
+            <Cell align='center' title='饥饿/功率难度' clickable extra={
               <>
                 <Text className='text-primary font-bold mr-4'>{hungerLevel}</Text>
                 <ArrowRight size={16} />
               </>
-            } />
+            }
+            />
           </Picker>
         </Cell.Group>
       </View>

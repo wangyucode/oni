@@ -19,7 +19,7 @@ const ConversionItem = ({ item, onPush, isFabricator = false }: { item: IConvers
         src={`${ORIGIN_BASE}/upload/oni/v3${item.icon}`}
         iconFilter={getFilter(item.style)}
         style={{ width: isFabricator ? 32 : 40, height: isFabricator ? 32 : 40 }}
-        mode="aspectFit"
+        mode='aspectFit'
       />
       <Text className={`text-sm ${isFabricator ? 'font-bold' : ''}`}>{item.name}</Text>
       {item.value && (

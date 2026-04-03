@@ -131,7 +131,7 @@ export default function PlantDetailView({
   }, [plant.life, modeSelections]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -139,22 +139,22 @@ export default function PlantDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
 
       {lifeDisplay ? (
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">生长</Text>
-          <Text className="text-gray-600">{lifeDisplay}</Text>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>生长</Text>
+          <Text className='text-gray-600'>{lifeDisplay}</Text>
         </View>
       ) : null}
 
       {plant.modes && plant.modes.length > 0 && (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">模式</Text>
+        <View className='flex flex-col gap-6'>
+          <Text className='text-sm font-semibold'>模式</Text>
           <ModeSelectionEditor detail={plant} modes={plant.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}
