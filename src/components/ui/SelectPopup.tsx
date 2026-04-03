@@ -73,10 +73,10 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
         }
     }
 
-    function renderMenu(menu: Menu | null): JSX.Element | null {
-        if (!menu) return null;
-        if (!menu.items?.length) return null;
-        return <MenuGrid<Link> columns={calculateGridColumns(menu.items.length, 3)} items={menu.items} onItemClick={handleSelectLink} />;
+    function renderMenu(m: Menu | null): JSX.Element | null {
+        if (!m) return null;
+        if (!m.items?.length) return null;
+        return <MenuGrid<Link> columns={calculateGridColumns(m.items.length, 3)} items={m.items} onItemClick={handleSelectLink} />;
     }
 
     const content = selectedLink
@@ -85,17 +85,17 @@ export default function SelectPopup({ visible, onClose }: SelectPopupProps) {
 
     return (
         <Popup
-            className="popup-root"
-            visible={visible}
-            position="bottom"
-            title={title}
-            left={selectedLink || backStack.length > 1 ? <ArrowLeft onClick={handleGoBack}/> : null}
-            onClose={handleClose}
-            closeable
-            style={{ marginBottom: process.env.TARO_ENV === 'h5'  ? '50px' : '0',}}
+          className='popup-root'
+          visible={visible}
+          position='bottom'
+          title={title}
+          left={selectedLink || backStack.length > 1 ? <ArrowLeft onClick={handleGoBack} /> : null}
+          onClose={handleClose}
+          closeable
+          style={{ marginBottom: process.env.TARO_ENV === 'h5'  ? '50px' : '0',}}
         >
-            <ScrollView style={{ height: 'calc(100% - 48px)',  }} scrollY={true}>
-                <View className="p-8">
+            <ScrollView style={{ height: 'calc(100% - 48px)',  }} scrollY>
+                <View className='p-8'>
                     {content ?? (<Text>加载中...</Text>)}
                 </View>
             </ScrollView>

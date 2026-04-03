@@ -31,7 +31,9 @@ export default function SliderNumberInput({ value, min, max, step = 1, onChange,
   }, [clampedValue, isEditing]);
 
   const emitChange = (next: number) => {
-    const clamped = clampValue(next, min, max);
+    const normalizedStep = step > 0 ? step : 1;
+    const stepped = Math.round(next / normalizedStep) * normalizedStep;
+    const clamped = clampValue(stepped, min, max);
     onChange(clamped);
   };
 
@@ -56,8 +58,8 @@ export default function SliderNumberInput({ value, min, max, step = 1, onChange,
   };
 
   return (
-    <View className="slider-number-input flex gap-6 items-center">
-      <View className="flex-1">
+    <View className='slider-number-input flex gap-6 items-center'>
+      <View className='flex-1'>
         <CustomRange
           min={min}
           max={max}
@@ -66,26 +68,26 @@ export default function SliderNumberInput({ value, min, max, step = 1, onChange,
         />
       </View>
       <Button
-        className="rounded-6 p-0 bg-gray-100 active-bg-gray-200 w-32 h-32 flex items-center justify-center"
-        onClick={() => emitChange(clampedValue - 1)}
+        className='rounded-6 p-0 bg-gray-100 active-bg-gray-200 w-32 h-32 flex items-center justify-center'
+        onClick={() => emitChange(clampedValue - step)}
       >
         <Minus />
       </Button>
       <Input
-        type="digit"
+        type='digit'
         value={inputValue}
         onInput={(event) => handleInputChange(event.detail.value)}
         onFocus={() => setIsEditing(true)}
         onBlur={handleInputBlur}
-        className="border border-gray rounded-6 h-32 items-center flex w-64 text-center"
+        className='border border-gray rounded-6 h-32 items-center flex w-64 text-center'
       />
       <Button
-        className="rounded-6 p-0 bg-gray-100 active-bg-gray-200 w-32 h-32 flex items-center justify-center"
-        onClick={() => emitChange(clampedValue + 1)}
+        className='rounded-6 p-0 bg-gray-100 active-bg-gray-200 w-32 h-32 flex items-center justify-center'
+        onClick={() => emitChange(clampedValue + step)}
       >
-        <Plus/>
+        <Plus />
       </Button>
-      {unit ? <Text className="text-gray-600">{unit}</Text> : null}
+      {unit ? <Text className='text-gray-600'>{unit}</Text> : null}
     </View>
   );
 }

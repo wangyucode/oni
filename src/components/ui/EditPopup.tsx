@@ -38,17 +38,17 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
 
   return (
     <Popup
-      className="popup-root"
+      className='popup-root'
       visible={visible}
-      position="bottom"
+      position='bottom'
       title={title}
       onClose={handleClose}
       left={selectedEntry ? <ArrowLeft onClick={handleGoBack} /> : null}
       closeable
       style={{ marginBottom: process.env.TARO_ENV === "h5" ? "50px" : "0" }}
     >
-      <ScrollView style={{ height: "calc(100% - 48px)" }} scrollY={true}>
-        <View className="p-8">
+      <ScrollView style={{ height: "calc(100% - 48px)" }} scrollY>
+        <View className='p-8'>
           {selectedEntry ? (
             <LinkDetailView
               link={{
@@ -56,7 +56,7 @@ export default function EditPopup({ visible, selections, onClose }: EditPopupPro
                 detail: selectedEntry.detail,
               }}
               category={selectedEntry.category}
-              mode="edit"
+              mode='edit'
               editKey={selectedEntry.key}
               initialCount={selectedEntry.count}
               initialModeSelections={selectedEntry.modeSelections}

@@ -77,10 +77,11 @@ export default function CritterDetailView({
   }, [resources, resourceKinds]);
   const resourceCollapseKey = process.env.TARO_ENV === "weapp" ? resourceItems.length.toString() : "resource";
 
-  const lastSelectionKey = useMemo(() => {
-    const matches = selections.filter((item) => item.name === link.name && item.category === category);
-    return matches.length ? matches[matches.length - 1].key : "";
-  }, [category, link.name, selections]);
+  const currentSelectionKey = useMemo(() => {
+    const nextKey = createSelectionKey(link.name, critter, modeSelections);
+    const match = selections.find((item) => item.key === nextKey && item.category === category);
+    return match ? match.key : "";
+  }, [category, link.name, modeSelections, critter, selections]);
 
   useEffect(() => {
     const payload = {
@@ -90,30 +91,27 @@ export default function CritterDetailView({
       modeSelections,
       category,
     };
-    const nextKey = createSelectionKey(link.name, critter, modeSelections);
+
     if (mode === "edit") {
-      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      const fromKey = editKeyRef.current || editKey || currentSelectionKey;
       if (fromKey) {
         update(fromKey, payload);
-        editKeyRef.current = nextKey;
-        return;
-      }
-    }
-    if (count <= 0) {
-      if (lastSelectionKey) {
-        update(lastSelectionKey, payload);
+        editKeyRef.current = createSelectionKey(link.name, critter, modeSelections);
       }
       return;
     }
-    if (lastSelectionKey) {
-      update(lastSelectionKey, payload);
-      return;
+
+    if (count > 0) {
+      if (currentSelectionKey) {
+        update(currentSelectionKey, payload);
+      } else {
+        upsert(payload);
+      }
     }
-    upsert(payload);
-  }, [category, count, critter, editKey, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
+  }, [category, count, critter, currentSelectionKey, editKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -121,29 +119,29 @@ export default function CritterDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
 
-      <View className="flex justify-between flex-wrap gap-8">
+      <View className='flex justify-between flex-wrap gap-8'>
         {critter.life ? (
-          <View className="flex gap-4">
-            <Text className="text-sm font-semibold">寿命:</Text>
-            <Text className="text-gray-600">{critter.life}</Text>
+          <View className='flex gap-4'>
+            <Text className='text-sm font-semibold'>寿命:</Text>
+            <Text className='text-gray-600'>{critter.life}</Text>
           </View>
         ) : null}
         {critter.spawn ? (
-          <View className="flex gap-4">
-            <Text className="text-sm font-semibold">野生产卵周期:</Text>
-            <Text className="text-gray-600">{critter.spawn}周期</Text>
+          <View className='flex gap-4'>
+            <Text className='text-sm font-semibold'>野生产卵周期:</Text>
+            <Text className='text-gray-600'>{critter.spawn}周期</Text>
           </View>
         ) : null}
         {critter.drop && Object.keys(critter.drop).length > 0 ? (
-          <View className="flex gap-4">
-            <Text className="text-sm font-semibold">死亡掉落:</Text>
-            <Text className="text-gray-600">
+          <View className='flex gap-4'>
+            <Text className='text-sm font-semibold'>死亡掉落:</Text>
+            <Text className='text-gray-600'>
               {Object.entries(critter.drop).map(([name, value]) => `${name}-${value}`).join(', ')}
             </Text>
           </View>
@@ -151,8 +149,8 @@ export default function CritterDetailView({
       </View>
 
       {critter.modes?.length > 0 && (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">模式</Text>
+        <View className='flex flex-col gap-6'>
+          <Text className='text-sm font-semibold'>模式</Text>
           <ModeSelectionEditor detail={critter} modes={critter.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}

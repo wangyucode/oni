@@ -117,10 +117,11 @@ export default function GeyserDetailView({
     }).join(', ');
   }, [resources, timeUnit]);
 
-  const lastSelectionKey = useMemo(() => {
-    const matches = selections.filter((item) => item.name === link.name && item.category === category);
-    return matches.length ? matches[matches.length - 1].key : "";
-  }, [category, link.name, selections]);
+  const currentSelectionKey = useMemo(() => {
+    const nextKey = createSelectionKey(link.name, geyser, modeSelections);
+    const match = selections.find((item) => item.key === nextKey && item.category === category);
+    return match ? match.key : "";
+  }, [category, link.name, modeSelections, geyser, selections]);
 
   useEffect(() => {
     const payload = {
@@ -130,30 +131,27 @@ export default function GeyserDetailView({
       modeSelections,
       category,
     };
-    const nextKey = createSelectionKey(link.name, geyser, modeSelections);
+
     if (mode === "edit") {
-      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      const fromKey = editKeyRef.current || editKey || currentSelectionKey;
       if (fromKey) {
         update(fromKey, payload);
-        editKeyRef.current = nextKey;
-        return;
-      }
-    }
-    if (count <= 0) {
-      if (lastSelectionKey) {
-        update(lastSelectionKey, payload);
+        editKeyRef.current = createSelectionKey(link.name, geyser, modeSelections);
       }
       return;
     }
-    if (lastSelectionKey) {
-      update(lastSelectionKey, payload);
-      return;
+
+    if (count > 0) {
+      if (currentSelectionKey) {
+        update(currentSelectionKey, payload);
+      } else {
+        upsert(payload);
+      }
     }
-    upsert(payload);
-  }, [category, count, editKey, geyser, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
+  }, [category, count, currentSelectionKey, editKey, geyser, link.name, mode, modeSelections, upsert, update]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -161,16 +159,16 @@ export default function GeyserDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
 
-      <View className="flex flex-col gap-6 mt-12">
-        <View className="flex justify-between items-center">
-          <Text className="text-sm font-semibold">平均产量</Text>
-          <Text className="text-sm text-gray-600">{averageOutputText}</Text>
+      <View className='flex flex-col gap-6 mt-12'>
+        <View className='flex justify-between items-center'>
+          <Text className='text-sm font-semibold'>平均产量</Text>
+          <Text className='text-sm text-gray-600'>{averageOutputText}</Text>
         </View>
         <SliderNumberInput
           min={minVal}

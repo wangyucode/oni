@@ -19,7 +19,8 @@ const LargeLink = ({ data, onPush }: LargeLinkProps) => {
           src={`${ORIGIN_BASE}/upload/oni/v3${data.icon}`}
           iconFilter={getFilter(data.style)}
           style={{ width: 64, height: 64 }}
-          mode="aspectFit" />
+          mode='aspectFit'
+        />
       )}
       <Text className='text-md'>{data.text}</Text>
     </View>

@@ -1,0 +1,51 @@
+.page.rocket {
+  min-height: 100vh;
+
+  --nutui-inputnumber-button-width: 32PX;
+  --nutui-inputnumber-button-height: 32PX;
+
+  .tool-card {
+    border: 1PX solid #000;
+    border-radius: 6PX;
+    background-color: #fff;
+  }
+
+  .picker-chip {
+    border: 1PX solid #c6b3bf;
+    border-radius: 4PX;
+    padding: 4PX 8PX;
+    font-size: 12PX;
+    color: #2b1f27;
+    background-color: #fff;
+  }
+
+  .module-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8PX;
+    padding: 6PX 8PX;
+    border-bottom: 1PX solid #f0f0f0;
+  }
+
+  .result-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6PX;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8PX;
+    padding: 8PX;
+    border: 1PX solid #ddd;
+    border-radius: 4PX;
+    background-color: #faf9fb;
+  }
+
+  .text-danger {
+    color: #ff0f23;
+  }
+}

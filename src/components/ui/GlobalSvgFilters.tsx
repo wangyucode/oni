@@ -3,7 +3,6 @@ import { View } from '@tarojs/components';
 import { DataContext } from '@/contexts/DataContext';
 
 export default function GlobalSvgFilters() {
-    if (process.env.TARO_ENV !== 'h5') return null;
     const { iconMap } = useContext(DataContext);
 
     const filters = useMemo(() => {
@@ -20,11 +19,12 @@ export default function GlobalSvgFilters() {
         return Array.from(uniqueFilters);
     }, [iconMap]);
 
+    if (process.env.TARO_ENV !== 'h5') return null;
     if (filters.length === 0) return null;
 
     return (
         <View style={{ height: 0, width: 0, overflow: 'hidden', position: 'absolute', pointerEvents: 'none', visibility: 'hidden' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+            <svg xmlns='http://www.w3.org/2000/svg' style={{ display: 'block' }}>
                 <defs>
                     {filters.map(filterId => {
                         if (filterId.startsWith('colorMultiply-')) {
@@ -44,8 +44,8 @@ export default function GlobalSvgFilters() {
                                 return (
                                     <filter id={filterId} key={filterId}>
                                         <feColorMatrix
-                                            type="matrix"
-                                            values={`${r} 0 0 0 0
+                                          type='matrix'
+                                          values={`${r} 0 0 0 0
                                                      0 ${g} 0 0 0
                                                      0 0 ${b} 0 0
                                                      0 0 0 1 0`}

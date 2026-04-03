@@ -99,10 +99,11 @@ export default function DupeDetailView({
     [timeUnit, totalCalories]
   );
 
-  const lastSelectionKey = useMemo(() => {
-    const matches = selections.filter((item) => item.name === link.name && item.category === category);
-    return matches.length ? matches[matches.length - 1].key : "";
-  }, [category, link.name, selections]);
+  const currentSelectionKey = useMemo(() => {
+    const nextKey = createSelectionKey(link.name, dupe, modeSelections);
+    const match = selections.find((item) => item.key === nextKey && item.category === category);
+    return match ? match.key : "";
+  }, [category, link.name, modeSelections, dupe, selections]);
 
   useEffect(() => {
     const payload = {
@@ -112,30 +113,27 @@ export default function DupeDetailView({
       modeSelections,
       category,
     };
-    const nextKey = createSelectionKey(link.name, dupe, modeSelections);
+
     if (mode === "edit") {
-      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      const fromKey = editKeyRef.current || editKey || currentSelectionKey;
       if (fromKey) {
         update(fromKey, payload);
-        editKeyRef.current = nextKey;
-        return;
-      }
-    }
-    if (count <= 0) {
-      if (lastSelectionKey) {
-        update(lastSelectionKey, payload);
+        editKeyRef.current = createSelectionKey(link.name, dupe, modeSelections);
       }
       return;
     }
-    if (lastSelectionKey) {
-      update(lastSelectionKey, payload);
-      return;
+
+    if (count > 0) {
+      if (currentSelectionKey) {
+        update(currentSelectionKey, payload);
+      } else {
+        upsert(payload);
+      }
     }
-    upsert(payload);
-  }, [category, count, dupe, editKey, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
+  }, [category, count, currentSelectionKey, dupe, editKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -143,29 +141,29 @@ export default function DupeDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
 
       {isBionic && dupe.power ? (
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">电力</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>电力</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
       ) : null}
 
       {isDupe && dupe.calorie ? (
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">卡路里</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>卡路里</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(convertedCalories)} ${caloriesUnit}`}</Text>
         </View>
       ) : null}
 
       {dupe.modes?.length > 0 && (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">模式</Text>
+        <View className='flex flex-col gap-6'>
+          <Text className='text-sm font-semibold'>模式</Text>
           <ModeSelectionEditor detail={dupe} modes={dupe.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}

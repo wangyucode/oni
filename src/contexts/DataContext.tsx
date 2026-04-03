@@ -87,11 +87,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 method: "GET",
             });
             
-            const data = res.data as any;
-            if (!data?.success) {
-                throw new Error(data?.message || "Request failed");
+            const resData = res.data as any;
+            if (!resData?.success) {
+                throw new Error(resData?.message || "Request failed");
             }
-            return data.payload as T;
+            return resData.payload as T;
         } catch (err: any) {
             throw new Error(err?.errMsg || err?.message || "Request failed");
         }

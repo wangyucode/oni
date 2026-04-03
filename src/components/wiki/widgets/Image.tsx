@@ -10,9 +10,10 @@ interface Props {
 export default function Image({ data }: Props) {
     return (
         <FilteredImage
-            src={`${ORIGIN_BASE}/upload/oni/v3${data.src}`}
-            iconFilter={getFilter(data.style)}
-            style={{ width: 128, height: 128 }}
-            mode="aspectFit" />
+          src={`${ORIGIN_BASE}/upload/oni/v3${data.src}`}
+          iconFilter={getFilter(data.style)}
+          style={{ width: 128, height: 128 }}
+          mode='aspectFit'
+        />
     );
 }

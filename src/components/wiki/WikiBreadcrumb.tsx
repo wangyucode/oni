@@ -103,17 +103,17 @@ const WikiBreadcrumb = forwardRef<WikiBreadcrumbRef, Props>(({ onPageChange }, r
   if (stack.length === 0) return null;
 
   return (
-    <ScrollView scrollX className="wiki-breadcrumb-container rounded-8">
-      <View className="wiki-breadcrumb">
+    <ScrollView scrollX className='wiki-breadcrumb-container rounded-8'>
+      <View className='wiki-breadcrumb'>
         {stack.map((page, index) => (
-          <View key={page.link + index} className="breadcrumb-item-wrapper">
+          <View key={page.link + index} className='breadcrumb-item-wrapper'>
             <Text 
               className={`breadcrumb-item ${index === stack.length - 1 ? 'active' : ''}`}
               onClick={() => index < stack.length - 1 && onPopTo(index)}
             >
               {page.title}
             </Text>
-            {index < stack.length - 1 && <Text className="separator">/</Text>}
+            {index < stack.length - 1 && <Text className='separator'>/</Text>}
           </View>
         ))}
       </View>

@@ -83,10 +83,11 @@ export default function BuildingDetailView({
   const { convertedValue: convertedHeat, unit: heatUnit } = useMemo(() => convertHeat(totalHeat, timeUnit), [timeUnit, totalHeat]);
   const resourceCollapseKey = process.env.TARO_ENV === "weapp" ? resourceItems.length.toString() : "resource";
 
-  const lastSelectionKey = useMemo(() => {
-    const matches = selections.filter((item) => item.name === link.name && item.category === category);
-    return matches.length ? matches[matches.length - 1].key : "";
-  }, [category, link.name, selections]);
+  const currentSelectionKey = useMemo(() => {
+    const nextKey = createSelectionKey(link.name, building, modeSelections);
+    const match = selections.find((item) => item.key === nextKey && item.category === category);
+    return match ? match.key : "";
+  }, [building, category, link.name, modeSelections, selections]);
 
   useEffect(() => {
     const payload = {
@@ -97,30 +98,29 @@ export default function BuildingDetailView({
       category,
       efficiency,
     };
-    const nextKey = createSelectionKey(link.name, building, modeSelections);
+
     if (mode === "edit") {
-      const fromKey = editKeyRef.current || editKey || lastSelectionKey;
+      const fromKey = editKeyRef.current || editKey || currentSelectionKey;
       if (fromKey) {
         update(fromKey, payload);
+        const nextKey = createSelectionKey(link.name, building, modeSelections);
         editKeyRef.current = nextKey;
-        return;
-      }
-    }
-    if (count <= 0) {
-      if (lastSelectionKey) {
-        update(lastSelectionKey, payload);
       }
       return;
     }
-    if (lastSelectionKey) {
-      update(lastSelectionKey, payload);
-      return;
+
+    // Add mode: only update or upsert if count > 0
+    if (count > 0) {
+      if (currentSelectionKey) {
+        update(currentSelectionKey, payload);
+      } else {
+        upsert(payload);
+      }
     }
-    upsert(payload);
-  }, [building, category, count, editKey, efficiency, lastSelectionKey, link.name, mode, modeSelections, upsert, update]);
+  }, [building, category, count, editKey, efficiency, currentSelectionKey, link.name, mode, modeSelections, upsert, update]);
 
   return (
-    <View className="selection-detail-view">
+    <View className='selection-detail-view'>
       <SelectionDetailHeader
         icon={iconData?.icon}
         iconFilter={iconData?.iconFilter}
@@ -128,29 +128,29 @@ export default function BuildingDetailView({
         count={count}
         onCountChange={setCount}
       />
-      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className="text-white" />}>
-        <Collapse.Item title="资源" name="资源" key={resourceCollapseKey}>
+      <Collapse defaultActiveName={["资源"]} expandIcon={<ArrowDown className='text-white' />}>
+        <Collapse.Item title='资源' name='资源' key={resourceCollapseKey}>
           <ResourceGrid items={resourceItems} />
         </Collapse.Item>
       </Collapse>
-      <View className="flex flex-col gap-6">
-        <Text className="text-sm font-semibold">效率</Text>
-        <SliderNumberInput min={0} max={100} step={1} value={efficiency} onChange={setEfficiency} unit="%" />
+      <View className='flex flex-col gap-6'>
+        <Text className='text-sm font-semibold'>效率</Text>
+        <SliderNumberInput min={0} max={100} step={1} value={efficiency} onChange={setEfficiency} unit='%' />
       </View>
-      <View className="flex justify-between">
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">电力</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(totalPower)} 瓦`}</Text>
+      <View className='flex justify-between'>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>电力</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(totalPower)} 瓦`}</Text>
         </View>
-        <View className="flex gap-12">
-          <Text className="text-sm font-semibold">热量</Text>
-          <Text className="text-gray-600">{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
+        <View className='flex gap-12'>
+          <Text className='text-sm font-semibold'>热量</Text>
+          <Text className='text-gray-600'>{`${formatSignedFloor(convertedHeat)} ${heatUnit}`}</Text>
         </View>
       </View>
 
       {building.modes && building.modes.length > 0 && (
-        <View className="flex flex-col gap-6">
-          <Text className="text-sm font-semibold">模式</Text>
+        <View className='flex flex-col gap-6'>
+          <Text className='text-sm font-semibold'>模式</Text>
           <ModeSelectionEditor detail={building} modes={building.modes} modeSelections={modeSelections} onModeSelectionsChange={setModeSelections} />
         </View>
       )}

@@ -2,6 +2,10 @@ export default defineAppConfig({
   pages: [
     "pages/index/index",
     "pages/wiki/wiki",
+    "pages/other-tools/other-tools",
+    "pages/other-tools/oxygen/oxygen",
+    "pages/other-tools/food/food",
+    "pages/other-tools/rocket/rocket",
     "pages/about/about",
     "pages/about/log/log",
     "pages/about/support/support",
@@ -29,6 +33,12 @@ export default defineAppConfig({
         iconPath: "components/ui/icons/refine-1.png",
         selectedIconPath: "components/ui/icons/refine.png",
         text: "产物计算",
+      },
+      {
+        pagePath: "pages/other-tools/other-tools",
+        iconPath: "components/ui/icons/input-1.png",
+        selectedIconPath: "components/ui/icons/input.png",
+        text: "需求计算",
       },
       {
         pagePath: "pages/about/about",

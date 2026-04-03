@@ -1,6 +1,6 @@
 import { View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface CustomRangeProps {
   value: number;
@@ -41,20 +41,20 @@ export default function CustomRange({ value, min, max, onChange, disabled }: Cus
   const rectRef = useRef(rect);
   rectRef.current = rect;
 
-  const calculateValueSafe = (clientX: number) => {
+  const calculateValueSafe = useCallback((clientX: number) => {
       const r = rectRef.current;
       if (!r || r.width === 0) return;
-      const { min, max, onChange, value } = latestProps.current;
+      const { min: currentMin, max: currentMax, onChange: currentOnChange, value: currentValue } = latestProps.current;
       
       const offset = clientX - r.left;
       let percent = offset / r.width;
       percent = Math.max(0, Math.min(1, percent));
-      const rawVal = min + percent * (max - min);
+      const rawVal = currentMin + percent * (currentMax - currentMin);
       const roundedVal = Math.round(rawVal);
-      if (roundedVal !== value) {
-        onChange(roundedVal);
+      if (roundedVal !== currentValue) {
+        currentOnChange(roundedVal);
       }
-  };
+  }, []);
 
   // Touch Events (Mobile/Touch)
   const handleTouchStart = (e: any) => {
@@ -76,6 +76,17 @@ export default function CustomRange({ value, min, max, onChange, disabled }: Cus
     isDragging.current = false;
   };
 
+  const handleMouseMoveSafe = useCallback((e: any) => {
+      if (!isDragging.current) return;
+      calculateValueSafe(e.clientX);
+  }, [calculateValueSafe]);
+
+  const handleMouseUpSafe = useCallback(() => {
+      isDragging.current = false;
+      document.removeEventListener('mousemove', handleMouseMoveSafe);
+      document.removeEventListener('mouseup', handleMouseUpSafe);
+  }, [handleMouseMoveSafe]);
+
   // Mouse Events (PC/Web)
   const handleMouseDown = (e: any) => {
     if (disabled) return;
@@ -87,17 +98,6 @@ export default function CustomRange({ value, min, max, onChange, disabled }: Cus
     document.addEventListener('mouseup', handleMouseUpSafe);
   };
   
-  const handleMouseMoveSafe = (e: any) => {
-      if (!isDragging.current) return;
-      calculateValueSafe(e.clientX);
-  }
-
-  const handleMouseUpSafe = () => {
-      isDragging.current = false;
-      document.removeEventListener('mousemove', handleMouseMoveSafe);
-      document.removeEventListener('mouseup', handleMouseUpSafe);
-  }
-
   // Cleanup global listeners
   useEffect(() => {
     return () => {
@@ -106,25 +106,25 @@ export default function CustomRange({ value, min, max, onChange, disabled }: Cus
         document.removeEventListener('mouseup', handleMouseUpSafe);
       }
     };
-  }, []);
+  }, [handleMouseMoveSafe, handleMouseUpSafe]);
 
   const percent = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 
   return (
     <View 
-        id={idRef.current}
-        className="relative flex items-center select-none cursor-pointer"
-        style={{ height: '24px', padding: '10px 0' }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+      id={idRef.current}
+      className='relative flex items-center select-none cursor-pointer'
+      style={{ height: '24px', padding: '10px 0' }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
         // @ts-ignore
-        onMouseDown={handleMouseDown}
+      onMouseDown={handleMouseDown}
     >
         {/* Track */}
         <View 
-            className="w-full relative mr-16" 
-            style={{ 
+          className='w-full relative mr-16' 
+          style={{ 
                 height: '4px', 
                 backgroundColor: '#e5e5e5', 
                 borderRadius: '99px',
@@ -133,8 +133,8 @@ export default function CustomRange({ value, min, max, onChange, disabled }: Cus
         >
              {/* Fill */}
              <View 
-                className="h-full absolute top-0 left-0" 
-                style={{ 
+               className='h-full absolute top-0 left-0' 
+               style={{ 
                     width: `${percent}%`, 
                     backgroundColor: 'var(--nutui-color-primary, #7F3D5E)',
                     borderRadius: '99px'
@@ -143,8 +143,8 @@ export default function CustomRange({ value, min, max, onChange, disabled }: Cus
              
              {/* Thumb - positioned relative to track to handle vertical alignment easily */}
              <View 
-                className="absolute bg-white shadow"
-                style={{ 
+               className='absolute bg-white shadow'
+               style={{ 
                     left: `${percent}%`, 
                     width: '20px', 
                     height: '20px', 
@@ -154,7 +154,7 @@ export default function CustomRange({ value, min, max, onChange, disabled }: Cus
                     border: '1px solid #ccc',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}
-            />
+             />
         </View>
     </View>
   );
