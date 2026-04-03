@@ -1,5 +1,5 @@
 import { useContext, useMemo, useState } from 'react';
-import { View, Text, Picker } from '@tarojs/components';
+import { View, Text, Picker, AdCustom } from '@tarojs/components';
 import { InputNumber, Radio, RadioGroup } from '@nutui/nutui-react-taro';
 import BackButton from '@/components/ui/BackButton';
 import FilteredImage from '@/components/ui/FilteredImage';
@@ -477,6 +477,8 @@ export default function Oxygen() {
           })}
         </View>
       )}
+
+      {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-3ea00a0b550cb48c' adIntervals={30} />}
 
       {selectedMethodProfile && oxygenNeed > 0 && (
         <View className='tool-card p-12 flex flex-col gap-8'>

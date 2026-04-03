@@ -1,4 +1,4 @@
-import { View, Text } from '@tarojs/components';
+import { View, Text, AdCustom } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import FilteredImage from '@/components/ui/FilteredImage';
 import './other-tools.scss';
@@ -28,6 +28,7 @@ export default function OtherTools() {
           </View>
         ))}
       </View>
+      {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-3ea00a0b550cb48c' adIntervals={30} />}
     </View>
   );
 }

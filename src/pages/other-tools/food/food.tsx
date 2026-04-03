@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { Picker, Text, View } from '@tarojs/components';
+import { Picker, Text, View, AdCustom } from '@tarojs/components';
 import { InputNumber } from '@nutui/nutui-react-taro';
 import { ArrowRight } from '@nutui/icons-react-taro';
 import BackButton from '@/components/ui/BackButton';
@@ -452,6 +452,8 @@ export default function Food() {
         </View>
       </View>
 
+      {process.env.TARO_ENV === 'weapp' && <AdCustom unitId='adunit-3ea00a0b550cb48c' adIntervals={30} />}
+
       <View className='tool-card mt-8 p-12 flex flex-col gap-8'>
         {loading && <Text className='text-sm'>数据加载中...</Text>}
         {!loading && error && <Text className='text-sm text-danger'>数据加载失败：{error.message}</Text>}
@@ -522,6 +524,7 @@ export default function Food() {
           </>
         )}
       </View>
+      
       <GlobalSvgFilters />
     </View>
   );
