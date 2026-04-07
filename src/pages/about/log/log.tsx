@@ -40,7 +40,7 @@ export default function Log() {
                     </>
                 }
                 />
-                <Cell title='2.2.0' extra='2026-04-04' description={
+                <Cell title='2.2' extra='2026-04-04' description={
                     <>
                         <Text>• 修复产物计算建筑无法同时使用多配方的问题</Text>
                         <Text>• 新增需求计算模块，支持：氧气需求，食物需求，火箭需求计算。与产物计算互补。</Text>

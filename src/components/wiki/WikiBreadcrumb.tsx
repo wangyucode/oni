@@ -47,7 +47,7 @@ const WikiBreadcrumb = forwardRef<WikiBreadcrumbRef, Props>(({ onPageChange }, r
   useEffect(() => {
     if (process.env.TARO_ENV !== 'weapp') return;
     try {
-      const ad = Taro.createInterstitialAd({adUnitId: 'adunit-3dac8eb71db869b2'});
+      const ad = Taro.createInterstitialAd({adUnitId: 'adunit-43743fea0e83272c'});
       adRef.current = ad;
       ad.onLoad(() => {
         adLoadedRef.current = true;
