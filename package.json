@@ -45,7 +45,7 @@
     "@babel/plugin-proposal-class-properties": "7.18.6",
     "@babel/preset-react": "^7.28.5",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
-    "@tarojs/cli": "4.1.11",
+    "@tarojs/cli": "4.2.0",
     "@tarojs/taro-loader": "4.1.11",
     "@tarojs/webpack5-runner": "4.1.11",
     "@types/node": "^18.15.11",
