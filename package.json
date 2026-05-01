@@ -48,7 +48,7 @@
     "@tarojs/cli": "4.1.11",
     "@tarojs/taro-loader": "4.1.11",
     "@tarojs/webpack5-runner": "4.1.11",
-    "@types/node": "^18.15.11",
+    "@types/node": "^25.6.0",
     "@types/react": "^18.0.0",
     "@types/webpack-env": "^1.13.6",
     "@typescript-eslint/eslint-plugin": "^8.58.0",

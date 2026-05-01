@@ -71,7 +71,7 @@ importers:
         version: 0.6.2(react-refresh@0.18.0)(type-fest@2.19.0)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@tarojs/cli':
         specifier: 4.1.11
-        version: 4.1.11(@swc/helpers@0.5.18)(@types/node@18.19.113)
+        version: 4.1.11(@swc/helpers@0.5.18)(@types/node@25.6.0)
       '@tarojs/taro-loader':
         specifier: 4.1.11
         version: 4.1.11(@swc/helpers@0.5.18)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
@@ -79,8 +79,8 @@ importers:
         specifier: 4.1.11
         version: 4.1.11(@babel/core@7.29.0)(@swc/core@1.3.96(@swc/helpers@0.5.18))(@swc/helpers@0.5.18)(@tarojs/runtime@4.1.9)(less@3.13.1)(postcss@8.5.6)(sass@1.98.0)(stylus@0.64.0)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@types/node':
-        specifier: ^18.15.11
-        version: 18.19.113
+        specifier: ^25.6.0
+        version: 25.6.0
       '@types/react':
         specifier: ^18.0.0
         version: 18.3.23
@@ -125,7 +125,7 @@ importers:
         version: 17.1.0(typescript@5.9.3)
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.2(@swc/core@1.3.96(@swc/helpers@0.5.18))(@types/node@18.19.113)(typescript@5.9.3)
+        version: 10.9.2(@swc/core@1.3.96(@swc/helpers@0.5.18))(@types/node@25.6.0)(typescript@5.9.3)
       tsconfig-paths-webpack-plugin:
         specifier: ^4.0.1
         version: 4.2.0
@@ -2008,8 +2008,8 @@ packages:
   '@types/node-forge@1.3.14':
     resolution: {integrity: sha512-mhVF2BnD4BO+jtOp7z1CdzaK4mbuK0LLQYAvdOLqHTavxFNq4zA1EmYkpnFjP8HOUzedfQkRnp0E2ulSAYSzAw==}
 
-  '@types/node@18.19.113':
-    resolution: {integrity: sha512-TmSTE9vyebJ9vSEiU+P+0Sp4F5tMgjiEOZaQUW6wA3ODvi6uBgkHQ+EsIu0pbiKvf9QHEvyRCiaz03rV0b+IaA==}
+  '@types/node@25.6.0':
+    resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
 
   '@types/postcss-url@10.0.4':
     resolution: {integrity: sha512-5QIO9NgbWmAkle65haRqkdgYPCOXheNsaFdbTJJQjT302yK3H49ql4t9a4y0NfpuPtU/UBo15VcV64WCSIMJKg==}
@@ -6891,8 +6891,8 @@ packages:
   unbzip2-stream@1.4.3:
     resolution: {integrity: sha512-mlExGW4w71ebDJviH16lQLtZS32VKqsSfk80GCfUlwT/4/hNRFsoscrF/c++9xinkMzECL1uL9DDwXqFWkruPg==}
 
-  undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+  undici-types@7.19.2:
+    resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
 
   unescape-js@1.1.4:
     resolution: {integrity: sha512-42SD8NOQEhdYntEiUQdYq/1V/YHwr1HLwlHuTJB5InVVdOSbgI6xu8jK5q65yIzuFCfczzyDF/7hbGzVbyCw0g==}
@@ -7018,6 +7018,7 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   v8-compile-cache-lib@3.0.1:
@@ -8369,12 +8370,12 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@inquirer/external-editor@1.0.3(@types/node@18.19.113)':
+  '@inquirer/external-editor@1.0.3(@types/node@25.6.0)':
     dependencies:
       chardet: 2.1.1
       iconv-lite: 0.7.2
     optionalDependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -8393,7 +8394,7 @@ snapshots:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       '@types/yargs': 15.0.20
       chalk: 4.1.2
 
@@ -8402,7 +8403,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -8774,7 +8775,7 @@ snapshots:
       '@tarojs/binding-linux-x64-gnu': 4.1.11
       '@tarojs/binding-win32-x64-msvc': 4.1.11
 
-  '@tarojs/cli@4.1.11(@swc/helpers@0.5.18)(@types/node@18.19.113)':
+  '@tarojs/cli@4.1.11(@swc/helpers@0.5.18)(@types/node@25.6.0)':
     dependencies:
       '@tarojs/binding': 4.1.11
       '@tarojs/helper': 4.1.11(@swc/helpers@0.5.18)
@@ -8786,7 +8787,7 @@ snapshots:
       cli-highlight: 2.1.11
       download-git-repo: 3.0.2
       envinfo: 7.21.0
-      inquirer: 8.2.7(@types/node@18.19.113)
+      inquirer: 8.2.7(@types/node@25.6.0)
       latest-version: 5.1.0
       minimist: 1.2.8
       ora: 5.4.1
@@ -9244,20 +9245,20 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/bonjour@3.5.13':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
       '@types/express-serve-static-core': 5.1.1
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/debug@4.1.13':
     dependencies:
@@ -9277,14 +9278,14 @@ snapshots:
 
   '@types/express-serve-static-core@4.19.8':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       '@types/qs': 6.15.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
 
   '@types/express-serve-static-core@5.1.1':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       '@types/qs': 6.15.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -9298,12 +9299,12 @@ snapshots:
 
   '@types/fs-extra@8.1.5':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/hast@3.0.4':
     dependencies:
@@ -9315,7 +9316,7 @@ snapshots:
 
   '@types/http-proxy@1.17.17':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -9333,7 +9334,7 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/lodash.debounce@4.0.9':
     dependencies:
@@ -9351,15 +9352,15 @@ snapshots:
 
   '@types/node-forge@1.3.14':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
-  '@types/node@18.19.113':
+  '@types/node@25.6.0':
     dependencies:
-      undici-types: 5.26.5
+      undici-types: 7.19.2
 
   '@types/postcss-url@10.0.4':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       postcss: 8.5.6
 
   '@types/prop-types@15.7.15': {}
@@ -9375,7 +9376,7 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/retry@0.12.0': {}
 
@@ -9388,11 +9389,11 @@ snapshots:
   '@types/send@0.17.6':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/serve-index@1.9.4':
     dependencies:
@@ -9401,12 +9402,12 @@ snapshots:
   '@types/serve-static@1.15.10':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       '@types/send': 0.17.6
 
   '@types/sockjs@0.3.36':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/unist@3.0.3': {}
 
@@ -9414,7 +9415,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -12312,9 +12313,9 @@ snapshots:
       strip-ansi: 5.2.0
       through: 2.3.8
 
-  inquirer@8.2.7(@types/node@18.19.113):
+  inquirer@8.2.7(@types/node@25.6.0):
     dependencies:
-      '@inquirer/external-editor': 1.0.3(@types/node@18.19.113)
+      '@inquirer/external-editor': 1.0.3(@types/node@25.6.0)
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       cli-cursor: 3.1.0
@@ -12588,7 +12589,7 @@ snapshots:
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -12596,13 +12597,13 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -14872,14 +14873,14 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-node@10.9.2(@swc/core@1.3.96(@swc/helpers@0.5.18))(@types/node@18.19.113)(typescript@5.9.3):
+  ts-node@10.9.2(@swc/core@1.3.96(@swc/helpers@0.5.18))(@types/node@25.6.0)(typescript@5.9.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.113
+      '@types/node': 25.6.0
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -14986,7 +14987,7 @@ snapshots:
       buffer: 5.7.1
       through: 2.3.8
 
-  undici-types@5.26.5: {}
+  undici-types@7.19.2: {}
 
   unescape-js@1.1.4:
     dependencies:
