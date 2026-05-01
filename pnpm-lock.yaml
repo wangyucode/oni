@@ -22,7 +22,7 @@ importers:
         version: 3.0.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tarojs/components':
         specifier: 4.1.9
-        version: 4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+        version: 4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@tarojs/helper':
         specifier: 4.1.9
         version: 4.1.9(@swc/helpers@0.5.18)
@@ -34,7 +34,7 @@ importers:
         version: 4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/runtime@4.1.9)(@tarojs/shared@4.1.9)
       '@tarojs/plugin-platform-h5':
         specifier: 4.1.11
-        version: 4.1.11(8ceb6d4fac8486e190c057d2574694a7)
+        version: 4.1.11(8fdcdee368b4d0e22629da9644b7c420)
       '@tarojs/plugin-platform-weapp':
         specifier: 4.1.9
         version: 4.1.9(@tarojs/service@4.1.11(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)
@@ -49,7 +49,7 @@ importers:
         version: 4.1.9
       '@tarojs/taro':
         specifier: 4.1.9
-        version: 4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+        version: 4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       react:
         specifier: ^18.0.0
         version: 18.3.1
@@ -77,7 +77,7 @@ importers:
         version: 4.1.11(@swc/helpers@0.5.18)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@tarojs/webpack5-runner':
         specifier: 4.1.11
-        version: 4.1.11(@babel/core@7.29.0)(@swc/core@1.3.96(@swc/helpers@0.5.18))(@swc/helpers@0.5.18)(@tarojs/runtime@4.1.9)(less@3.13.1)(postcss@8.5.6)(sass@1.98.0)(stylus@0.64.0)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+        version: 4.1.11(@babel/core@7.29.0)(@swc/core@1.3.96(@swc/helpers@0.5.18))(@swc/helpers@0.5.18)(@tarojs/runtime@4.1.9)(less@3.13.1)(postcss@8.5.13)(sass@1.98.0)(stylus@0.64.0)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@types/node':
         specifier: ^18.15.11
         version: 18.19.113
@@ -115,8 +115,8 @@ importers:
         specifier: ^4.2.0
         version: 4.6.2(eslint@8.57.1)
       postcss:
-        specifier: ^8.4.18
-        version: 8.5.6
+        specifier: ^8.5.13
+        version: 8.5.13
       react-refresh:
         specifier: ^0.18.0
         version: 0.18.0
@@ -5193,8 +5193,8 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
-  nanoid@3.3.11:
-    resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
+  nanoid@3.3.12:
+    resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -5824,8 +5824,8 @@ packages:
     resolution: {integrity: sha512-yioayjNbHn6z1/Bywyb2Y4s3yvDAeXGOyxqD+LnVOinq6Mdmd++SW2wUNVzavyyHxd6+DxzWGIuosg6P1Rj8uA==}
     engines: {node: '>=6.0.0'}
 
-  postcss@8.5.6:
-    resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
+  postcss@8.5.13:
+    resolution: {integrity: sha512-qif0+jGGZoLWdHey3UFHHWP0H7Gbmsk8T5VEqyYFbWqPr1XqvLGBbk/sl8V5exGmcYJklJOhOQq1pV9IcsiFag==}
     engines: {node: ^10 || ^12 || >=14}
 
   prelude-ls@1.2.1:
@@ -7018,6 +7018,7 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   v8-compile-cache-lib@3.0.1:
@@ -8798,12 +8799,12 @@ snapshots:
       - debug
       - supports-color
 
-  '@tarojs/components-react@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(react@18.3.1)(rollup@3.30.0)(solid-js@1.9.7)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
+  '@tarojs/components-react@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(react@18.3.1)(rollup@3.30.0)(solid-js@1.9.7)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
     dependencies:
       '@babel/runtime': 7.28.6
-      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@tarojs/shared': 4.1.11
-      '@tarojs/taro': 4.1.11(@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@tarojs/shared@4.1.11)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/taro': 4.1.11(@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@tarojs/shared@4.1.11)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       classnames: 2.5.1
       identity-obj-proxy: 3.0.0
       react: 18.3.1
@@ -8821,12 +8822,12 @@ snapshots:
       - webpack-chain
       - webpack-dev-server
 
-  '@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
+  '@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
     dependencies:
       '@stencil/core': 2.22.3
       '@tarojs/runtime': 4.1.11
       '@tarojs/shared': 4.1.11
-      '@tarojs/taro': 4.1.11(@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@tarojs/shared@4.1.11)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/taro': 4.1.11(@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@tarojs/shared@4.1.11)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       classnames: 2.5.1
       hammerjs: 2.0.8
       hls.js: 1.6.15
@@ -8844,12 +8845,12 @@ snapshots:
       - webpack-chain
       - webpack-dev-server
 
-  '@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
+  '@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
     dependencies:
       '@stencil/core': 2.22.3
       '@tarojs/runtime': 4.1.9
       '@tarojs/shared': 4.1.9
-      '@tarojs/taro': 4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/taro': 4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       classnames: 2.5.1
       hammerjs: 2.0.8
       hls.js: 1.6.15
@@ -8989,16 +8990,16 @@ snapshots:
       '@tarojs/runtime': 4.1.9
       '@tarojs/shared': 4.1.9
 
-  '@tarojs/plugin-platform-h5@4.1.11(8ceb6d4fac8486e190c057d2574694a7)':
+  '@tarojs/plugin-platform-h5@4.1.11(8fdcdee368b4d0e22629da9644b7c420)':
     dependencies:
       '@babel/core': 7.29.0
-      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
-      '@tarojs/components-react': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(react@18.3.1)(rollup@3.30.0)(solid-js@1.9.7)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/components-react': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(react@18.3.1)(rollup@3.30.0)(solid-js@1.9.7)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@tarojs/helper': 4.1.11(@swc/helpers@0.5.18)
       '@tarojs/runtime': 4.1.11
       '@tarojs/service': 4.1.11(@swc/helpers@0.5.18)
       '@tarojs/shared': 4.1.11
-      '@tarojs/taro-h5': 4.1.11(984c3b2bd319db0a3a997a672a611e25)
+      '@tarojs/taro-h5': 4.1.11(7ea9994fbe6d1c66445b7e9567a4e930)
       babel-plugin-transform-taroapi: 4.1.11(@babel/core@7.29.0)
       change-case: 4.1.2
       lodash-es: 4.17.21
@@ -9030,11 +9031,11 @@ snapshots:
       react: 18.3.1
       react-reconciler: 0.29.0(react@18.3.1)
 
-  '@tarojs/router@4.1.11(@tarojs/runtime@4.1.11)(@tarojs/shared@4.1.11)(@tarojs/taro@4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))':
+  '@tarojs/router@4.1.11(@tarojs/runtime@4.1.11)(@tarojs/shared@4.1.11)(@tarojs/taro@4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))':
     dependencies:
       '@tarojs/runtime': 4.1.11
       '@tarojs/shared': 4.1.11
-      '@tarojs/taro': 4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/taro': 4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       dingtalk-jsapi: 2.15.6
       history: 5.3.0
       mobile-detect: 1.4.5
@@ -9080,11 +9081,11 @@ snapshots:
 
   '@tarojs/shared@4.1.9': {}
 
-  '@tarojs/taro-h5@4.1.11(984c3b2bd319db0a3a997a672a611e25)':
+  '@tarojs/taro-h5@4.1.11(7ea9994fbe6d1c66445b7e9567a4e930)':
     dependencies:
       '@tarojs/api': 4.1.11(@tarojs/runtime@4.1.11)(@tarojs/shared@4.1.11)
-      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
-      '@tarojs/router': 4.1.11(@tarojs/runtime@4.1.11)(@tarojs/shared@4.1.11)(@tarojs/taro@4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))
+      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/router': 4.1.11(@tarojs/runtime@4.1.11)(@tarojs/shared@4.1.11)(@tarojs/taro@4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))
       '@tarojs/runtime': 4.1.11
       '@tarojs/shared': 4.1.11
       abortcontroller-polyfill: 1.7.8
@@ -9109,15 +9110,15 @@ snapshots:
       - '@swc/helpers'
       - supports-color
 
-  '@tarojs/taro@4.1.11(@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@tarojs/shared@4.1.11)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
+  '@tarojs/taro@4.1.11(@tarojs/components@4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@tarojs/shared@4.1.11)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
     dependencies:
       '@tarojs/api': 4.1.11(@tarojs/runtime@4.1.11)(@tarojs/shared@4.1.11)
-      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/components': 4.1.11(@tarojs/helper@4.1.11(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@tarojs/helper': 4.1.11(@swc/helpers@0.5.18)
       '@tarojs/runtime': 4.1.11
       '@tarojs/shared': 4.1.11
       '@types/postcss-url': 10.0.4
-      postcss: 8.5.6
+      postcss: 8.5.13
     optionalDependencies:
       '@types/react': 18.3.23
       html-webpack-plugin: 5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
@@ -9126,15 +9127,15 @@ snapshots:
       webpack-chain: 6.5.1
       webpack-dev-server: 4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
 
-  '@tarojs/taro@4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
+  '@tarojs/taro@4.1.9(@tarojs/components@4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@tarojs/shared@4.1.9)(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
     dependencies:
       '@tarojs/api': 4.1.9(@tarojs/runtime@4.1.9)(@tarojs/shared@4.1.9)
-      '@tarojs/components': 4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.6)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      '@tarojs/components': 4.1.9(@tarojs/helper@4.1.9(@swc/helpers@0.5.18))(@types/react@18.3.23)(html-webpack-plugin@5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(postcss@8.5.13)(rollup@3.30.0)(webpack-chain@6.5.1)(webpack-dev-server@4.15.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))))(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       '@tarojs/helper': 4.1.9(@swc/helpers@0.5.18)
       '@tarojs/runtime': 4.1.9
       '@tarojs/shared': 4.1.9
       '@types/postcss-url': 10.0.4
-      postcss: 8.5.6
+      postcss: 8.5.13
     optionalDependencies:
       '@types/react': 18.3.23
       html-webpack-plugin: 5.6.6(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
@@ -9156,7 +9157,7 @@ snapshots:
       - '@swc/helpers'
       - supports-color
 
-  '@tarojs/webpack5-runner@4.1.11(@babel/core@7.29.0)(@swc/core@1.3.96(@swc/helpers@0.5.18))(@swc/helpers@0.5.18)(@tarojs/runtime@4.1.9)(less@3.13.1)(postcss@8.5.6)(sass@1.98.0)(stylus@0.64.0)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
+  '@tarojs/webpack5-runner@4.1.11(@babel/core@7.29.0)(@swc/core@1.3.96(@swc/helpers@0.5.18))(@swc/helpers@0.5.18)(@tarojs/runtime@4.1.9)(less@3.13.1)(postcss@8.5.13)(sass@1.98.0)(stylus@0.64.0)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))':
     dependencies:
       '@babel/core': 7.29.0
       '@tarojs/helper': 4.1.11(@swc/helpers@0.5.18)
@@ -9167,7 +9168,7 @@ snapshots:
       '@tarojs/webpack5-prebundle': 4.1.11(@swc/helpers@0.5.18)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       acorn: 8.16.0
       acorn-walk: 8.3.5
-      autoprefixer: 10.4.27(postcss@8.5.6)
+      autoprefixer: 10.4.27(postcss@8.5.13)
       babel-loader: 8.2.1(@babel/core@7.29.0)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       copy-webpack-plugin: 12.0.2(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
       css-loader: 7.1.4(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
@@ -9187,13 +9188,13 @@ snapshots:
       miniprogram-simulate: 1.6.1
       ora: 5.4.1
       picomatch: 4.0.4
-      postcss: 8.5.6
-      postcss-html-transform: 4.1.11(postcss@8.5.6)
-      postcss-import: 16.1.1(postcss@8.5.6)
-      postcss-loader: 8.2.1(postcss@8.5.6)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
-      postcss-plugin-constparse: 4.1.11(postcss@8.5.6)
-      postcss-pxtransform: 4.1.11(postcss@8.5.6)
-      postcss-url: 10.1.3(postcss@8.5.6)
+      postcss: 8.5.13
+      postcss-html-transform: 4.1.11(postcss@8.5.13)
+      postcss-import: 16.1.1(postcss@8.5.13)
+      postcss-loader: 8.2.1(postcss@8.5.13)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
+      postcss-plugin-constparse: 4.1.11(postcss@8.5.13)
+      postcss-pxtransform: 4.1.11(postcss@8.5.13)
+      postcss-url: 10.1.3(postcss@8.5.13)
       regenerator-runtime: 0.11.1
       resolve-url-loader: 5.0.0
       sass-loader: 14.2.1(sass@1.98.0)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18)))
@@ -9360,7 +9361,7 @@ snapshots:
   '@types/postcss-url@10.0.4':
     dependencies:
       '@types/node': 18.19.113
-      postcss: 8.5.6
+      postcss: 8.5.13
 
   '@types/prop-types@15.7.15': {}
 
@@ -9897,13 +9898,13 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  autoprefixer@10.4.27(postcss@8.5.6):
+  autoprefixer@10.4.27(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
       caniuse-lite: 1.0.30001784
       fraction.js: 5.3.4
       picocolors: 1.1.1
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -10589,20 +10590,20 @@ snapshots:
 
   crypto-random-string@1.0.0: {}
 
-  css-declaration-sorter@7.3.1(postcss@8.5.6):
+  css-declaration-sorter@7.3.1(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
   css-functions-list@3.2.3: {}
 
   css-loader@7.1.4(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))):
     dependencies:
-      icss-utils: 5.1.0(postcss@8.5.6)
-      postcss: 8.5.6
-      postcss-modules-extract-imports: 3.1.0(postcss@8.5.6)
-      postcss-modules-local-by-default: 4.2.0(postcss@8.5.6)
-      postcss-modules-scope: 3.2.1(postcss@8.5.6)
-      postcss-modules-values: 4.0.0(postcss@8.5.6)
+      icss-utils: 5.1.0(postcss@8.5.13)
+      postcss: 8.5.13
+      postcss-modules-extract-imports: 3.1.0(postcss@8.5.13)
+      postcss-modules-local-by-default: 4.2.0(postcss@8.5.13)
+      postcss-modules-scope: 3.2.1(postcss@8.5.13)
+      postcss-modules-values: 4.0.0(postcss@8.5.13)
       postcss-value-parser: 4.2.0
       semver: 7.7.4
     optionalDependencies:
@@ -10611,9 +10612,9 @@ snapshots:
   css-minimizer-webpack-plugin@6.0.0(esbuild@0.21.5)(lightningcss@1.32.0)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
-      cssnano: 6.1.2(postcss@8.5.6)
+      cssnano: 6.1.2(postcss@8.5.13)
       jest-worker: 29.7.0
-      postcss: 8.5.6
+      postcss: 8.5.13
       schema-utils: 4.3.3
       serialize-javascript: 6.0.2
       webpack: 5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))
@@ -10661,49 +10662,49 @@ snapshots:
 
   cssesc@3.0.0: {}
 
-  cssnano-preset-default@6.1.2(postcss@8.5.6):
+  cssnano-preset-default@6.1.2(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
-      css-declaration-sorter: 7.3.1(postcss@8.5.6)
-      cssnano-utils: 4.0.2(postcss@8.5.6)
-      postcss: 8.5.6
-      postcss-calc: 9.0.1(postcss@8.5.6)
-      postcss-colormin: 6.1.0(postcss@8.5.6)
-      postcss-convert-values: 6.1.0(postcss@8.5.6)
-      postcss-discard-comments: 6.0.2(postcss@8.5.6)
-      postcss-discard-duplicates: 6.0.3(postcss@8.5.6)
-      postcss-discard-empty: 6.0.3(postcss@8.5.6)
-      postcss-discard-overridden: 6.0.2(postcss@8.5.6)
-      postcss-merge-longhand: 6.0.5(postcss@8.5.6)
-      postcss-merge-rules: 6.1.1(postcss@8.5.6)
-      postcss-minify-font-values: 6.1.0(postcss@8.5.6)
-      postcss-minify-gradients: 6.0.3(postcss@8.5.6)
-      postcss-minify-params: 6.1.0(postcss@8.5.6)
-      postcss-minify-selectors: 6.0.4(postcss@8.5.6)
-      postcss-normalize-charset: 6.0.2(postcss@8.5.6)
-      postcss-normalize-display-values: 6.0.2(postcss@8.5.6)
-      postcss-normalize-positions: 6.0.2(postcss@8.5.6)
-      postcss-normalize-repeat-style: 6.0.2(postcss@8.5.6)
-      postcss-normalize-string: 6.0.2(postcss@8.5.6)
-      postcss-normalize-timing-functions: 6.0.2(postcss@8.5.6)
-      postcss-normalize-unicode: 6.1.0(postcss@8.5.6)
-      postcss-normalize-url: 6.0.2(postcss@8.5.6)
-      postcss-normalize-whitespace: 6.0.2(postcss@8.5.6)
-      postcss-ordered-values: 6.0.2(postcss@8.5.6)
-      postcss-reduce-initial: 6.1.0(postcss@8.5.6)
-      postcss-reduce-transforms: 6.0.2(postcss@8.5.6)
-      postcss-svgo: 6.0.3(postcss@8.5.6)
-      postcss-unique-selectors: 6.0.4(postcss@8.5.6)
+      css-declaration-sorter: 7.3.1(postcss@8.5.13)
+      cssnano-utils: 4.0.2(postcss@8.5.13)
+      postcss: 8.5.13
+      postcss-calc: 9.0.1(postcss@8.5.13)
+      postcss-colormin: 6.1.0(postcss@8.5.13)
+      postcss-convert-values: 6.1.0(postcss@8.5.13)
+      postcss-discard-comments: 6.0.2(postcss@8.5.13)
+      postcss-discard-duplicates: 6.0.3(postcss@8.5.13)
+      postcss-discard-empty: 6.0.3(postcss@8.5.13)
+      postcss-discard-overridden: 6.0.2(postcss@8.5.13)
+      postcss-merge-longhand: 6.0.5(postcss@8.5.13)
+      postcss-merge-rules: 6.1.1(postcss@8.5.13)
+      postcss-minify-font-values: 6.1.0(postcss@8.5.13)
+      postcss-minify-gradients: 6.0.3(postcss@8.5.13)
+      postcss-minify-params: 6.1.0(postcss@8.5.13)
+      postcss-minify-selectors: 6.0.4(postcss@8.5.13)
+      postcss-normalize-charset: 6.0.2(postcss@8.5.13)
+      postcss-normalize-display-values: 6.0.2(postcss@8.5.13)
+      postcss-normalize-positions: 6.0.2(postcss@8.5.13)
+      postcss-normalize-repeat-style: 6.0.2(postcss@8.5.13)
+      postcss-normalize-string: 6.0.2(postcss@8.5.13)
+      postcss-normalize-timing-functions: 6.0.2(postcss@8.5.13)
+      postcss-normalize-unicode: 6.1.0(postcss@8.5.13)
+      postcss-normalize-url: 6.0.2(postcss@8.5.13)
+      postcss-normalize-whitespace: 6.0.2(postcss@8.5.13)
+      postcss-ordered-values: 6.0.2(postcss@8.5.13)
+      postcss-reduce-initial: 6.1.0(postcss@8.5.13)
+      postcss-reduce-transforms: 6.0.2(postcss@8.5.13)
+      postcss-svgo: 6.0.3(postcss@8.5.13)
+      postcss-unique-selectors: 6.0.4(postcss@8.5.13)
 
-  cssnano-utils@4.0.2(postcss@8.5.6):
+  cssnano-utils@4.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  cssnano@6.1.2(postcss@8.5.6):
+  cssnano@6.1.2(postcss@8.5.13):
     dependencies:
-      cssnano-preset-default: 6.1.2(postcss@8.5.6)
+      cssnano-preset-default: 6.1.2(postcss@8.5.13)
       lilconfig: 3.1.3
-      postcss: 8.5.6
+      postcss: 8.5.13
 
   csso@3.5.1:
     dependencies:
@@ -12247,13 +12248,13 @@ snapshots:
 
   ics@3.11.0:
     dependencies:
-      nanoid: 3.3.11
+      nanoid: 3.3.12
       runes2: 1.1.4
       yup: 1.7.1
 
-  icss-utils@5.1.0(postcss@8.5.6):
+  icss-utils@5.1.0(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
   identity-obj-proxy@3.0.0:
     dependencies:
@@ -13127,7 +13128,7 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  nanoid@3.3.11: {}
+  nanoid@3.3.12: {}
 
   native-request@1.1.2:
     optional: true
@@ -13528,196 +13529,196 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-calc@9.0.1(postcss@8.5.6):
+  postcss-calc@9.0.1(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-selector-parser: 6.1.2
       postcss-value-parser: 4.2.0
 
-  postcss-colormin@6.1.0(postcss@8.5.6):
+  postcss-colormin@6.1.0(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
       caniuse-api: 3.0.0
       colord: 2.9.3
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-convert-values@6.1.0(postcss@8.5.6):
+  postcss-convert-values@6.1.0(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-discard-comments@6.0.2(postcss@8.5.6):
+  postcss-discard-comments@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-discard-duplicates@6.0.3(postcss@8.5.6):
+  postcss-discard-duplicates@6.0.3(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-discard-empty@6.0.3(postcss@8.5.6):
+  postcss-discard-empty@6.0.3(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-discard-overridden@6.0.2(postcss@8.5.6):
+  postcss-discard-overridden@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-html-transform@4.1.11(postcss@8.5.6):
+  postcss-html-transform@4.1.11(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-import@16.1.1(postcss@8.5.6):
+  postcss-import@16.1.1(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.11
 
-  postcss-loader@8.2.1(postcss@8.5.6)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))):
+  postcss-loader@8.2.1(postcss@8.5.13)(typescript@5.9.3)(webpack@5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))):
     dependencies:
       cosmiconfig: 9.0.1(typescript@5.9.3)
       jiti: 2.6.1
-      postcss: 8.5.6
+      postcss: 8.5.13
       semver: 7.7.4
     optionalDependencies:
       webpack: 5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))
     transitivePeerDependencies:
       - typescript
 
-  postcss-merge-longhand@6.0.5(postcss@8.5.6):
+  postcss-merge-longhand@6.0.5(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
-      stylehacks: 6.1.1(postcss@8.5.6)
+      stylehacks: 6.1.1(postcss@8.5.13)
 
-  postcss-merge-rules@6.1.1(postcss@8.5.6):
+  postcss-merge-rules@6.1.1(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
       caniuse-api: 3.0.0
-      cssnano-utils: 4.0.2(postcss@8.5.6)
-      postcss: 8.5.6
+      cssnano-utils: 4.0.2(postcss@8.5.13)
+      postcss: 8.5.13
       postcss-selector-parser: 6.1.2
 
-  postcss-minify-font-values@6.1.0(postcss@8.5.6):
+  postcss-minify-font-values@6.1.0(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-minify-gradients@6.0.3(postcss@8.5.6):
+  postcss-minify-gradients@6.0.3(postcss@8.5.13):
     dependencies:
       colord: 2.9.3
-      cssnano-utils: 4.0.2(postcss@8.5.6)
-      postcss: 8.5.6
+      cssnano-utils: 4.0.2(postcss@8.5.13)
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-minify-params@6.1.0(postcss@8.5.6):
+  postcss-minify-params@6.1.0(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
-      cssnano-utils: 4.0.2(postcss@8.5.6)
-      postcss: 8.5.6
+      cssnano-utils: 4.0.2(postcss@8.5.13)
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-minify-selectors@6.0.4(postcss@8.5.6):
+  postcss-minify-selectors@6.0.4(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-selector-parser: 6.1.2
 
-  postcss-modules-extract-imports@3.1.0(postcss@8.5.6):
+  postcss-modules-extract-imports@3.1.0(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-modules-local-by-default@4.2.0(postcss@8.5.6):
+  postcss-modules-local-by-default@4.2.0(postcss@8.5.13):
     dependencies:
-      icss-utils: 5.1.0(postcss@8.5.6)
-      postcss: 8.5.6
+      icss-utils: 5.1.0(postcss@8.5.13)
+      postcss: 8.5.13
       postcss-selector-parser: 7.1.1
       postcss-value-parser: 4.2.0
 
-  postcss-modules-scope@3.2.1(postcss@8.5.6):
+  postcss-modules-scope@3.2.1(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-selector-parser: 7.1.1
 
-  postcss-modules-values@4.0.0(postcss@8.5.6):
+  postcss-modules-values@4.0.0(postcss@8.5.13):
     dependencies:
-      icss-utils: 5.1.0(postcss@8.5.6)
-      postcss: 8.5.6
+      icss-utils: 5.1.0(postcss@8.5.13)
+      postcss: 8.5.13
 
-  postcss-normalize-charset@6.0.2(postcss@8.5.6):
+  postcss-normalize-charset@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-normalize-display-values@6.0.2(postcss@8.5.6):
+  postcss-normalize-display-values@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-normalize-positions@6.0.2(postcss@8.5.6):
+  postcss-normalize-positions@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-normalize-repeat-style@6.0.2(postcss@8.5.6):
+  postcss-normalize-repeat-style@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-normalize-string@6.0.2(postcss@8.5.6):
+  postcss-normalize-string@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-normalize-timing-functions@6.0.2(postcss@8.5.6):
+  postcss-normalize-timing-functions@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-normalize-unicode@6.1.0(postcss@8.5.6):
+  postcss-normalize-unicode@6.1.0(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-normalize-url@6.0.2(postcss@8.5.6):
+  postcss-normalize-url@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-normalize-whitespace@6.0.2(postcss@8.5.6):
+  postcss-normalize-whitespace@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-ordered-values@6.0.2(postcss@8.5.6):
+  postcss-ordered-values@6.0.2(postcss@8.5.13):
     dependencies:
-      cssnano-utils: 4.0.2(postcss@8.5.6)
-      postcss: 8.5.6
+      cssnano-utils: 4.0.2(postcss@8.5.13)
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-plugin-constparse@4.1.11(postcss@8.5.6):
+  postcss-plugin-constparse@4.1.11(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-pxtransform@4.1.11(postcss@8.5.6):
+  postcss-pxtransform@4.1.11(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-reduce-initial@6.1.0(postcss@8.5.6):
+  postcss-reduce-initial@6.1.0(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
       caniuse-api: 3.0.0
-      postcss: 8.5.6
+      postcss: 8.5.13
 
-  postcss-reduce-transforms@6.0.2(postcss@8.5.6):
+  postcss-reduce-transforms@6.0.2(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
 
-  postcss-safe-parser@7.0.1(postcss@8.5.6):
+  postcss-safe-parser@7.0.1(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
 
   postcss-selector-parser@6.1.2:
     dependencies:
@@ -13729,23 +13730,23 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss-svgo@6.0.3(postcss@8.5.6):
+  postcss-svgo@6.0.3(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-value-parser: 4.2.0
       svgo: 3.3.3
 
-  postcss-unique-selectors@6.0.4(postcss@8.5.6):
+  postcss-unique-selectors@6.0.4(postcss@8.5.13):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-selector-parser: 6.1.2
 
-  postcss-url@10.1.3(postcss@8.5.6):
+  postcss-url@10.1.3(postcss@8.5.13):
     dependencies:
       make-dir: 3.1.0
       mime: 2.5.2
       minimatch: 3.0.8
-      postcss: 8.5.6
+      postcss: 8.5.13
       xxhashjs: 0.2.2
 
   postcss-value-parser@4.2.0: {}
@@ -13755,9 +13756,9 @@ snapshots:
       picocolors: 0.2.1
       source-map: 0.6.1
 
-  postcss@8.5.6:
+  postcss@8.5.13:
     dependencies:
-      nanoid: 3.3.11
+      nanoid: 3.3.12
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -14066,7 +14067,7 @@ snapshots:
       adjust-sourcemap-loader: 4.0.0
       convert-source-map: 1.9.0
       loader-utils: 2.0.4
-      postcss: 8.5.6
+      postcss: 8.5.13
       source-map: 0.6.1
 
   resolve@1.22.10:
@@ -14353,7 +14354,7 @@ snapshots:
 
   shortid@2.2.17:
     dependencies:
-      nanoid: 3.3.11
+      nanoid: 3.3.12
 
   side-channel-list@1.0.0:
     dependencies:
@@ -14638,10 +14639,10 @@ snapshots:
     dependencies:
       webpack: 5.105.4(@swc/core@1.3.96(@swc/helpers@0.5.18))
 
-  stylehacks@6.1.1(postcss@8.5.6):
+  stylehacks@6.1.1(postcss@8.5.13):
     dependencies:
       browserslist: 4.28.2
-      postcss: 8.5.6
+      postcss: 8.5.13
       postcss-selector-parser: 6.1.2
 
   stylelint@17.1.0(typescript@5.9.3):
@@ -14675,8 +14676,8 @@ snapshots:
       micromatch: 4.0.8
       normalize-path: 3.0.0
       picocolors: 1.1.1
-      postcss: 8.5.6
-      postcss-safe-parser: 7.0.1(postcss@8.5.6)
+      postcss: 8.5.13
+      postcss-safe-parser: 7.0.1(postcss@8.5.13)
       postcss-selector-parser: 7.1.1
       postcss-value-parser: 4.2.0
       string-width: 8.1.1
