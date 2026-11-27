@@ -65,7 +65,7 @@ export default defineConfig<"webpack5">(async (merge, { command, mode }) => {
       },
     },
     h5: {
-      publicPath: "/oni/",
+      publicPath: "/",
       staticDirectory: "static",
       output: {
         filename: "js/[name].[hash:8].js",
