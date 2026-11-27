@@ -5,9 +5,10 @@
 ## 已确认技术决策
 
 1. **前端技术栈**：保留现有 **Taro + React** 方案，升级 Taro 与京东组件库（NutUI React Taro）至最新版。
-2. **游戏数据与静态资源**：先搭建 **Wiki 数据提取管线**；静态图片**继续托管在自有服务器（暂不迁移 OSS/COS）**，统一做图片压缩优化。
-3. **线性规划计算器**：延后至后续独立 Session 推进，当前仅在路线图中保留规划。
-4. **目标平台**：以微信小程序为核心发布平台。H5 仅用于本地开发预览与自动化验证，不再部署到线上，也不做 PC 端宽屏适配。
+2. **版本与线上共存**：开发分支为 **`v4`**，版本号 **`4.0.0`**。由于线上运行中的 2.2.x 已占用 `/upload/oni/v3/...` 与 `/api/v1/yml/{entry,calculator}/*`，V4 的新数据与新静态资源统一隔离在 **`/upload/oni/v4/...`**（及独立数据路径）下与老版本共存；待 V4 正式上线并稳定运行一段时间后，再移除 2.2.x 的旧资源与后端老接口。
+3. **游戏数据与静态资源**：先搭建 **Wiki 数据提取管线**；静态图片**继续托管在自有服务器（暂不迁移 OSS/COS）**，统一做图片压缩优化。
+4. **线性规划计算器**：延后至后续独立 Session 推进，当前仅在路线图中保留规划。
+5. **目标平台**：以微信小程序为核心发布平台。H5 仅用于本地开发预览与自动化验证，不再部署到线上，也不做 PC 端宽屏适配。
 
 ---
 
@@ -21,12 +22,16 @@
 
 ---
 
-## Phase 2：Wiki 游戏数据管线与静态图片压缩（下一 Session）
+## Phase 2：Wiki 整体改造与静态图片压缩（进行中）
 
+### Part A：整体 Wiki 改造与游戏数据管线
 - [ ] 在 Mac 安装《缺氧》游戏，定位 `Assembly-CSharp.dll`、本地化 `.po` 与贴图资源路径
-- [ ] 审计前后端现有 Wiki 数据结构（`src/contexts/WikiContext.tsx`、`src/pages/wiki/`、`src/components/wiki/` 及后端接口），定义可版本化的统一 Wiki Schema
-- [ ] 搭建「游戏导出（反编译或轻量导出 Mod）→ 清洗校验 → Diff → 一键上传服务器」工作流
-- [ ] 对现有服务器静态图片做批量压缩（如 WebP / 无损压缩），优化加载体验与流量占用
+- [ ] 审计前后端现有 Wiki 数据结构（`src/contexts/WikiContext.tsx`、`src/pages/wiki/`、`src/components/wiki/` 及后端接口），定义可版本化的统一 V4 Wiki Schema（与线上 2.2.x 隔离共存）
+- [ ] 搭建「游戏导出（反编译或轻量导出 Mod）→ 清洗校验 → Diff → 一键上传服务器（`/upload/oni/v4/`）」工作流
+- [ ] 重构小程序 Wiki 前端页面与交互组件，切至 V4 数据与资源路径
+
+### Part B：静态图片压缩优化
+- [ ] 对 V4 静态图片统一做批量压缩（如 WebP / 无损压缩），优化加载体验与流量占用（不改动线上 2.2.x 的 `/upload/oni/v3/` 目录）
 
 ---
 
@@ -42,10 +47,9 @@
 
 ## Handoff（Phase 1 → Phase 2 交接）
 
-- **本地仓库**：`/Users/wayne/code/oni`（当前分支 `master`，改动未 commit，含 `package.json`、`pnpm-lock.yaml`、`ROADMAP.md`；注意远端 `origin/dev` 另有 1 个广告位相关提交 `02ecd60`）
+- **本地仓库**：`/Users/wayne/code/oni`（当前分支 `v4`，版本 `4.0.0`；注意远端 `origin/dev` 另有 1 个广告位相关提交 `02ecd60`）
 - **Phase 1 成果**：Taro 全面对齐至 `4.3.3`，NutUI 升级至 `4.0.0` / Icons `4.1.1`，小程序与 H5 构建均通过（`dist/weapp` 总大小 `1.0M`）。
-- **人工确认项（进入 Phase 2 前建议顺手做）**：
+- **人工确认项**：
   1. 用微信开发者工具打开 `/Users/wayne/code/oni`（或 `dist/weapp`）真机/模拟器目视抽查页面样式（尤其是 `InputNumber`、`Collapse`、`Popup`、`Radio` 在 NutUI v4 下的外观与间距）。
-  2. 确认无误后在本地提交/合并变更。
-  3. 留意 `src/pages/other-tools/food/food.tsx:275` 有一处原有未使用参数 `preferredMachine`（`tsc` 报 `TS6133`），以及 NutUI v4 `InputNumber` 的一条无害 `postcss-calc` 压缩 warning（不阻断构建）。
-- **下一 Session 启动入口**：直接读取 `/Users/wayne/code/oni/ROADMAP.md`，从 **Phase 2** 开始——先审计 `src/contexts/WikiContext.tsx`、`src/pages/wiki/` 与对应后端 Wiki 数据结构，再对接 Mac 本机已安装的《缺氧》游戏目录搭建 Wiki 数据提取与图片压缩管线。
+  2. 留意 `src/pages/other-tools/food/food.tsx:275` 有一处原有未使用参数 `preferredMachine`（`tsc` 报 `TS6133`），以及 NutUI v4 `InputNumber` 的一条无害 `postcss-calc` 压缩 warning（不阻断构建）。
+- **当前推进入口**：从 **Phase 2 Part A（整体 Wiki 改造）** 开始，确保所有新数据与静态资源均落在新路径 `/upload/oni/v4/` 下，与线上 2.2.x 无冲突共存。
